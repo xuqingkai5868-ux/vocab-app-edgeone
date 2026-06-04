@@ -937,6 +937,16 @@ function render() {
     userSwitch.classList.add('hidden');
   }
 
+  // Reset button (admin only — 哥哥弟弟不能有重置按钮)
+  const resetBtn = document.getElementById('reset-btn');
+  if (resetBtn) {
+    if (auth.role === 'admin') {
+      resetBtn.classList.remove('hidden');
+    } else {
+      resetBtn.classList.add('hidden');
+    }
+  }
+
   // Day nav
   document.getElementById('current-day').textContent = u.currentDay;
   document.getElementById('prev-day').disabled = u.currentDay <= 1;
@@ -1382,6 +1392,11 @@ async function doLogin() {
 }
 
 async function doReset() {
+  // 防御性二次校验：重置仅限管理员（UI 已隐藏，但防 DevTools 误调）
+  if (auth.role !== 'admin') {
+    showToast('无权操作：仅管理员可重置进度');
+    return;
+  }
   let label = auth.name;
   if (!isViewingSelf) {
     const target = summaryCache && summaryCache[viewingUserId];
