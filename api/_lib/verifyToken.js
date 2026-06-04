@@ -2,7 +2,7 @@
 // Vercel Functions（独立部署）不支持 middleware.js
 // 所以每个需要鉴权的 API 在函数体内先调用此工具
 
-import { kv } from '@vercel/kv';
+import { redis, K } from './kv.js';
 
 export async function verifyToken(req) {
   const auth = req.headers.get('authorization') || req.headers.get('Authorization') || '';
@@ -12,7 +12,7 @@ export async function verifyToken(req) {
     return { error: 'unauthorized', status: 401, message: '缺少登录凭证' };
   }
 
-  const sessionRaw = await kv.get(`session:${token}`);
+  const sessionRaw = await redis.get(K.session(token));
   if (!sessionRaw) {
     return { error: 'invalid_token', status: 401, message: '登录已失效，请重新登录' };
   }
@@ -21,12 +21,12 @@ export async function verifyToken(req) {
   try {
     session = typeof sessionRaw === 'string' ? JSON.parse(sessionRaw) : sessionRaw;
   } catch {
-    await kv.del(`session:${token}`);
+    await redis.del(K.session(token));
     return { error: 'corrupted_session', status: 401, message: '会话数据损坏' };
   }
 
   if (!session.expiresAt || session.expiresAt < Date.now()) {
-    await kv.del(`session:${token}`);
+    await redis.del(K.session(token));
     return { error: 'expired', status: 401, message: '登录已过期，请重新登录' };
   }
 

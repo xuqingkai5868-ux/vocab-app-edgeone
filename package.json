@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "暑假共学背单词系统 - Vercel Functions + Vercel KV",
+  "description": "暑假共学背单词系统 - Vercel Functions + ioredis",
   "scripts": {
     "dev": "vercel dev",
     "deploy": "vercel --prod",
     "deploy-preview": "vercel"
   },
   "dependencies": {
-    "@vercel/kv": "^2.0.0"
+    "ioredis": "^5.4.1"
   },
   "devDependencies": {
     "vercel": "^34.0.0"
