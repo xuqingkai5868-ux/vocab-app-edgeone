@@ -34,15 +34,20 @@ export async function POST(req) {
   // 检查是否已 seed 过
   const existingAdminUser = await kvGet(K.user('admin'));
   if (existingAdminUser) {
-    if (!adminConfirmPin) {
-      return json({
-        error: 'already_seeded',
-        message: '已初始化过，需要传 adminConfirmPin 才能覆盖'
-      }, 403);
-    }
-    const storedAdminPin = await kvGet(K.pin('admin'));
-    if (String(adminConfirmPin) !== String(storedAdminPin)) {
-      return json({ error: 'wrong_admin_pin' }, 403);
+    if (body.force === true) {
+      // 强制覆盖：用于修复历史坏数据（与本次请求的 pins.admin 一致即可，不必匹配旧的存储）
+      console.warn('[seed] force overwrite mode');
+    } else {
+      if (!adminConfirmPin) {
+        return json({
+          error: 'already_seeded',
+          message: '已初始化过，需要传 adminConfirmPin 才能覆盖'
+        }, 403);
+      }
+      const storedAdminPin = await kvGet(K.pin('admin'));
+      if (String(adminConfirmPin) !== String(storedAdminPin)) {
+        return json({ error: 'wrong_admin_pin' }, 403);
+      }
     }
   }
 
