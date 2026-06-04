@@ -1,5 +1,5 @@
 // ===== POST /api/seed =====
-// Vercel Node.js Function
+// Vercel Function (Web fetch-style)
 // 初始化 3 个账号（PIN + 资料 + 空 state）
 // 首次 seed：开放（无 admin 存在即可）
 // 再次 seed：需要传 adminConfirmPin（admin 账号的 PIN）才能覆盖
@@ -18,11 +18,7 @@
 import { K, kvGet, kvSetJSON, kvGetJSON } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 
-export default async function handler(req) {
-  if (req.method !== 'POST') {
-    return json({ error: 'method_not_allowed' }, 405);
-  }
-
+export async function POST(req) {
   let body;
   try {
     body = await req.json();

@@ -1,5 +1,5 @@
 // ===== POST /api/login =====
-// Vercel Node.js Function
+// Vercel Function (Web fetch-style)
 // 4 位 PIN 登录 → 返回 token + user 信息
 // 请求体：{ userId: "gao"|"di"|"admin", pin: "1234" }
 // 响应：{ token, user: { id, name, role, grade? }, expiresAt }
@@ -7,11 +7,7 @@
 import { K, kvGet, kvSetJSON } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 
-export default async function handler(req) {
-  if (req.method !== 'POST') {
-    return json({ error: 'method_not_allowed' }, 405);
-  }
-
+export async function POST(req) {
   let body;
   try {
     body = await req.json();

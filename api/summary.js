@@ -1,5 +1,5 @@
 // ===== GET /api/summary =====
-// Vercel Node.js Function
+// Vercel Function (Web fetch-style)
 // 返回所有用户进度概览，按角色过滤敏感度：
 //   admin → 看所有人的 full state（含 currentDay）
 //   user  → 看自己 full + 看别人百分比（mastered/fuzzy 计数）
@@ -10,11 +10,7 @@ import { K, kvGet, kvGetJSON, kvKeysByPrefix } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 import { verifyToken } from './_lib/verifyToken.js';
 
-export default async function handler(req) {
-  if (req.method !== 'GET') {
-    return json({ error: 'method_not_allowed' }, 405);
-  }
-
+export async function GET(req) {
   const auth = await verifyToken(req);
   if (auth.error) return json({ error: auth.error, message: auth.message }, auth.status);
 

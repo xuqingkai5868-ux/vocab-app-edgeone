@@ -1,5 +1,5 @@
 // ===== GET /api/me =====
-// Vercel Node.js Function
+// Vercel Function (Web fetch-style)
 // 返回当前登录用户的资料
 // 响应：{ user: { id, name, role, grade? } }
 
@@ -7,11 +7,7 @@ import { K, kvGet } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 import { verifyToken } from './_lib/verifyToken.js';
 
-export default async function handler(req) {
-  if (req.method !== 'GET') {
-    return json({ error: 'method_not_allowed' }, 405);
-  }
-
+export async function GET(req) {
   const auth = await verifyToken(req);
   if (auth.error) return json({ error: auth.error, message: auth.message }, auth.status);
 

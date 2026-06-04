@@ -1,5 +1,5 @@
 // ===== POST /api/reset =====
-// Vercel Node.js Function
+// Vercel Function (Web fetch-style)
 // 重置某用户进度（currentDay → 1, states → {}）
 // user 只能重置自己；admin 可重置任意（body 传 userId）
 // 请求体（可选）：{ userId: "gao" }
@@ -8,11 +8,7 @@ import { K, kvSetJSON } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 import { verifyToken } from './_lib/verifyToken.js';
 
-export default async function handler(req) {
-  if (req.method !== 'POST') {
-    return json({ error: 'method_not_allowed' }, 405);
-  }
-
+export async function POST(req) {
   const auth = await verifyToken(req);
   if (auth.error) return json({ error: auth.error, message: auth.message }, auth.status);
 
