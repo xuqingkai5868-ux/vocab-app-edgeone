@@ -2,7 +2,7 @@
 // EdgeOne Pages Edge Function (onRequest style)
 // 初始化 3 个账号（PIN + 资料 + 空 state）
 // 首次 seed：开放（无 admin 存在即可）
-// 再次 seed：需要传 adminConfirmPin（admin 账号的 PIN）才能覆盖；或 force:true
+// 再次 seed：需要传 adminConfirmPin（admin 账号的 PIN）才能覆盖
 //
 // 请求体：
 // {
@@ -13,7 +13,6 @@
 //   },
 //   pins: { gao: "1234", di: "5678", admin: "9999" },
 //   adminConfirmPin?: "9999"   // 已 seed 过时必填
-//   force?: true                // 强制覆盖（修复历史坏数据）
 // }
 
 import { K, kvGet, kvSet, kvSetJSON, kvGetJSON } from './_lib/kv.js';
@@ -35,20 +34,18 @@ export async function onRequestPost({ request }) {
   // 检查是否已 seed 过
   const existingAdminUser = await kvGet(K.user('admin'));
   if (existingAdminUser) {
-    if (body.force === true) {
-      // 强制覆盖：用于修复历史坏数据（与本次请求的 pins.admin 一致即可，不必匹配旧的存储）
-      console.warn('[seed] force overwrite mode');
-    } else {
-      if (!adminConfirmPin) {
-        return json({
-          error: 'already_seeded',
-          message: '已初始化过，需要传 adminConfirmPin 才能覆盖'
-        }, 403);
-      }
-      const storedAdminPin = await kvGet(K.pin('admin'));
-      if (String(adminConfirmPin) !== String(storedAdminPin)) {
-        return json({ error: 'wrong_admin_pin' }, 403);
-      }
+    const storedAdminPin = await kvGet(K.pin('admin'));
+    if (!storedAdminPin) {
+      return json({ error: 'admin_pin_missing', message: '管理员 PIN 缺失，不能通过公开 seed 覆盖' }, 403);
+    }
+    if (!adminConfirmPin) {
+      return json({
+        error: 'already_seeded',
+        message: '已初始化过，需要传 adminConfirmPin 才能覆盖'
+      }, 403);
+    }
+    if (String(adminConfirmPin) !== String(storedAdminPin)) {
+      return json({ error: 'wrong_admin_pin' }, 403);
     }
   }
 

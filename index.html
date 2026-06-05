@@ -794,7 +794,39 @@ let summaryCache = null;
 let isViewingSelf = true;
 let selectedLoginUser = null;
 
-function wordId(w) { return w.theme + '|' + w.word; }
+function wordId(w) {
+  const idx = w.themeIdx != null ? w.themeIdx : '';
+  return w.theme + '|' + idx + '|' + w.word;
+}
+function legacyWordId(w) { return w.theme + '|' + w.word; }
+function getWordState(u, w) {
+  if (!u || !u.states) return 'new';
+  return u.states[wordId(w)] || u.states[legacyWordId(w)] || 'new';
+}
+function migrateStateKeys(state) {
+  if (!state || !state.states || typeof state.states !== 'object') return false;
+  let changed = false;
+  const legacyIds = new Set();
+  for (const day of SCHEDULE) {
+    if (day.type !== '新词') continue;
+    for (const w of day.words) {
+      const id = wordId(w);
+      const legacyId = legacyWordId(w);
+      if (state.states[legacyId] && !state.states[id]) {
+        state.states[id] = state.states[legacyId];
+        changed = true;
+      }
+      legacyIds.add(legacyId);
+    }
+  }
+  legacyIds.forEach(id => {
+    if (state.states[id]) {
+      delete state.states[id];
+      changed = true;
+    }
+  });
+  return changed;
+}
 
 async function api(path, opts = {}) {
   const headers = { 'Content-Type': 'application/json', ...(opts.headers || {}) };
@@ -849,8 +881,10 @@ function logout() {
 async function loadMe() {
   const r = await api('/api/state');
   currentState = r.state;
+  const migrated = migrateStateKeys(currentState);
   viewingUserId = auth.userId;
   isViewingSelf = true;
+  if (migrated) await saveCurrentState();
   summaryCache = await api('/api/summary');
 }
 
@@ -860,6 +894,8 @@ async function switchViewUser(uid) {
     viewingUserId = auth.userId;
     const r = await api('/api/state');
     currentState = r.state;
+    const migrated = migrateStateKeys(currentState);
+    if (migrated) await saveCurrentState();
     summaryCache = await api('/api/summary');
   } else {
     if (auth.role !== 'admin') {
@@ -868,6 +904,7 @@ async function switchViewUser(uid) {
     }
     const r = await api('/api/state?userId=' + encodeURIComponent(uid));
     currentState = r.state;
+    migrateStateKeys(currentState);
     viewingUserId = uid;
     isViewingSelf = false;
     summaryCache = await api('/api/summary');
@@ -898,6 +935,16 @@ async function refreshSummary() {
 
 function getUserState() { return currentState; }
 
+function escapeHTML(value) {
+  return String(value ?? '').replace(/[&<>"']/g, ch => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }[ch]));
+}
+
 // ===== Stats =====
 function getStats() {
   const u = getUserState();
@@ -906,7 +953,7 @@ function getStats() {
   for (const day of SCHEDULE) {
     if (day.type !== '新词') continue;
     for (const w of day.words) {
-      const s = u.states[wordId(w)];
+      const s = getWordState(u, w);
       if (s === 'mastered') { mastered++; learned++; }
       else if (s === 'fuzzy') { fuzzy++; learned++; }
     }
@@ -1020,7 +1067,7 @@ function renderRoleExtras() {
       .filter(([id]) => id !== auth.userId)
       .map(([id, p]) => {
         const percent = TOTAL_WORDS ? (p.mastered / TOTAL_WORDS * 100) : 0;
-        return { id, name: p.name, percent, mastered: p.mastered, fuzzy: p.fuzzy };
+        return { id, name: escapeHTML(p.name || id), percent, mastered: p.mastered, fuzzy: p.fuzzy };
       });
     if (peers.length > 0) {
       peersEl.classList.remove('hidden');
@@ -1043,7 +1090,13 @@ function renderRoleExtras() {
   if (auth.role === 'admin' && summaryCache) {
     const all = Object.entries(summaryCache).map(([id, p]) => {
       const percent = TOTAL_WORDS ? (p.mastered / TOTAL_WORDS * 100) : 0;
-      return Object.assign({ id }, p, { percent });
+      return Object.assign({}, p, {
+        id: escapeHTML(id),
+        name: escapeHTML(p.name || id),
+        role: p.role,
+        grade: escapeHTML(p.grade || ''),
+        percent
+      });
     });
     adminEl.classList.remove('hidden');
     adminEl.innerHTML = '<h3>🔑 所有用户详情</h3>' + all.map(p => (
@@ -1074,7 +1127,10 @@ function renderNewDay(container, day) {
 
   day.words.forEach((w, i) => {
     const id = wordId(w);
-    const s = u.states[id] || 'new';
+    const legacyId = legacyWordId(w);
+    const attrId = escapeHTML(id);
+    const attrLegacyId = escapeHTML(legacyId);
+    const s = getWordState(u, w);
     const card = document.createElement('div');
     card.className = 'word-card ' + s;
     card.innerHTML = (
@@ -1083,7 +1139,7 @@ function renderNewDay(container, day) {
         '<div class="word-en">' + w.word + '<span class="word-cn-inline">' + w.cn + '</span></div>' +
         (w.phrase ? '<div class="word-phrase">' + w.phrase + '</div>' : '<div class="word-phrase">&nbsp;</div>') +
       '</div>' +
-      '<button class="state-btn ' + s + '" data-word-id="' + id + '" data-idx="' + i + '">' +
+      '<button class="state-btn ' + s + '" data-word-id="' + attrId + '" data-legacy-id="' + attrLegacyId + '" data-state="' + s + '" data-idx="' + i + '">' +
         (s === 'mastered' ? '✓' : s === 'fuzzy' ? '⭐' : '○') +
       '</button>'
     );
@@ -1102,7 +1158,10 @@ function renderReviewDay(container, day) {
     let html = '<h3>📚 ' + theme + '</h3><div class="word-list">';
     themeWords.forEach((w, i) => {
       const id = wordId(w);
-      const s = u.states[id] || 'new';
+      const legacyId = legacyWordId(w);
+      const attrId = escapeHTML(id);
+      const attrLegacyId = escapeHTML(legacyId);
+      const s = getWordState(u, w);
       html += (
         '<div class="word-card ' + s + '">' +
           '<div class="word-idx">' + (i + 1) + '</div>' +
@@ -1110,7 +1169,7 @@ function renderReviewDay(container, day) {
             '<div class="word-en">' + w.word + '<span class="word-cn-inline">' + w.cn + '</span></div>' +
             (w.phrase ? '<div class="word-phrase">' + w.phrase + '</div>' : '<div class="word-phrase">&nbsp;</div>') +
           '</div>' +
-          '<button class="state-btn ' + s + '" data-word-id="' + id + '" data-idx="r' + i + '">' + (s === 'mastered' ? '✓' : s === 'fuzzy' ? '⭐' : '○') + '</button>' +
+          '<button class="state-btn ' + s + '" data-word-id="' + attrId + '" data-legacy-id="' + attrLegacyId + '" data-state="' + s + '" data-idx="r' + i + '">' + (s === 'mastered' ? '✓' : s === 'fuzzy' ? '⭐' : '○') + '</button>' +
         '</div>'
       );
     });
@@ -1126,6 +1185,9 @@ function renderReviewDay(container, day) {
     let html = '<h3>⭐ 模糊回炉</h3><div class="word-list">';
     fuzzyWords.forEach((w, i) => {
       const id = wordId(w);
+      const legacyId = legacyWordId(w);
+      const attrId = escapeHTML(id);
+      const attrLegacyId = escapeHTML(legacyId);
       html += (
         '<div class="word-card fuzzy">' +
           '<div class="word-idx">' + (i + 1) + '</div>' +
@@ -1133,7 +1195,7 @@ function renderReviewDay(container, day) {
             '<div class="word-en">' + w.word + '<span class="word-cn-inline">' + w.cn + '</span></div>' +
             (w.phrase ? '<div class="word-phrase">' + w.phrase + '</div>' : '<div class="word-phrase">&nbsp;</div>') +
           '</div>' +
-          '<button class="state-btn fuzzy" data-word-id="' + id + '">⭐</button>' +
+          '<button class="state-btn fuzzy" data-word-id="' + attrId + '" data-legacy-id="' + attrLegacyId + '" data-state="fuzzy">⭐</button>' +
         '</div>'
       );
     });
@@ -1158,7 +1220,7 @@ function collectFuzzyWords(day) {
   for (let i = cycleStart; i < cycleStart + 5 && i < SCHEDULE.length; i++) {
     if (SCHEDULE[i].type !== '新词') continue;
     SCHEDULE[i].words.forEach(w => {
-      if (u.states[wordId(w)] === 'fuzzy') {
+      if (getWordState(u, w) === 'fuzzy') {
         result.push(w);
       }
     });
@@ -1189,13 +1251,15 @@ function renderRestDay(container, day) {
 function cycleState(id, btn) {
   const u = getUserState();
   if (!u) return;
-  const cur = u.states[id] || 'new';
+  const legacyId = btn ? btn.dataset.legacyId : null;
+  const cur = (btn && btn.dataset.state) || u.states[id] || (legacyId && u.states[legacyId]) || 'new';
   const next = cur === 'new' ? 'mastered' : cur === 'mastered' ? 'fuzzy' : 'new';
   if (next === 'new') {
     delete u.states[id];
   } else {
     u.states[id] = next;
   }
+  if (legacyId && legacyId !== id) delete u.states[legacyId];
   saveState();
   render();
   refreshSummary().then(() => renderRoleExtras());
@@ -1204,13 +1268,16 @@ function cycleState(id, btn) {
 function clearState(id, btn) {
   const u = getUserState();
   if (!u) return;
-  if (u.states[id] === 'fuzzy') {
+  const legacyId = btn ? btn.dataset.legacyId : null;
+  const cur = (btn && btn.dataset.state) || u.states[id] || (legacyId && u.states[legacyId]) || 'new';
+  if (cur === 'fuzzy') {
     u.states[id] = 'mastered';
-  } else if (u.states[id] === 'mastered') {
+  } else if (cur === 'mastered') {
     delete u.states[id];
   } else {
     u.states[id] = 'mastered';
   }
+  if (legacyId && legacyId !== id) delete u.states[legacyId];
   saveState();
   render();
   refreshSummary().then(() => renderRoleExtras());
@@ -1228,7 +1295,7 @@ function startDictation(day) {
   for (let i = cycleStart; i < cycleStart + 5 && i < SCHEDULE.length; i++) {
     if (SCHEDULE[i].type !== '新词') continue;
     SCHEDULE[i].words.forEach(w => {
-      const s = u.states[wordId(w)];
+      const s = getWordState(u, w);
       if (s !== 'mastered') candidates.push(w);
     });
   }
@@ -1304,7 +1371,11 @@ function checkDictation() {
     fb.textContent = '✓ 正确！';
     fb.className = 'dictation-feedback correct';
     dictationState.correct++;
-    getUserState().states[wordId(w)] = 'mastered';
+    const u = getUserState();
+    const id = wordId(w);
+    const legacyId = legacyWordId(w);
+    u.states[id] = 'mastered';
+    if (legacyId !== id) delete u.states[legacyId];
     saveState();
     refreshSummary();
     setTimeout(() => {
@@ -1404,7 +1475,16 @@ async function doReset() {
   }
   if (!confirm('确定要重置「' + label + '」的所有进度吗？此操作不可撤销。')) return;
   try {
-    const body = isViewingSelf ? {} : { userId: viewingUserId };
+    let body = {};
+    if (!isViewingSelf) {
+      const adminConfirmPin = prompt('请输入管理员 PIN 以确认重置「' + label + '」');
+      if (adminConfirmPin === null) return;
+      if (!/^\d{4,8}$/.test(adminConfirmPin.trim())) {
+        showToast('管理员 PIN 必须为 4-8 位数字');
+        return;
+      }
+      body = { userId: viewingUserId, adminConfirmPin: adminConfirmPin.trim() };
+    }
     const r = await api('/api/reset', { method: 'POST', body: JSON.stringify(body) });
     if (r && r.state) {
       currentState = r.state;

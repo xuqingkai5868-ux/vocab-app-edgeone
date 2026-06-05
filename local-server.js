@@ -186,6 +186,9 @@ async function handleSummary(user) {
 async function handleReset(req, user, body) {
   // admin 重置任意用户；user 只能重置自己
   const targetId = user.role === 'admin' && body.userId ? body.userId : user.userId;
+  if (!/^[a-z][a-z0-9_]{0,31}$/.test(targetId)) {
+    return jsonResponse({ error: 'invalid_user_id' }, 400);
+  }
   if (user.role !== 'admin' && body.userId && body.userId !== user.userId) {
     return jsonResponse({ error: 'forbidden' }, 403);
   }

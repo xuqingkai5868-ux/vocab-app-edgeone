@@ -4,7 +4,7 @@
 // user 只能重置自己；admin 可重置任意（body 传 userId）
 // 请求体（可选）：{ userId: "gao" }
 
-import { K, kvSetJSON } from './_lib/kv.js';
+import { K, kvGet, kvSetJSON } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 import { verifyToken } from './_lib/verifyToken.js';
 
@@ -22,9 +22,18 @@ export async function onRequestPost({ request }) {
   }
 
   const target = (body && body.userId) || userId;
+  if (!/^[a-z][a-z0-9_]{0,31}$/.test(target)) {
+    return json({ error: 'invalid_user_id' }, 400);
+  }
 
   if (role !== 'admin' && target !== userId) {
     return json({ error: 'forbidden', message: '只能重置自己的进度' }, 403);
+  }
+  if (role === 'admin' && target !== userId) {
+    const storedAdminPin = await kvGet(K.pin('admin'));
+    if (!storedAdminPin || String(body.adminConfirmPin || '') !== String(storedAdminPin)) {
+      return json({ error: 'wrong_admin_pin', message: '管理员 PIN 不正确' }, 403);
+    }
   }
 
   const empty = {

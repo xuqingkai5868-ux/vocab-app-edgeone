@@ -11,3 +11,8 @@ node_modules
 .env.local
 .DS_Store
 *.log
+.workbuddy/
+
+# 临时测试产物（curl 调试残留）
+r_*.json
+seed_*.json
