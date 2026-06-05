@@ -68,31 +68,38 @@ export async function kvKeysByPrefix(prefix, max = 1000) {
   if (typeof my_kv === 'undefined') {
     throw new Error('my_kv 未绑定');
   }
-  const keys = [];
-  const prefixPattern = prefix.endsWith('*') ? prefix : prefix + '*';
-  let cursor;
 
-  do {
-    const resp = await my_kv.list({
-      prefix: prefixPattern,
-      cursor,
-      limit: 256
-    });
+  // EdgeOne KV list 不支持 wildcard，直接用 prefix 匹配
+  // 文档：my_kv.list({ prefix: 'user:', limit: 256 })
+  try {
+    const keys = [];
+    let cursor;
 
-    // EdgeOne 返回结构可能是 { keys: [{name}], cursor, list_complete }
-    // 兼容两种返回
-    const list = resp.keys || resp || [];
-    for (const item of list) {
-      const name = typeof item === 'string' ? item : (item.name || item.key);
-      if (name) {
-        keys.push(name);
-        if (keys.length >= max) return keys;
+    do {
+      const resp = await my_kv.list({
+        prefix,
+        cursor,
+        limit: 256
+      });
+
+      if (!resp) break;
+
+      const list = resp.keys || [];
+      for (const item of list) {
+        const name = typeof item === 'string' ? item : (item.name || item.key || '');
+        if (name && name.startsWith(prefix)) {
+          keys.push(name);
+          if (keys.length >= max) return keys;
+        }
       }
-    }
 
-    cursor = resp.cursor;
-    if (!cursor || resp.list_complete) break;
-  } while (cursor);
+      cursor = resp.cursor;
+      if (!cursor || resp.list_complete) break;
+    } while (cursor);
 
-  return keys;
+    return keys;
+  } catch (e) {
+    console.error('[kvKeysByPrefix] error:', e);
+    return [];
+  }
 }
