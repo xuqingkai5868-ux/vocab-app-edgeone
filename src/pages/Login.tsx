@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 const USERS = [
-  { id: 'gao', label: '高高' },
+  { id: 'gao', label: '哥哥' },
   { id: 'di', label: '弟弟' },
   { id: 'admin', label: '管理员' },
 ];
