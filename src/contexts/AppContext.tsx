@@ -4,7 +4,7 @@ import { getState, updateState, UserState } from '../api/state';
 import { createCheckIn, getCheckIns } from '../api/checkin';
 import type { CheckInRecord } from '../types/study';
 import { getStats, DashboardStats } from '../api/stats';
-import { loadVocab, ScheduleWord, VocabIndex, getTodayWords } from '../services/utils/vocabLoader';
+import { loadVocab, ScheduleWord, VocabIndex, getDayWords } from '../services/utils/vocabLoader';
 import { canCheckIn } from '../services/checkIn/checkInService';
 import { calculateStreak } from '../services/checkIn/streakCalculator';
 import { getToday, getCurrentYear, getCurrentMonth } from '../services/utils/dateUtils';
@@ -43,28 +43,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [todayNewWords, setTodayNewWords] = useState<ScheduleWord[]>([]);
 
   const loadAll = useCallback(async () => {
-    // 加载词库
+    // 加载词库（本地，无网络请求）
     const vi = await loadVocab();
     setVocabIndex(vi);
 
     if (!user) return;
 
-    // 加载学习状态
+    // 并行加载学习状态、打卡（减少串行等待）
     try {
-      const stateResp = await getState(user.id);
+      const [stateResp, checkinResp] = await Promise.all([
+        getState(user.id),
+        getCheckIns(`${getCurrentYear()}-${String(getCurrentMonth()).padStart(2, '0')}`),
+      ]);
+
+      // 学习状态
       setUserState(stateResp.state);
 
-      // 获取今日新词
-      const tnw = await getTodayWords(stateResp.state.currentDay);
-      setTodayNewWords(tnw.newWords);
-    } catch (e) {
-      console.error('Failed to load state:', e);
-    }
+      // 今日新词
+      const tnw = getDayWords(stateResp.state.currentDay, vi);
+      setTodayNewWords(tnw);
 
-    // 加载打卡
-    await refreshCheckIns();
-    // 加载统计
-    await refreshStats();
+      // 打卡记录
+      setCheckIns(checkinResp.records);
+      const records = Object.values(checkinResp.records);
+      setStreak(calculateStreak(records));
+    } catch (e) {
+      console.error('Failed to load data:', e);
+    }
   }, [user]);
 
   const refreshCheckIns = useCallback(async () => {
@@ -95,8 +100,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       await updateState(user.id, newState);
       setUserState(newState);
-      const tnw = await getTodayWords(newState.currentDay);
-      setTodayNewWords(tnw.newWords);
+      const tnw = getDayWords(newState.currentDay, vocabIndex || await loadVocab());
+      setTodayNewWords(tnw);
     } catch (e) {
       console.error('Failed to update state:', e);
       throw e;
