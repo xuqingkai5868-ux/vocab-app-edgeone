@@ -154,7 +154,32 @@
           "meaning": "奢侈品"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "once upon a time",
+          "meaning": "从前",
+          "source": "book",
+          "associated_word": "once"
+        },
+        {
+          "phrase": "ring up",
+          "meaning": "打电话给",
+          "source": "book",
+          "associated_word": "ring"
+        },
+        {
+          "phrase": "school work",
+          "meaning": "学校作业",
+          "source": "cambridge_official",
+          "associated_word": "school"
+        },
+        {
+          "phrase": "even though",
+          "meaning": "即使,尽管",
+          "source": "book",
+          "associated_word": "even"
+        }
+      ]
     },
     {
       "day": 2,
@@ -310,7 +335,32 @@
           "meaning": "疾病"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "driving licence  \nlie down",
+          "meaning": "life (n)",
+          "source": "cambridge_official",
+          "associated_word": "licence"
+        },
+        {
+          "phrase": "to go on strike",
+          "meaning": "罢工",
+          "source": "cambridge_official",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "hurry up",
+          "meaning": "快点",
+          "source": "book",
+          "associated_word": "hurry"
+        },
+        {
+          "phrase": "spare time",
+          "meaning": "空闲时间",
+          "source": "cambridge_official",
+          "associated_word": "spare"
+        }
+      ]
     },
     {
       "day": 3,
@@ -466,7 +516,32 @@
           "meaning": "值得"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "to be present",
+          "meaning": "出席",
+          "source": "cambridge_official",
+          "associated_word": "present"
+        },
+        {
+          "phrase": "fall ill",
+          "meaning": "患病",
+          "source": "book",
+          "associated_word": "fall"
+        },
+        {
+          "phrase": "the more...the more...………… ... ...",
+          "meaning": "越……就越……",
+          "source": "book",
+          "associated_word": "more"
+        },
+        {
+          "phrase": "look at",
+          "meaning": "看",
+          "source": "cambridge_official",
+          "associated_word": "look"
+        }
+      ]
     },
     {
       "day": 4,
@@ -622,7 +697,32 @@
           "meaning": "陆地；着陆"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "arrive at / in+ a place / +",
+          "meaning": "到达某地",
+          "source": "book",
+          "associated_word": "arrive"
+        },
+        {
+          "phrase": "sweet food",
+          "meaning": "甜食",
+          "source": "cambridge_official",
+          "associated_word": "sweet"
+        },
+        {
+          "phrase": "from now on",
+          "meaning": "从现在开始",
+          "source": "book",
+          "associated_word": "now"
+        },
+        {
+          "phrase": "turn up",
+          "meaning": "出现；调大",
+          "source": "book",
+          "associated_word": "turn"
+        }
+      ]
     },
     {
       "day": 5,
@@ -778,7 +878,32 @@
           "meaning": "洒出；溢出"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "spend...on…… ...",
+          "meaning": "在……花钱",
+          "source": "book",
+          "associated_word": "spend"
+        },
+        {
+          "phrase": "bring up",
+          "meaning": "抚养；提出",
+          "source": "book",
+          "associated_word": "bring"
+        },
+        {
+          "phrase": "come in",
+          "meaning": "进来",
+          "source": "book",
+          "associated_word": "come"
+        },
+        {
+          "phrase": "side by side",
+          "meaning": "肩并肩，一起",
+          "source": "book",
+          "associated_word": "side"
+        }
+      ]
     },
     {
       "day": 6,
@@ -934,7 +1059,32 @@
           "meaning": "提建议"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "take care of someone",
+          "meaning": "照顾某人",
+          "source": "cambridge_official",
+          "associated_word": "take"
+        },
+        {
+          "phrase": "hard wood",
+          "meaning": "硬木",
+          "source": "cambridge_official",
+          "associated_word": "hard"
+        },
+        {
+          "phrase": "such as",
+          "meaning": "例如",
+          "source": "book",
+          "associated_word": "such"
+        },
+        {
+          "phrase": "live on ……",
+          "meaning": "以…为食,以…为天",
+          "source": "book",
+          "associated_word": "live"
+        }
+      ]
     },
     {
       "day": 7,
@@ -1090,7 +1240,32 @@
           "meaning": "到达"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "by accident",
+          "meaning": "偶然；意外地",
+          "source": "book",
+          "associated_word": "accident"
+        },
+        {
+          "phrase": "fall over",
+          "meaning": "跌倒",
+          "source": "cambridge_official",
+          "associated_word": "fall"
+        },
+        {
+          "phrase": "a pair of",
+          "meaning": "一双",
+          "source": "book",
+          "associated_word": "pair"
+        },
+        {
+          "phrase": "Q \n \nquarter",
+          "meaning": "a quarter of an hour",
+          "source": "cambridge_official",
+          "associated_word": "quarter"
+        }
+      ]
     },
     {
       "day": 8,
@@ -1246,7 +1421,32 @@
           "meaning": "明智的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "look up",
+          "meaning": "查找",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "come from",
+          "meaning": "来自",
+          "source": "book",
+          "associated_word": "come"
+        },
+        {
+          "phrase": "in half",
+          "meaning": "成两半",
+          "source": "cambridge_official",
+          "associated_word": "half"
+        },
+        {
+          "phrase": "care for",
+          "meaning": "照顾；喜欢",
+          "source": "book",
+          "associated_word": "care"
+        }
+      ]
     },
     {
       "day": 9,
@@ -1402,7 +1602,32 @@
           "meaning": "询问"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "help oneself to",
+          "meaning": "请随便吃点",
+          "source": "book",
+          "associated_word": "help"
+        },
+        {
+          "phrase": "to keep a record",
+          "meaning": "保持记录",
+          "source": "cambridge_official",
+          "associated_word": "keep"
+        },
+        {
+          "phrase": "a round object",
+          "meaning": "圆形物体",
+          "source": "cambridge_official",
+          "associated_word": "round"
+        },
+        {
+          "phrase": "far away",
+          "meaning": "遥远的",
+          "source": "book",
+          "associated_word": "far"
+        }
+      ]
     },
     {
       "day": 10,
@@ -1558,7 +1783,32 @@
           "meaning": "拒绝"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "to put something in order",
+          "meaning": "整理某物",
+          "source": "cambridge_official",
+          "associated_word": "put"
+        },
+        {
+          "phrase": "do one’s best",
+          "meaning": "尽最大的努力",
+          "source": "book",
+          "associated_word": "do"
+        },
+        {
+          "phrase": "end up",
+          "meaning": "最终；结果",
+          "source": "cambridge_official",
+          "associated_word": "end"
+        },
+        {
+          "phrase": "see...off ...",
+          "meaning": "为某人送行",
+          "source": "book",
+          "associated_word": "see"
+        }
+      ]
     },
     {
       "day": 11,
@@ -1714,7 +1964,32 @@
           "meaning": "关系；亲属"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "hold one’s breath",
+          "meaning": "不出气，屏住呼吸",
+          "source": "book",
+          "associated_word": "hold"
+        },
+        {
+          "phrase": "compare to ……",
+          "meaning": "与……相比",
+          "source": "book",
+          "associated_word": "compare"
+        },
+        {
+          "phrase": "on show",
+          "meaning": "展出，在上演（放映）",
+          "source": "book",
+          "associated_word": "show"
+        },
+        {
+          "phrase": "cut down",
+          "meaning": "砍倒",
+          "source": "book",
+          "associated_word": "cut"
+        }
+      ]
     },
     {
       "day": 12,
@@ -1870,7 +2145,32 @@
           "meaning": "离开"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "out of breath",
+          "meaning": "上气不接下气",
+          "source": "book",
+          "associated_word": "breath"
+        },
+        {
+          "phrase": "a straight line",
+          "meaning": "一条直线",
+          "source": "cambridge_official",
+          "associated_word": "straight"
+        },
+        {
+          "phrase": "pardon",
+          "meaning": "请再说一遍",
+          "source": "cambridge_official",
+          "associated_word": "pardon"
+        },
+        {
+          "phrase": "agree with sb",
+          "meaning": "同意某人",
+          "source": "book",
+          "associated_word": "agree"
+        }
+      ]
     },
     {
       "day": 13,
@@ -2026,7 +2326,32 @@
           "meaning": "虫子"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "right now",
+          "meaning": "立即，马上",
+          "source": "book",
+          "associated_word": "right"
+        },
+        {
+          "phrase": "turn off",
+          "meaning": "关掉",
+          "source": "book",
+          "associated_word": "turn"
+        },
+        {
+          "phrase": "a number of",
+          "meaning": "一些",
+          "source": "book",
+          "associated_word": "number"
+        },
+        {
+          "phrase": "so far as………… （",
+          "meaning": "表示程度，范围）就……，尽……",
+          "source": "book",
+          "associated_word": "far"
+        }
+      ]
     },
     {
       "day": 14,
@@ -2182,7 +2507,32 @@
           "meaning": "大陆"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "depend on (upon) ()",
+          "meaning": "依靠,相信,信赖",
+          "source": "book",
+          "associated_word": "depend"
+        },
+        {
+          "phrase": "agree to do sth",
+          "meaning": "同意做某事",
+          "source": "book",
+          "associated_word": "agree"
+        },
+        {
+          "phrase": "to travel by train",
+          "meaning": "乘火车旅行",
+          "source": "cambridge_official",
+          "associated_word": "travel"
+        },
+        {
+          "phrase": "save one's life",
+          "meaning": "挽救某人生命",
+          "source": "book",
+          "associated_word": "save"
+        }
+      ]
     },
     {
       "day": 15,
@@ -2338,7 +2688,32 @@
           "meaning": "打扰"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "Key and Key for \nSchools \nmouse",
+          "meaning": "I got a new mouse for my laptop.",
+          "source": "cambridge_official",
+          "associated_word": "key"
+        },
+        {
+          "phrase": "a walking stick",
+          "meaning": "手杖",
+          "source": "cambridge_official",
+          "associated_word": "stick"
+        },
+        {
+          "phrase": "a piece of",
+          "meaning": "一张/一片",
+          "source": "book",
+          "associated_word": "piece"
+        },
+        {
+          "phrase": "get back",
+          "meaning": "回来",
+          "source": "book",
+          "associated_word": "get"
+        }
+      ]
     },
     {
       "day": 16,
@@ -2494,7 +2869,32 @@
           "meaning": "日常饮食；节食"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "help sbwith sth",
+          "meaning": "帮助某人做某事",
+          "source": "book",
+          "associated_word": "help"
+        },
+        {
+          "phrase": "buy something online",
+          "meaning": "在线购买",
+          "source": "cambridge_official",
+          "associated_word": "buy"
+        },
+        {
+          "phrase": "from then on",
+          "meaning": "从那时起",
+          "source": "book",
+          "associated_word": "then"
+        },
+        {
+          "phrase": "get on with sb ……",
+          "meaning": "与……相处",
+          "source": "book",
+          "associated_word": "get"
+        }
+      ]
     },
     {
       "day": 17,
@@ -2650,7 +3050,32 @@
           "meaning": "日光浴"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "look after",
+          "meaning": "照顾",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "fill up",
+          "meaning": "填满；加满",
+          "source": "cambridge_official",
+          "associated_word": "fill"
+        },
+        {
+          "phrase": "not at all",
+          "meaning": "一点也不，绝非",
+          "source": "book",
+          "associated_word": "not"
+        },
+        {
+          "phrase": "once again",
+          "meaning": "再一次",
+          "source": "book",
+          "associated_word": "once"
+        }
+      ]
     },
     {
       "day": 18,
@@ -2806,7 +3231,32 @@
           "meaning": "照耀"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "put up",
+          "meaning": "张贴；搭建",
+          "source": "book",
+          "associated_word": "put"
+        },
+        {
+          "phrase": "a kitchen sink",
+          "meaning": "厨房水槽",
+          "source": "cambridge_official",
+          "associated_word": "kitchen"
+        },
+        {
+          "phrase": "because of",
+          "meaning": "因为",
+          "source": "cambridge_official",
+          "associated_word": "because"
+        },
+        {
+          "phrase": "check in",
+          "meaning": "办理入住/登机",
+          "source": "book",
+          "associated_word": "check"
+        }
+      ]
     },
     {
       "day": 19,
@@ -2962,7 +3412,32 @@
           "meaning": "打算"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "point out",
+          "meaning": "指出",
+          "source": "book",
+          "associated_word": "point"
+        },
+        {
+          "phrase": "to have a rest",
+          "meaning": "休息一下",
+          "source": "cambridge_official",
+          "associated_word": "have"
+        },
+        {
+          "phrase": "a bit （of）",
+          "meaning": "有一点，一会儿",
+          "source": "book",
+          "associated_word": "bit"
+        },
+        {
+          "phrase": "turn on",
+          "meaning": "打开",
+          "source": "book",
+          "associated_word": "turn"
+        }
+      ]
     },
     {
       "day": 20,
@@ -3118,7 +3593,32 @@
           "meaning": "口香糖；牙龈"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a warm welcome",
+          "meaning": "热烈的欢迎",
+          "source": "cambridge_official",
+          "associated_word": "warm"
+        },
+        {
+          "phrase": "break down",
+          "meaning": "出故障；分解",
+          "source": "book",
+          "associated_word": "break"
+        },
+        {
+          "phrase": "a safe place",
+          "meaning": "安全的地方",
+          "source": "cambridge_official",
+          "associated_word": "safe"
+        },
+        {
+          "phrase": "in order",
+          "meaning": "按顺序",
+          "source": "book",
+          "associated_word": "order"
+        }
+      ]
     },
     {
       "day": 21,
@@ -3274,7 +3774,32 @@
           "meaning": "组织"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "keep off",
+          "meaning": "务踏，务踩",
+          "source": "book",
+          "associated_word": "keep"
+        },
+        {
+          "phrase": "look down upon",
+          "meaning": "看不起，轻视",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "break up",
+          "meaning": "分手；解散",
+          "source": "cambridge_official",
+          "associated_word": "break"
+        },
+        {
+          "phrase": "Oh dear!",
+          "meaning": "death (n)",
+          "source": "cambridge_official",
+          "associated_word": "dear"
+        }
+      ]
     },
     {
       "day": 22,
@@ -3430,7 +3955,32 @@
           "meaning": "碟子"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "send for",
+          "meaning": "派人去叫（请）",
+          "source": "book",
+          "associated_word": "send"
+        },
+        {
+          "phrase": "make up",
+          "meaning": "组成；化妆；和解",
+          "source": "book",
+          "associated_word": "make"
+        },
+        {
+          "phrase": "a good start",
+          "meaning": "好的开始",
+          "source": "cambridge_official",
+          "associated_word": "good"
+        },
+        {
+          "phrase": "even if",
+          "meaning": "即使",
+          "source": "book",
+          "associated_word": "even"
+        }
+      ]
     },
     {
       "day": 23,
@@ -3586,7 +4136,32 @@
           "meaning": "典型的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "run out of",
+          "meaning": "用完",
+          "source": "book",
+          "associated_word": "run"
+        },
+        {
+          "phrase": "speed up",
+          "meaning": "加快速度",
+          "source": "book",
+          "associated_word": "speed"
+        },
+        {
+          "phrase": "turn over",
+          "meaning": "翻转",
+          "source": "book",
+          "associated_word": "turn"
+        },
+        {
+          "phrase": "have a cold",
+          "meaning": "感冒",
+          "source": "book",
+          "associated_word": "have"
+        }
+      ]
     },
     {
       "day": 24,
@@ -3742,7 +4317,32 @@
           "meaning": "液体"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "keep in",
+          "meaning": "使留在里面",
+          "source": "cambridge_official",
+          "associated_word": "keep"
+        },
+        {
+          "phrase": "thanks",
+          "meaning": "谢谢",
+          "source": "cambridge_official",
+          "associated_word": "thanks"
+        },
+        {
+          "phrase": "used to do sth. .",
+          "meaning": "过去常常",
+          "source": "book",
+          "associated_word": "do"
+        },
+        {
+          "phrase": "over and over again",
+          "meaning": "反复，多次重复",
+          "source": "book",
+          "associated_word": "again"
+        }
+      ]
     },
     {
       "day": 25,
@@ -3898,7 +4498,32 @@
           "meaning": "组成"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "out of date",
+          "meaning": "过时的",
+          "source": "cambridge_official",
+          "associated_word": "date"
+        },
+        {
+          "phrase": "wake up",
+          "meaning": "醒来",
+          "source": "book",
+          "associated_word": "wake"
+        },
+        {
+          "phrase": "on foot",
+          "meaning": "步行",
+          "source": "book",
+          "associated_word": "foot"
+        },
+        {
+          "phrase": "for example",
+          "meaning": "例如",
+          "source": "book",
+          "associated_word": "example"
+        }
+      ]
     },
     {
       "day": 26,
@@ -4054,7 +4679,32 @@
           "meaning": "休克；使震惊"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "throw away",
+          "meaning": "扔掉",
+          "source": "book",
+          "associated_word": "throw"
+        },
+        {
+          "phrase": "a rest from work",
+          "meaning": "工作休息",
+          "source": "cambridge_official",
+          "associated_word": "rest"
+        },
+        {
+          "phrase": "in need of",
+          "meaning": "需要,缺少",
+          "source": "book",
+          "associated_word": "need"
+        },
+        {
+          "phrase": "get away",
+          "meaning": "逃；离",
+          "source": "book",
+          "associated_word": "get"
+        }
+      ]
     },
     {
       "day": 27,
@@ -4210,7 +4860,32 @@
           "meaning": "登记"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "hear from …",
+          "meaning": "收到…的来信",
+          "source": "book",
+          "associated_word": "hear"
+        },
+        {
+          "phrase": "as a result",
+          "meaning": "结果",
+          "source": "book",
+          "associated_word": "result"
+        },
+        {
+          "phrase": "to go straight on",
+          "meaning": "直走",
+          "source": "cambridge_official",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "first prize",
+          "meaning": "一等奖",
+          "source": "cambridge_official",
+          "associated_word": "first"
+        }
+      ]
     },
     {
       "day": 28,
@@ -4366,7 +5041,32 @@
           "meaning": "研究"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "get together",
+          "meaning": "聚会",
+          "source": "book",
+          "associated_word": "get"
+        },
+        {
+          "phrase": "come across (",
+          "meaning": "偶然)遇见(或发现)",
+          "source": "book",
+          "associated_word": "come"
+        },
+        {
+          "phrase": "bright pink  \nbrilliant",
+          "meaning": "I thought the film was brilliant!",
+          "source": "cambridge_official",
+          "associated_word": "bright"
+        },
+        {
+          "phrase": "catch up with",
+          "meaning": "赶上",
+          "source": "book",
+          "associated_word": "catch"
+        }
+      ]
     },
     {
       "day": 29,
@@ -4522,7 +5222,32 @@
           "meaning": "询问"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "come up",
+          "meaning": "上来，上升，抬头",
+          "source": "book",
+          "associated_word": "come"
+        },
+        {
+          "phrase": "re welcome",
+          "meaning": "Welcome to London! (exclam)",
+          "source": "cambridge_official",
+          "associated_word": "welcome"
+        },
+        {
+          "phrase": "let in …",
+          "meaning": "让…进来,放进",
+          "source": "book",
+          "associated_word": "let"
+        },
+        {
+          "phrase": "cut off",
+          "meaning": "切断",
+          "source": "book",
+          "associated_word": "cut"
+        }
+      ]
     },
     {
       "day": 30,
@@ -4678,7 +5403,32 @@
           "meaning": "选择"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "wash up",
+          "meaning": "洗碗",
+          "source": "cambridge_official",
+          "associated_word": "wash"
+        },
+        {
+          "phrase": "point to",
+          "meaning": "指向",
+          "source": "book",
+          "associated_word": "point"
+        },
+        {
+          "phrase": "get on",
+          "meaning": "上车",
+          "source": "book",
+          "associated_word": "get"
+        },
+        {
+          "phrase": "a road sign",
+          "meaning": "路标",
+          "source": "cambridge_official",
+          "associated_word": "road"
+        }
+      ]
     },
     {
       "day": 31,
@@ -4834,7 +5584,32 @@
           "meaning": "傻瓜"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "customer service \nsession",
+          "meaning": "in a school, gym",
+          "source": "cambridge_official",
+          "associated_word": "customer"
+        },
+        {
+          "phrase": "F \n \nface",
+          "meaning": "a sad look on his face",
+          "source": "cambridge_official",
+          "associated_word": "face"
+        },
+        {
+          "phrase": "at once",
+          "meaning": "立刻；马上",
+          "source": "cambridge_official",
+          "associated_word": "once"
+        },
+        {
+          "phrase": "set out",
+          "meaning": "出发;开始",
+          "source": "book",
+          "associated_word": "set"
+        }
+      ]
     },
     {
       "day": 32,
@@ -4990,7 +5765,32 @@
           "meaning": "膝盖"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "give way",
+          "meaning": "让路",
+          "source": "cambridge_official",
+          "associated_word": "give"
+        },
+        {
+          "phrase": "call up",
+          "meaning": "打电话",
+          "source": "book",
+          "associated_word": "call"
+        },
+        {
+          "phrase": "pick up",
+          "meaning": "捡起；接人",
+          "source": "cambridge_official",
+          "associated_word": "pick"
+        },
+        {
+          "phrase": "good morning",
+          "meaning": "早上好",
+          "source": "cambridge_official",
+          "associated_word": "good"
+        }
+      ]
     },
     {
       "day": 33,
@@ -5146,7 +5946,32 @@
           "meaning": "老式的；过时的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a play at the theatre",
+          "meaning": "剧院演出",
+          "source": "cambridge_official",
+          "associated_word": "play"
+        },
+        {
+          "phrase": "to raise prices \nrange",
+          "meaning": "a mountain range",
+          "source": "cambridge_official",
+          "associated_word": "raise"
+        },
+        {
+          "phrase": "in surprise",
+          "meaning": "吃惊,惊讶",
+          "source": "book",
+          "associated_word": "surprise"
+        },
+        {
+          "phrase": "a kind of",
+          "meaning": "一种",
+          "source": "book",
+          "associated_word": "kind"
+        }
+      ]
     },
     {
       "day": 34,
@@ -5302,7 +6127,32 @@
           "meaning": "结论"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "sell out",
+          "meaning": "卖完,出卖",
+          "source": "book",
+          "associated_word": "sell"
+        },
+        {
+          "phrase": "pick up……",
+          "meaning": "拾起，捡起,接收；开车去接……",
+          "source": "book",
+          "associated_word": "pick"
+        },
+        {
+          "phrase": "look into",
+          "meaning": "向……里看去，调查",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "wait for",
+          "meaning": "等待",
+          "source": "book",
+          "associated_word": "wait"
+        }
+      ]
     },
     {
       "day": 35,
@@ -5458,7 +6308,32 @@
           "meaning": "和平"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "up to date",
+          "meaning": "最新的",
+          "source": "cambridge_official",
+          "associated_word": "date"
+        },
+        {
+          "phrase": "give up",
+          "meaning": "放弃",
+          "source": "book",
+          "associated_word": "give"
+        },
+        {
+          "phrase": "hang out",
+          "meaning": "闲逛；一起玩",
+          "source": "cambridge_official",
+          "associated_word": "hang"
+        },
+        {
+          "phrase": "prevent ..from ..",
+          "meaning": "妨碍,防止,预防",
+          "source": "book",
+          "associated_word": "prevent"
+        }
+      ]
     },
     {
       "day": 36,
@@ -5614,7 +6489,32 @@
           "meaning": "回收的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a public park",
+          "meaning": "公共公园",
+          "source": "cambridge_official",
+          "associated_word": "public"
+        },
+        {
+          "phrase": "the rules of grammar",
+          "meaning": "语法规则",
+          "source": "cambridge_official",
+          "associated_word": "grammar"
+        },
+        {
+          "phrase": "set up",
+          "meaning": "建立；设置",
+          "source": "cambridge_official",
+          "associated_word": "set"
+        },
+        {
+          "phrase": "all over",
+          "meaning": "到处；遍及",
+          "source": "book",
+          "associated_word": "all"
+        }
+      ]
     },
     {
       "day": 37,
@@ -5770,7 +6670,32 @@
           "meaning": "极其地"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "to send it by post",
+          "meaning": "邮寄",
+          "source": "cambridge_official",
+          "associated_word": "send"
+        },
+        {
+          "phrase": "laugh at",
+          "meaning": "嘲笑",
+          "source": "book",
+          "associated_word": "laugh"
+        },
+        {
+          "phrase": "to serve in a shop \nserver",
+          "meaning": "a file server",
+          "source": "cambridge_official",
+          "associated_word": "serve"
+        },
+        {
+          "phrase": "be strict with",
+          "meaning": "对...严格",
+          "source": "book",
+          "associated_word": "strict"
+        }
+      ]
     },
     {
       "day": 38,
@@ -5926,7 +6851,32 @@
           "meaning": "咬"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "from time to time",
+          "meaning": "不时,偶尔",
+          "source": "book",
+          "associated_word": "time"
+        },
+        {
+          "phrase": "not any more",
+          "meaning": "不再",
+          "source": "book",
+          "associated_word": "not"
+        },
+        {
+          "phrase": "give out",
+          "meaning": "分发",
+          "source": "book",
+          "associated_word": "give"
+        },
+        {
+          "phrase": "change into ……",
+          "meaning": "转变成，把……变成",
+          "source": "book",
+          "associated_word": "change"
+        }
+      ]
     },
     {
       "day": 39,
@@ -6082,7 +7032,32 @@
           "meaning": "出现"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "give in",
+          "meaning": "屈服,让步",
+          "source": "book",
+          "associated_word": "give"
+        },
+        {
+          "phrase": "on fire",
+          "meaning": "着火",
+          "source": "cambridge_official",
+          "associated_word": "fire"
+        },
+        {
+          "phrase": "pick out",
+          "meaning": "选出",
+          "source": "book",
+          "associated_word": "pick"
+        },
+        {
+          "phrase": "write to……",
+          "meaning": "写信给……",
+          "source": "book",
+          "associated_word": "write"
+        }
+      ]
     },
     {
       "day": 40,
@@ -6238,7 +7213,32 @@
           "meaning": "社会"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "not only ..but also………… ..",
+          "meaning": "不仅……而且……",
+          "source": "book",
+          "associated_word": "not"
+        },
+        {
+          "phrase": "take off",
+          "meaning": "脱下；起飞",
+          "source": "book",
+          "associated_word": "take"
+        },
+        {
+          "phrase": "Welcome to London!",
+          "meaning": "well (adv & adj)",
+          "source": "cambridge_official",
+          "associated_word": "welcome"
+        },
+        {
+          "phrase": "go for a walk",
+          "meaning": "散步",
+          "source": "book",
+          "associated_word": "go"
+        }
+      ]
     },
     {
       "day": 41,
@@ -6394,7 +7394,32 @@
           "meaning": "操作；手术"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "take place",
+          "meaning": "发生",
+          "source": "book",
+          "associated_word": "take"
+        },
+        {
+          "phrase": "look ahead",
+          "meaning": "向前看",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "waves at sea",
+          "meaning": "海上的波浪",
+          "source": "cambridge_official",
+          "associated_word": "sea"
+        },
+        {
+          "phrase": "grow up",
+          "meaning": "长大",
+          "source": "book",
+          "associated_word": "grow"
+        }
+      ]
     },
     {
       "day": 42,
@@ -6550,7 +7575,32 @@
           "meaning": "签证"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "put on weight",
+          "meaning": "发福，增加体重",
+          "source": "book",
+          "associated_word": "put"
+        },
+        {
+          "phrase": "as long as",
+          "meaning": "只要",
+          "source": "book",
+          "associated_word": "long"
+        },
+        {
+          "phrase": "by herself  \nhey",
+          "meaning": "hi (exclam)",
+          "source": "cambridge_official",
+          "associated_word": "herself"
+        },
+        {
+          "phrase": "to be good at maths  \ngood afternoon",
+          "meaning": "goodbye (exclam)",
+          "source": "cambridge_official",
+          "associated_word": "good"
+        }
+      ]
     },
     {
       "day": 43,
@@ -6706,7 +7756,32 @@
           "meaning": "按；熨烫"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "set free",
+          "meaning": "释放，解放",
+          "source": "book",
+          "associated_word": "set"
+        },
+        {
+          "phrase": "sit down",
+          "meaning": "坐下",
+          "source": "cambridge_official",
+          "associated_word": "sit"
+        },
+        {
+          "phrase": "above all",
+          "meaning": "首先",
+          "source": "book",
+          "associated_word": "above"
+        },
+        {
+          "phrase": "find out",
+          "meaning": "找出；查明",
+          "source": "book",
+          "associated_word": "find"
+        }
+      ]
     },
     {
       "day": 44,
@@ -6862,7 +7937,32 @@
           "meaning": "流感"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "try on",
+          "meaning": "试穿",
+          "source": "book",
+          "associated_word": "try"
+        },
+        {
+          "phrase": "get close to",
+          "meaning": "接近",
+          "source": "book",
+          "associated_word": "get"
+        },
+        {
+          "phrase": "after all",
+          "meaning": "毕竟",
+          "source": "book",
+          "associated_word": "after"
+        },
+        {
+          "phrase": "feel like doing …………",
+          "meaning": "想要……,感觉要……",
+          "source": "book",
+          "associated_word": "feel"
+        }
+      ]
     },
     {
       "day": 45,
@@ -7018,7 +8118,32 @@
           "meaning": "雇用"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "each other",
+          "meaning": "互相",
+          "source": "book",
+          "associated_word": "each"
+        },
+        {
+          "phrase": "light switch",
+          "meaning": "电灯开关",
+          "source": "cambridge_official",
+          "associated_word": "light"
+        },
+        {
+          "phrase": "different from ……",
+          "meaning": "与……不同",
+          "source": "book",
+          "associated_word": "different"
+        },
+        {
+          "phrase": "pedestrian crossing  \ncross out",
+          "meaning": "Cross it out and write it again.",
+          "source": "cambridge_official",
+          "associated_word": "pedestrian"
+        }
+      ]
     },
     {
       "day": 46,
@@ -7174,7 +8299,32 @@
           "meaning": "冰柜"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "the sound of music",
+          "meaning": "音乐之声",
+          "source": "cambridge_official",
+          "associated_word": "sound"
+        },
+        {
+          "phrase": "a lot of",
+          "meaning": "许多",
+          "source": "book",
+          "associated_word": "lot"
+        },
+        {
+          "phrase": "go off",
+          "meaning": "走开",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "computer program \nprogrammer",
+          "meaning": "computer programmer",
+          "source": "cambridge_official",
+          "associated_word": "computer"
+        }
+      ]
     },
     {
       "day": 47,
@@ -7330,7 +8480,32 @@
           "meaning": "普通的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "break out (",
+          "meaning": "战争,火灾等)突然发生,爆发",
+          "source": "book",
+          "associated_word": "break"
+        },
+        {
+          "phrase": "go fishing (shopping skating) (, )",
+          "meaning": "去钓鱼（买东西，滑冰）散步",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "take up",
+          "meaning": "占据；开始从事",
+          "source": "book",
+          "associated_word": "take"
+        },
+        {
+          "phrase": "go ahead",
+          "meaning": "前进；请便",
+          "source": "book",
+          "associated_word": "go"
+        }
+      ]
     },
     {
       "day": 48,
@@ -7486,7 +8661,32 @@
           "meaning": "滑倒"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "in all",
+          "meaning": "总之",
+          "source": "book",
+          "associated_word": "all"
+        },
+        {
+          "phrase": "think about",
+          "meaning": "考虑",
+          "source": "book",
+          "associated_word": "think"
+        },
+        {
+          "phrase": "get down",
+          "meaning": "下来；写下",
+          "source": "book",
+          "associated_word": "get"
+        },
+        {
+          "phrase": "make a face",
+          "meaning": "做鬼脸",
+          "source": "book",
+          "associated_word": "make"
+        }
+      ]
     },
     {
       "day": 49,
@@ -7642,7 +8842,32 @@
           "meaning": "(Br Eng: lorry) 卡车"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "go away",
+          "meaning": "走开",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "keep doing sth",
+          "meaning": "继续做某事",
+          "source": "book",
+          "associated_word": "keep"
+        },
+        {
+          "phrase": "again and again",
+          "meaning": "反复地",
+          "source": "book",
+          "associated_word": "again"
+        },
+        {
+          "phrase": "not till/until…… /",
+          "meaning": "直到……才",
+          "source": "book",
+          "associated_word": "not"
+        }
+      ]
     },
     {
       "day": 50,
@@ -7798,7 +9023,32 @@
           "meaning": "全神贯注"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "pay attention to",
+          "meaning": "注意",
+          "source": "book",
+          "associated_word": "pay"
+        },
+        {
+          "phrase": "call for",
+          "meaning": "要求；需要；来接",
+          "source": "cambridge_official",
+          "associated_word": "call"
+        },
+        {
+          "phrase": "to win a race",
+          "meaning": "赢得比赛",
+          "source": "cambridge_official",
+          "associated_word": "win"
+        },
+        {
+          "phrase": "go over",
+          "meaning": "仔细检查，复习",
+          "source": "book",
+          "associated_word": "go"
+        }
+      ]
     },
     {
       "day": 51,
@@ -7954,7 +9204,32 @@
           "meaning": "狭窄的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "make up one's mind",
+          "meaning": "下决心",
+          "source": "book",
+          "associated_word": "make"
+        },
+        {
+          "phrase": "good evening",
+          "meaning": "晚上好",
+          "source": "cambridge_official",
+          "associated_word": "good"
+        },
+        {
+          "phrase": "after class",
+          "meaning": "课后",
+          "source": "book",
+          "associated_word": "after"
+        },
+        {
+          "phrase": "put off",
+          "meaning": "推迟",
+          "source": "book",
+          "associated_word": "put"
+        }
+      ]
     },
     {
       "day": 52,
@@ -8110,7 +9385,32 @@
           "meaning": "高度"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "deal with",
+          "meaning": "处理",
+          "source": "book",
+          "associated_word": "deal"
+        },
+        {
+          "phrase": "cut up",
+          "meaning": "切碎",
+          "source": "cambridge_official",
+          "associated_word": "cut"
+        },
+        {
+          "phrase": "top of the class",
+          "meaning": "全班第一",
+          "source": "cambridge_official",
+          "associated_word": "top"
+        },
+        {
+          "phrase": "make friends with……",
+          "meaning": "与……交朋友",
+          "source": "book",
+          "associated_word": "make"
+        }
+      ]
     },
     {
       "day": 53,
@@ -8266,7 +9566,32 @@
           "meaning": "石头"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "hand out",
+          "meaning": "分发",
+          "source": "book",
+          "associated_word": "hand"
+        },
+        {
+          "phrase": "to pass an examination  \npass on",
+          "meaning": "Pass on the message.",
+          "source": "cambridge_official",
+          "associated_word": "pass"
+        },
+        {
+          "phrase": "get through",
+          "meaning": "通过；拨通电话",
+          "source": "book",
+          "associated_word": "get"
+        },
+        {
+          "phrase": "hand in",
+          "meaning": "上交",
+          "source": "book",
+          "associated_word": "hand"
+        }
+      ]
     },
     {
       "day": 54,
@@ -8422,7 +9747,32 @@
           "meaning": "时机；场合"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "as far as ………… （",
+          "meaning": "表示程度，范围）就……，尽……",
+          "source": "book",
+          "associated_word": "far"
+        },
+        {
+          "phrase": "earn one’s living",
+          "meaning": "谋生",
+          "source": "book",
+          "associated_word": "earn"
+        },
+        {
+          "phrase": "too dear to buy",
+          "meaning": "太贵了买不起",
+          "source": "cambridge_official",
+          "associated_word": "too"
+        },
+        {
+          "phrase": "in the end",
+          "meaning": "最后",
+          "source": "book",
+          "associated_word": "end"
+        }
+      ]
     },
     {
       "day": 55,
@@ -8578,7 +9928,32 @@
           "meaning": "减少"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "have fun with",
+          "meaning": "玩得高兴",
+          "source": "book",
+          "associated_word": "have"
+        },
+        {
+          "phrase": "next to",
+          "meaning": "旁边",
+          "source": "book",
+          "associated_word": "next"
+        },
+        {
+          "phrase": "as well",
+          "meaning": "也",
+          "source": "book",
+          "associated_word": "well"
+        },
+        {
+          "phrase": "just now",
+          "meaning": "现在，刚才",
+          "source": "book",
+          "associated_word": "just"
+        }
+      ]
     },
     {
       "day": 56,
@@ -8734,7 +10109,32 @@
           "meaning": "租赁；雇佣"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a box of matches",
+          "meaning": "a tennis match (n)",
+          "source": "cambridge_official",
+          "associated_word": "box"
+        },
+        {
+          "phrase": "turn down",
+          "meaning": "关小；拒绝",
+          "source": "book",
+          "associated_word": "turn"
+        },
+        {
+          "phrase": "to write a note",
+          "meaning": "写笔记",
+          "source": "cambridge_official",
+          "associated_word": "write"
+        },
+        {
+          "phrase": "talk of",
+          "meaning": "谈论，议论",
+          "source": "book",
+          "associated_word": "talk"
+        }
+      ]
     },
     {
       "day": 57,
@@ -8890,7 +10290,32 @@
           "meaning": "攻击"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "in danger",
+          "meaning": "处于危险状态",
+          "source": "book",
+          "associated_word": "danger"
+        },
+        {
+          "phrase": "the least amount",
+          "meaning": "at least (adv)",
+          "source": "cambridge_official",
+          "associated_word": "least"
+        },
+        {
+          "phrase": "compare with ……",
+          "meaning": "与……相比",
+          "source": "book",
+          "associated_word": "compare"
+        },
+        {
+          "phrase": "a lot",
+          "meaning": "很多",
+          "source": "cambridge_official",
+          "associated_word": "lot"
+        }
+      ]
     },
     {
       "day": 58,
@@ -9046,7 +10471,32 @@
           "meaning": "相当地"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "knock at",
+          "meaning": "敲",
+          "source": "book",
+          "associated_word": "knock"
+        },
+        {
+          "phrase": "in fact",
+          "meaning": "事实上",
+          "source": "book",
+          "associated_word": "fact"
+        },
+        {
+          "phrase": "second class  \nclassical",
+          "meaning": "classical music",
+          "source": "cambridge_official",
+          "associated_word": "second"
+        },
+        {
+          "phrase": "in order that",
+          "meaning": "为了",
+          "source": "book",
+          "associated_word": "order"
+        }
+      ]
     },
     {
       "day": 59,
@@ -9202,7 +10652,32 @@
           "meaning": "西北方"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "org \nat all",
+          "meaning": "at first (prep phr)",
+          "source": "cambridge_official",
+          "associated_word": "all"
+        },
+        {
+          "phrase": "in spite of \nsplit up",
+          "meaning": "She’s just split up with her boyfriend.",
+          "source": "cambridge_official",
+          "associated_word": "spite"
+        },
+        {
+          "phrase": "show off",
+          "meaning": "炫耀",
+          "source": "book",
+          "associated_word": "show"
+        },
+        {
+          "phrase": "give away",
+          "meaning": "分发",
+          "source": "book",
+          "associated_word": "give"
+        }
+      ]
     },
     {
       "day": 60,
@@ -9358,7 +10833,32 @@
           "meaning": "景点"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "by mistake",
+          "meaning": "错误地",
+          "source": "cambridge_official",
+          "associated_word": "mistake"
+        },
+        {
+          "phrase": "instead of",
+          "meaning": "代替",
+          "source": "book",
+          "associated_word": "instead"
+        },
+        {
+          "phrase": "stand in a ring",
+          "meaning": "站成一圈",
+          "source": "cambridge_official",
+          "associated_word": "stand"
+        },
+        {
+          "phrase": "think of",
+          "meaning": "想起，考虑；认为，看法",
+          "source": "book",
+          "associated_word": "think"
+        }
+      ]
     },
     {
       "day": 61,
@@ -9514,7 +11014,32 @@
           "meaning": "活泼的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "one after another",
+          "meaning": "一个接一个",
+          "source": "book",
+          "associated_word": "one"
+        },
+        {
+          "phrase": "go for",
+          "meaning": "去(做某事)；选择",
+          "source": "cambridge_official",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "a weekly magazine",
+          "meaning": "周刊杂志",
+          "source": "cambridge_official",
+          "associated_word": "weekly"
+        },
+        {
+          "phrase": "do some cleaning(shopping) ()",
+          "meaning": "做扫除(买东西)",
+          "source": "book",
+          "associated_word": "do"
+        }
+      ]
     },
     {
       "day": 62,
@@ -9670,7 +11195,32 @@
           "meaning": "劣势"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "enjoy oneself",
+          "meaning": "过得愉快",
+          "source": "book",
+          "associated_word": "enjoy"
+        },
+        {
+          "phrase": "let out",
+          "meaning": "放掉,泄露",
+          "source": "book",
+          "associated_word": "let"
+        },
+        {
+          "phrase": "fall asleep",
+          "meaning": "入睡",
+          "source": "book",
+          "associated_word": "fall"
+        },
+        {
+          "phrase": "try out",
+          "meaning": "试验",
+          "source": "book",
+          "associated_word": "try"
+        }
+      ]
     },
     {
       "day": 63,
@@ -9826,7 +11376,32 @@
           "meaning": "发音"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "have a good time",
+          "meaning": "玩得开心",
+          "source": "book",
+          "associated_word": "have"
+        },
+        {
+          "phrase": "the whole world",
+          "meaning": "全世界",
+          "source": "cambridge_official",
+          "associated_word": "whole"
+        },
+        {
+          "phrase": "hard work",
+          "meaning": "辛苦的工作",
+          "source": "cambridge_official",
+          "associated_word": "hard"
+        },
+        {
+          "phrase": "come up with",
+          "meaning": "想出",
+          "source": "book",
+          "associated_word": "come"
+        }
+      ]
     },
     {
       "day": 64,
@@ -9982,7 +11557,32 @@
           "meaning": "肩膀"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "put through",
+          "meaning": "接通电话",
+          "source": "cambridge_official",
+          "associated_word": "put"
+        },
+        {
+          "phrase": "send up",
+          "meaning": "发出,射出",
+          "source": "book",
+          "associated_word": "send"
+        },
+        {
+          "phrase": "have classes",
+          "meaning": "上课",
+          "source": "book",
+          "associated_word": "have"
+        },
+        {
+          "phrase": "in love",
+          "meaning": "恋爱中",
+          "source": "cambridge_official",
+          "associated_word": "love"
+        }
+      ]
     },
     {
       "day": 65,
@@ -10138,7 +11738,32 @@
           "meaning": "基本的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "too...to………… ...",
+          "meaning": "太……以至于不……",
+          "source": "book",
+          "associated_word": "too"
+        },
+        {
+          "phrase": "my return from holiday",
+          "meaning": "度假归来",
+          "source": "cambridge_official",
+          "associated_word": "my"
+        },
+        {
+          "phrase": "first of all",
+          "meaning": "首先",
+          "source": "book",
+          "associated_word": "first"
+        },
+        {
+          "phrase": "set off",
+          "meaning": "出发",
+          "source": "book",
+          "associated_word": "set"
+        }
+      ]
     },
     {
       "day": 66,
@@ -10294,7 +11919,32 @@
           "meaning": "边界"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "close to",
+          "meaning": "靠近",
+          "source": "cambridge_official",
+          "associated_word": "close"
+        },
+        {
+          "phrase": "stand for",
+          "meaning": "代表，象征",
+          "source": "book",
+          "associated_word": "stand"
+        },
+        {
+          "phrase": "neither...nor………… ...",
+          "meaning": "既不……也不……",
+          "source": "book",
+          "associated_word": "neither"
+        },
+        {
+          "phrase": "out of work",
+          "meaning": "失业",
+          "source": "book",
+          "associated_word": "work"
+        }
+      ]
     },
     {
       "day": 67,
@@ -10450,7 +12100,32 @@
           "meaning": "路标"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "once more",
+          "meaning": "再一次",
+          "source": "book",
+          "associated_word": "once"
+        },
+        {
+          "phrase": "third place in a race",
+          "meaning": "比赛第三名",
+          "source": "cambridge_official",
+          "associated_word": "place"
+        },
+        {
+          "phrase": "as well as ……",
+          "meaning": "除……之外(也)",
+          "source": "book",
+          "associated_word": "well"
+        },
+        {
+          "phrase": "in a hurry",
+          "meaning": "匆忙地",
+          "source": "book",
+          "associated_word": "hurry"
+        }
+      ]
     },
     {
       "day": 68,
@@ -10606,7 +12281,32 @@
           "meaning": "宣布"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a square room",
+          "meaning": "方形房间",
+          "source": "cambridge_official",
+          "associated_word": "square"
+        },
+        {
+          "phrase": "now and then",
+          "meaning": "不时，偶尔",
+          "source": "book",
+          "associated_word": "now"
+        },
+        {
+          "phrase": "look forward to",
+          "meaning": "期待",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "a range of products \n \nrap",
+          "meaning": "rap artist",
+          "source": "cambridge_official",
+          "associated_word": "range"
+        }
+      ]
     },
     {
       "day": 69,
@@ -10762,7 +12462,32 @@
           "meaning": "财务的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "in time",
+          "meaning": "及时",
+          "source": "book",
+          "associated_word": "time"
+        },
+        {
+          "phrase": "break in",
+          "meaning": "闯入",
+          "source": "book",
+          "associated_word": "break"
+        },
+        {
+          "phrase": "fill in",
+          "meaning": "填写",
+          "source": "book",
+          "associated_word": "fill"
+        },
+        {
+          "phrase": "public opinion",
+          "meaning": "公众舆论",
+          "source": "cambridge_official",
+          "associated_word": "public"
+        }
+      ]
     },
     {
       "day": 70,
@@ -10918,7 +12643,32 @@
           "meaning": "比较"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "go by",
+          "meaning": "走过；经过；过去",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "by air / plane ( ship train bus) / ( , , , )",
+          "meaning": "乘飞机(轮船, 火车,公共汽车)",
+          "source": "book",
+          "associated_word": "air"
+        },
+        {
+          "phrase": "the other day",
+          "meaning": "前几天，某日",
+          "source": "book",
+          "associated_word": "other"
+        },
+        {
+          "phrase": "ever since",
+          "meaning": "自那时起直到现在",
+          "source": "book",
+          "associated_word": "ever"
+        }
+      ]
     },
     {
       "day": 71,
@@ -11074,7 +12824,32 @@
           "meaning": "目的地"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "right away",
+          "meaning": "立刻",
+          "source": "book",
+          "associated_word": "right"
+        },
+        {
+          "phrase": "hold on",
+          "meaning": "等一等（别挂电话）",
+          "source": "book",
+          "associated_word": "hold"
+        },
+        {
+          "phrase": "divide …into… …… ……",
+          "meaning": "把……分成",
+          "source": "book",
+          "associated_word": "divide"
+        },
+        {
+          "phrase": "get in",
+          "meaning": "进入",
+          "source": "book",
+          "associated_word": "get"
+        }
+      ]
     },
     {
       "day": 72,
@@ -11230,7 +13005,32 @@
           "meaning": "中等的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "hang up",
+          "meaning": "挂断电话",
+          "source": "book",
+          "associated_word": "hang"
+        },
+        {
+          "phrase": "a film show",
+          "meaning": "电影放映",
+          "source": "cambridge_official",
+          "associated_word": "film"
+        },
+        {
+          "phrase": "get up",
+          "meaning": "起床",
+          "source": "book",
+          "associated_word": "get"
+        },
+        {
+          "phrase": "keep one’s word",
+          "meaning": "守信",
+          "source": "book",
+          "associated_word": "keep"
+        }
+      ]
     },
     {
       "day": 73,
@@ -11386,7 +13186,32 @@
           "meaning": "诚实的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "underground trains",
+          "meaning": "地铁",
+          "source": "cambridge_official",
+          "associated_word": "underground"
+        },
+        {
+          "phrase": "so far",
+          "meaning": "到目前为止",
+          "source": "book",
+          "associated_word": "far"
+        },
+        {
+          "phrase": "com \nat all",
+          "meaning": "attractive (adj)",
+          "source": "cambridge_official",
+          "associated_word": "all"
+        },
+        {
+          "phrase": "take one's time",
+          "meaning": "慢慢来",
+          "source": "book",
+          "associated_word": "take"
+        }
+      ]
     },
     {
       "day": 74,
@@ -11542,7 +13367,32 @@
           "meaning": "意识到"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "stay behind",
+          "meaning": "留下；留下来",
+          "source": "cambridge_official",
+          "associated_word": "stay"
+        },
+        {
+          "phrase": "as usual",
+          "meaning": "像往常一样",
+          "source": "book",
+          "associated_word": "usual"
+        },
+        {
+          "phrase": "come to",
+          "meaning": "共计,达到",
+          "source": "book",
+          "associated_word": "come"
+        },
+        {
+          "phrase": "for ever",
+          "meaning": "永远",
+          "source": "book",
+          "associated_word": "ever"
+        }
+      ]
     },
     {
       "day": 75,
@@ -11698,7 +13548,32 @@
           "meaning": "大头针；钉住"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "go out",
+          "meaning": "出去；熄灭",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "carry on",
+          "meaning": "继续",
+          "source": "book",
+          "associated_word": "carry"
+        },
+        {
+          "phrase": "come on",
+          "meaning": "加油；快点",
+          "source": "book",
+          "associated_word": "come"
+        },
+        {
+          "phrase": "go on with",
+          "meaning": "继续",
+          "source": "book",
+          "associated_word": "go"
+        }
+      ]
     },
     {
       "day": 76,
@@ -11854,7 +13729,32 @@
           "meaning": "面粉"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "the trunk of a car  \n \ntrue",
+          "meaning": "Is it true?",
+          "source": "cambridge_official",
+          "associated_word": "car"
+        },
+        {
+          "phrase": "give back",
+          "meaning": "归还",
+          "source": "book",
+          "associated_word": "give"
+        },
+        {
+          "phrase": "in order to",
+          "meaning": "为了",
+          "source": "book",
+          "associated_word": "order"
+        },
+        {
+          "phrase": "more or less",
+          "meaning": "或多或少",
+          "source": "book",
+          "associated_word": "more"
+        }
+      ]
     },
     {
       "day": 77,
@@ -12010,7 +13910,32 @@
           "meaning": "复杂的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "the past few weeks",
+          "meaning": "in the past (n)",
+          "source": "cambridge_official",
+          "associated_word": "past"
+        },
+        {
+          "phrase": "to be patient",
+          "meaning": "有耐心",
+          "source": "cambridge_official",
+          "associated_word": "patient"
+        },
+        {
+          "phrase": "clear up",
+          "meaning": "整理,收拾,(天气)放晴",
+          "source": "book",
+          "associated_word": "clear"
+        },
+        {
+          "phrase": "as soon as ……",
+          "meaning": "一……就",
+          "source": "book",
+          "associated_word": "soon"
+        }
+      ]
     },
     {
       "day": 78,
@@ -12166,7 +14091,32 @@
           "meaning": "进入许可"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "so long as",
+          "meaning": "只要",
+          "source": "book",
+          "associated_word": "long"
+        },
+        {
+          "phrase": "keep up",
+          "meaning": "跟上；保持",
+          "source": "book",
+          "associated_word": "keep"
+        },
+        {
+          "phrase": "good afternoon",
+          "meaning": "下午好",
+          "source": "cambridge_official",
+          "associated_word": "good"
+        },
+        {
+          "phrase": "put out",
+          "meaning": "扑灭，关熄",
+          "source": "book",
+          "associated_word": "put"
+        }
+      ]
     },
     {
       "day": 79,
@@ -12322,7 +14272,32 @@
           "meaning": "费用"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a fall in the price",
+          "meaning": "价格下跌",
+          "source": "cambridge_official",
+          "associated_word": "fall"
+        },
+        {
+          "phrase": "day and night",
+          "meaning": "日日夜夜",
+          "source": "book",
+          "associated_word": "day"
+        },
+        {
+          "phrase": "in common",
+          "meaning": "共同，共有",
+          "source": "book",
+          "associated_word": "common"
+        },
+        {
+          "phrase": "take away",
+          "meaning": "拿走",
+          "source": "book",
+          "associated_word": "take"
+        }
+      ]
     },
     {
       "day": 80,
@@ -12478,7 +14453,32 @@
           "meaning": "犯人"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "face to face",
+          "meaning": "面对面",
+          "source": "book",
+          "associated_word": "face"
+        },
+        {
+          "phrase": "go on",
+          "meaning": "继续",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "all kinds of",
+          "meaning": "各种各样的",
+          "source": "book",
+          "associated_word": "all"
+        },
+        {
+          "phrase": "a little",
+          "meaning": "一点",
+          "source": "book",
+          "associated_word": "little"
+        }
+      ]
     },
     {
       "day": 81,
@@ -12634,7 +14634,32 @@
           "meaning": "例子"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "to have good taste",
+          "meaning": "有品味",
+          "source": "cambridge_official",
+          "associated_word": "have"
+        },
+        {
+          "phrase": "call in",
+          "meaning": "召来；来访",
+          "source": "book",
+          "associated_word": "call"
+        },
+        {
+          "phrase": "stop to do sth. .",
+          "meaning": "停下来做某事",
+          "source": "book",
+          "associated_word": "stop"
+        },
+        {
+          "phrase": "get off",
+          "meaning": "下车",
+          "source": "book",
+          "associated_word": "get"
+        }
+      ]
     },
     {
       "day": 82,
@@ -12790,7 +14815,32 @@
           "meaning": "扎紧"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "by the way",
+          "meaning": "顺便说一下",
+          "source": "book",
+          "associated_word": "way"
+        },
+        {
+          "phrase": "rather than",
+          "meaning": "而不是",
+          "source": "book",
+          "associated_word": "rather"
+        },
+        {
+          "phrase": "pay back",
+          "meaning": "偿还",
+          "source": "book",
+          "associated_word": "pay"
+        },
+        {
+          "phrase": "put down",
+          "meaning": "记下",
+          "source": "book",
+          "associated_word": "put"
+        }
+      ]
     },
     {
       "day": 83,
@@ -12946,7 +14996,32 @@
           "meaning": "breeze"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "had better ( do) ( )",
+          "meaning": "最好（做）",
+          "source": "book",
+          "associated_word": "do"
+        },
+        {
+          "phrase": "pass by",
+          "meaning": "经过",
+          "source": "book",
+          "associated_word": "pass"
+        },
+        {
+          "phrase": "in front of",
+          "meaning": "在...前面",
+          "source": "cambridge_official",
+          "associated_word": "front"
+        },
+        {
+          "phrase": "come true",
+          "meaning": "实现",
+          "source": "book",
+          "associated_word": "come"
+        }
+      ]
     },
     {
       "day": 84,
@@ -13102,7 +15177,32 @@
           "meaning": "greet"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "connect with ……",
+          "meaning": "与……相连",
+          "source": "book",
+          "associated_word": "connect"
+        },
+        {
+          "phrase": "ring back",
+          "meaning": "回电话",
+          "source": "book",
+          "associated_word": "ring"
+        },
+        {
+          "phrase": "put on",
+          "meaning": "穿上；上演",
+          "source": "book",
+          "associated_word": "put"
+        },
+        {
+          "phrase": "come down",
+          "meaning": "落,下来",
+          "source": "book",
+          "associated_word": "come"
+        }
+      ]
     },
     {
       "day": 85,
@@ -13258,7 +15358,32 @@
           "meaning": "dusty"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "to run a business \nrun",
+          "meaning": "go for a run",
+          "source": "cambridge_official",
+          "associated_word": "run"
+        },
+        {
+          "phrase": "to travel around",
+          "meaning": "到处旅行",
+          "source": "cambridge_official",
+          "associated_word": "travel"
+        },
+        {
+          "phrase": "tidy up",
+          "meaning": "整理；收拾",
+          "source": "cambridge_official",
+          "associated_word": "tidy"
+        },
+        {
+          "phrase": "make up of……",
+          "meaning": "由……组成，构成",
+          "source": "book",
+          "associated_word": "make"
+        }
+      ]
     },
     {
       "day": 86,
@@ -13414,7 +15539,32 @@
           "meaning": "单元"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "the last time",
+          "meaning": "最后一次",
+          "source": "cambridge_official",
+          "associated_word": "last"
+        },
+        {
+          "phrase": "keep fit",
+          "meaning": "保持健康",
+          "source": "cambridge_official",
+          "associated_word": "keep"
+        },
+        {
+          "phrase": "due to",
+          "meaning": "由于",
+          "source": "cambridge_official",
+          "associated_word": "due"
+        },
+        {
+          "phrase": "take the place of",
+          "meaning": "取代，代替",
+          "source": "book",
+          "associated_word": "take"
+        }
+      ]
     },
     {
       "day": 87,
@@ -13570,7 +15720,32 @@
           "meaning": "stylish"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "pay for",
+          "meaning": "付款",
+          "source": "book",
+          "associated_word": "pay"
+        },
+        {
+          "phrase": "show up",
+          "meaning": "出现；露面",
+          "source": "cambridge_official",
+          "associated_word": "show"
+        },
+        {
+          "phrase": "on sale",
+          "meaning": "促销中",
+          "source": "cambridge_official",
+          "associated_word": "sale"
+        },
+        {
+          "phrase": "in front of …",
+          "meaning": "在…前面",
+          "source": "book",
+          "associated_word": "front"
+        }
+      ]
     },
     {
       "day": 88,
@@ -13726,7 +15901,32 @@
           "meaning": "convince"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "sooner or later",
+          "meaning": "迟早，早晚",
+          "source": "book",
+          "associated_word": "later"
+        },
+        {
+          "phrase": "all right",
+          "meaning": "好吧；行了",
+          "source": "book",
+          "associated_word": "all"
+        },
+        {
+          "phrase": "come out",
+          "meaning": "出来；出版",
+          "source": "book",
+          "associated_word": "come"
+        },
+        {
+          "phrase": "you know",
+          "meaning": "你知道的",
+          "source": "cambridge_official",
+          "associated_word": "you"
+        }
+      ]
     },
     {
       "day": 89,
@@ -13882,7 +16082,32 @@
           "meaning": "handlebars"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "knock down",
+          "meaning": "撞倒；拆除",
+          "source": "cambridge_official",
+          "associated_word": "knock"
+        },
+        {
+          "phrase": "dial up",
+          "meaning": "拨号上网",
+          "source": "cambridge_official",
+          "associated_word": "dial"
+        },
+        {
+          "phrase": "put away",
+          "meaning": "放好",
+          "source": "book",
+          "associated_word": "put"
+        },
+        {
+          "phrase": "get along with ……",
+          "meaning": "与……相处",
+          "source": "book",
+          "associated_word": "get"
+        }
+      ]
     },
     {
       "day": 90,
@@ -14038,7 +16263,32 @@
           "meaning": "salmon"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "talk about",
+          "meaning": "谈论",
+          "source": "book",
+          "associated_word": "talk"
+        },
+        {
+          "phrase": "look out",
+          "meaning": "小心",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "run out",
+          "meaning": "用完；耗尽",
+          "source": "cambridge_official",
+          "associated_word": "run"
+        },
+        {
+          "phrase": "a shirt and tie",
+          "meaning": "衬衫和领带",
+          "source": "cambridge_official",
+          "associated_word": "shirt"
+        }
+      ]
     },
     {
       "day": 91,
@@ -14194,7 +16444,32 @@
           "meaning": "ironing"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "knock into sb",
+          "meaning": "撞上",
+          "source": "book",
+          "associated_word": "knock"
+        },
+        {
+          "phrase": "stop doing sth. .",
+          "meaning": "停止做某事",
+          "source": "book",
+          "associated_word": "stop"
+        },
+        {
+          "phrase": "He showed up at the party \nshower",
+          "meaning": "a shower of rain",
+          "source": "cambridge_official",
+          "associated_word": "he"
+        },
+        {
+          "phrase": "lie down",
+          "meaning": "躺下",
+          "source": "cambridge_official",
+          "associated_word": "lie"
+        }
+      ]
     },
     {
       "day": 92,
@@ -14350,7 +16625,32 @@
           "meaning": "cattle"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a sweet smell",
+          "meaning": "甜美的气味",
+          "source": "cambridge_official",
+          "associated_word": "sweet"
+        },
+        {
+          "phrase": "belong to",
+          "meaning": "属于",
+          "source": "book",
+          "associated_word": "belong"
+        },
+        {
+          "phrase": "of course",
+          "meaning": "当然",
+          "source": "book",
+          "associated_word": "course"
+        },
+        {
+          "phrase": "a bus stop",
+          "meaning": "公交车站",
+          "source": "cambridge_official",
+          "associated_word": "bus"
+        }
+      ]
     },
     {
       "day": 93,
@@ -14506,7 +16806,32 @@
           "meaning": "dj"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "separate...from... ......",
+          "meaning": "分开",
+          "source": "book",
+          "associated_word": "separate"
+        },
+        {
+          "phrase": "build up",
+          "meaning": "逐步建立",
+          "source": "book",
+          "associated_word": "build"
+        },
+        {
+          "phrase": "go through",
+          "meaning": "浏览；翻阅，通过",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "hear of",
+          "meaning": "听说，知道",
+          "source": "book",
+          "associated_word": "hear"
+        }
+      ]
     },
     {
       "day": 94,
@@ -14662,7 +16987,26 @@
           "meaning": "supporter"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "my own pen",
+          "meaning": "我自己的笔",
+          "source": "cambridge_official",
+          "associated_word": "my"
+        },
+        {
+          "phrase": "the day after tomorrow",
+          "meaning": "后天",
+          "source": "book",
+          "associated_word": "day"
+        },
+        {
+          "phrase": "work out",
+          "meaning": "解决；锻炼",
+          "source": "book",
+          "associated_word": "work"
+        }
+      ]
     },
     {
       "day": 95,
@@ -14818,7 +17162,26 @@
           "meaning": "tuna"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "on purpose",
+          "meaning": "故意地",
+          "source": "cambridge_official",
+          "associated_word": "purpose"
+        },
+        {
+          "phrase": "the head of the company",
+          "meaning": "公司负责人",
+          "source": "cambridge_official",
+          "associated_word": "head"
+        },
+        {
+          "phrase": "in peace",
+          "meaning": "安静,宁静",
+          "source": "book",
+          "associated_word": "peace"
+        }
+      ]
     },
     {
       "day": 96,
@@ -14974,7 +17337,26 @@
           "meaning": "紧挨着"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "worry about",
+          "meaning": "担心",
+          "source": "book",
+          "associated_word": "worry"
+        },
+        {
+          "phrase": "write down",
+          "meaning": "写下",
+          "source": "book",
+          "associated_word": "write"
+        },
+        {
+          "phrase": "no sign of life",
+          "meaning": "没有生命迹象",
+          "source": "cambridge_official",
+          "associated_word": "sign"
+        }
+      ]
     },
     {
       "day": 97,
@@ -15130,7 +17512,26 @@
           "meaning": "给……接通电话"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "to read a notice",
+          "meaning": "阅读通知",
+          "source": "cambridge_official",
+          "associated_word": "read"
+        },
+        {
+          "phrase": "in public",
+          "meaning": "当众",
+          "source": "book",
+          "associated_word": "public"
+        },
+        {
+          "phrase": "keep on",
+          "meaning": "继续",
+          "source": "book",
+          "associated_word": "keep"
+        }
+      ]
     },
     {
       "day": 98,
@@ -15286,7 +17687,26 @@
           "meaning": "主人；专家"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a break for lunch",
+          "meaning": "午餐休息时间",
+          "source": "cambridge_official",
+          "associated_word": "break"
+        },
+        {
+          "phrase": "go on doing",
+          "meaning": "继续做",
+          "source": "book",
+          "associated_word": "go"
+        },
+        {
+          "phrase": "come back",
+          "meaning": "回来",
+          "source": "book",
+          "associated_word": "come"
+        }
+      ]
     },
     {
       "day": 99,
@@ -15442,7 +17862,26 @@
           "meaning": "变成"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a few",
+          "meaning": "一些",
+          "source": "book",
+          "associated_word": "few"
+        },
+        {
+          "phrase": "on board",
+          "meaning": "在船上/飞机上",
+          "source": "cambridge_official",
+          "associated_word": "board"
+        },
+        {
+          "phrase": "take it easy",
+          "meaning": "别紧张",
+          "source": "book",
+          "associated_word": "take"
+        }
+      ]
     },
     {
       "day": 100,
@@ -15598,7 +18037,26 @@
           "meaning": "跪下"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "the day before yesterday",
+          "meaning": "前天",
+          "source": "book",
+          "associated_word": "day"
+        },
+        {
+          "phrase": "far from",
+          "meaning": "远离",
+          "source": "book",
+          "associated_word": "far"
+        },
+        {
+          "phrase": "hold up",
+          "meaning": "举起；延误",
+          "source": "cambridge_official",
+          "associated_word": "hold"
+        }
+      ]
     },
     {
       "day": 101,
@@ -15754,7 +18212,26 @@
           "meaning": "准时的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "on/over the radio /",
+          "meaning": "通过收音机",
+          "source": "book",
+          "associated_word": "radio"
+        },
+        {
+          "phrase": "die out",
+          "meaning": "灭绝",
+          "source": "book",
+          "associated_word": "die"
+        },
+        {
+          "phrase": "run away",
+          "meaning": "逃跑",
+          "source": "book",
+          "associated_word": "run"
+        }
+      ]
     },
     {
       "day": 102,
@@ -15910,7 +18387,26 @@
           "meaning": "立即的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "call on",
+          "meaning": "拜访，访问",
+          "source": "book",
+          "associated_word": "call"
+        },
+        {
+          "phrase": "in a word",
+          "meaning": "总之，简言之",
+          "source": "book",
+          "associated_word": "word"
+        },
+        {
+          "phrase": "have to",
+          "meaning": "不得不",
+          "source": "book",
+          "associated_word": "have"
+        }
+      ]
     },
     {
       "day": 103,
@@ -16066,7 +18562,26 @@
           "meaning": "查阅"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "at the same time",
+          "meaning": "同时",
+          "source": "cambridge_official",
+          "associated_word": "same"
+        },
+        {
+          "phrase": "get rid of",
+          "meaning": "摆脱；丢弃",
+          "source": "cambridge_official",
+          "associated_word": "get"
+        },
+        {
+          "phrase": "a railway line \nlink",
+          "meaning": "a link to a website",
+          "source": "cambridge_official",
+          "associated_word": "railway"
+        }
+      ]
     },
     {
       "day": 104,
@@ -16222,7 +18737,26 @@
           "meaning": "受害者"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "check out",
+          "meaning": "退房；查看",
+          "source": "book",
+          "associated_word": "check"
+        },
+        {
+          "phrase": "look through",
+          "meaning": "看穿，浏览",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "key to success \nkeyboard",
+          "meaning": "computer keyboard",
+          "source": "cambridge_official",
+          "associated_word": "key"
+        }
+      ]
     },
     {
       "day": 105,
@@ -16378,7 +18912,26 @@
           "meaning": "遥远的"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "a type of person",
+          "meaning": "某种类型的人",
+          "source": "cambridge_official",
+          "associated_word": "type"
+        },
+        {
+          "phrase": "carry out",
+          "meaning": "执行；实施",
+          "source": "book",
+          "associated_word": "carry"
+        },
+        {
+          "phrase": "at last",
+          "meaning": "最后；终于",
+          "source": "cambridge_official",
+          "associated_word": "last"
+        }
+      ]
     },
     {
       "day": 106,
@@ -16534,7 +19087,26 @@
           "meaning": "空调"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "on holiday",
+          "meaning": "度假",
+          "source": "cambridge_official",
+          "associated_word": "holiday"
+        },
+        {
+          "phrase": "look for",
+          "meaning": "寻找",
+          "source": "book",
+          "associated_word": "look"
+        },
+        {
+          "phrase": "help …out …",
+          "meaning": "帮助某人解决问题",
+          "source": "book",
+          "associated_word": "help"
+        }
+      ]
     },
     {
       "day": 107,
@@ -16690,7 +19262,26 @@
           "meaning": "微弱的；晕倒"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "the first turning on the left  \nturn into",
+          "meaning": "The water had turned into ice.",
+          "source": "cambridge_official",
+          "associated_word": "first"
+        },
+        {
+          "phrase": "by post",
+          "meaning": "通过邮寄",
+          "source": "cambridge_official",
+          "associated_word": "post"
+        },
+        {
+          "phrase": "on time",
+          "meaning": "准时",
+          "source": "book",
+          "associated_word": "time"
+        }
+      ]
     },
     {
       "day": 108,
@@ -16846,7 +19437,26 @@
           "meaning": "(Am Eng) (Br Eng: cinema)"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "not so...as ...",
+          "meaning": "不像，不如",
+          "source": "book",
+          "associated_word": "not"
+        },
+        {
+          "phrase": "on duty",
+          "meaning": "值日",
+          "source": "book",
+          "associated_word": "duty"
+        },
+        {
+          "phrase": "hang on （",
+          "meaning": "打电话时）不挂断，等待片刻",
+          "source": "book",
+          "associated_word": "hang"
+        }
+      ]
     },
     {
       "day": 109,
@@ -17002,7 +19612,26 @@
           "meaning": "耽搁"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "send out",
+          "meaning": "发出，派遣",
+          "source": "book",
+          "associated_word": "send"
+        },
+        {
+          "phrase": "in other words",
+          "meaning": "换句话说",
+          "source": "book",
+          "associated_word": "other"
+        },
+        {
+          "phrase": "a running race",
+          "meaning": "一场赛跑",
+          "source": "cambridge_official",
+          "associated_word": "race"
+        }
+      ]
     },
     {
       "day": 110,
@@ -17158,7 +19787,26 @@
           "meaning": "蔬菜水果商"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "join in",
+          "meaning": "参加",
+          "source": "book",
+          "associated_word": "join"
+        },
+        {
+          "phrase": "be proud of",
+          "meaning": "以...为傲",
+          "source": "book",
+          "associated_word": "proud"
+        },
+        {
+          "phrase": "by day",
+          "meaning": "在白天,日间",
+          "source": "book",
+          "associated_word": "day"
+        }
+      ]
     },
     {
       "day": 111,
@@ -17279,7 +19927,26 @@
           "meaning": "营业时间"
         }
       ],
-      "phrases": []
+      "phrases": [
+        {
+          "phrase": "lead to",
+          "meaning": "导致",
+          "source": "book",
+          "associated_word": "lead"
+        },
+        {
+          "phrase": "a street plan",
+          "meaning": "街道规划图",
+          "source": "cambridge_official",
+          "associated_word": "street"
+        },
+        {
+          "phrase": "take out",
+          "meaning": "取出",
+          "source": "book",
+          "associated_word": "take"
+        }
+      ]
     }
   ]
 }
