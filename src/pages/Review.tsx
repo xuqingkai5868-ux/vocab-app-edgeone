@@ -6,7 +6,7 @@ import { useApp } from '../contexts/AppContext';
 import { MASTER_WORDS } from '../services/utils/petVocabLoader';
 
 type SelfAssessment = 'forgot' | 'vague' | 'known';
-type Mode = 'select' | 'definition' | 'dictation';
+type Mode = 'select' | 'definition' | 'spelling' | 'audio';
 
 function getWordMeaning(word: string): string {
   const w = MASTER_WORDS.find(w => w.word.toLowerCase() === word.toLowerCase());
@@ -93,14 +93,24 @@ export function Review() {
               <div className="text-sm text-indigo-100 mt-1">看英文 → 回想中文含义</div>
             </button>
 
-            {/* 听写模式 - 大按钮 */}
+            {/* 拼写模式 - 大按钮 */}
             <button
-              onClick={() => setMode('dictation')}
-              className="w-full py-6 bg-amber-500 text-white rounded-2xl shadow-lg shadow-amber-200 active:scale-[0.98] transition-transform"
+              onClick={() => setMode('spelling')}
+              className="w-full py-6 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-200 active:scale-[0.98] transition-transform"
             >
               <div className="text-3xl mb-2">✍️</div>
+              <div className="text-lg font-bold">拼写模式</div>
+              <div className="text-sm text-emerald-100 mt-1">看中文 → 拼写英文单词</div>
+            </button>
+
+            {/* 听写模式 - 大按钮 */}
+            <button
+              onClick={() => setMode('audio')}
+              className="w-full py-6 bg-amber-500 text-white rounded-2xl shadow-lg shadow-amber-200 active:scale-[0.98] transition-transform"
+            >
+              <div className="text-3xl mb-2">🎧</div>
               <div className="text-lg font-bold">听写模式</div>
-              <div className="text-sm text-amber-100 mt-1">看中文 → 拼写英文单词</div>
+              <div className="text-sm text-amber-100 mt-1">听发音 → 默写英文单词</div>
             </button>
           </div>
         </Card>
@@ -108,9 +118,13 @@ export function Review() {
     );
   }
 
-  // --- 听写模式：跳转到独立听写页 ---
-  if (mode === 'dictation') {
-    navigate('/dictation');
+  // --- 拼写/听写模式：跳转到独立页面 ---
+  if (mode === 'spelling') {
+    navigate('/dictation?type=spelling');
+    return null;
+  }
+  if (mode === 'audio') {
+    navigate('/dictation?type=audio');
     return null;
   }
 
