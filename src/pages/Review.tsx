@@ -40,7 +40,10 @@ export function Review() {
           <p className="text-gray-500 text-center py-8">
             🎉 当前没有模糊词，继续保持！
           </p>
-          <button onClick={() => navigate('/home')} className="w-full py-2.5 bg-primary-500 text-white rounded-lg">
+          <button onClick={() => navigate('/dictation')} className="w-full py-2.5 bg-primary-500 text-white rounded-lg mb-2">
+            进入听写 ✍️
+          </button>
+          <button onClick={() => navigate('/home')} className="w-full py-2.5 bg-gray-100 text-gray-600 rounded-lg">
             返回首页
           </button>
         </Card>
@@ -61,6 +64,10 @@ export function Review() {
       </div>
 
       <ProgressBar value={currentIndex} max={total} label="复习进度" />
+
+      <button onClick={() => navigate('/dictation')} className="w-full py-2.5 bg-amber-500 text-white rounded-xl font-medium mb-2">
+        听写模式 ✍️
+      </button>
 
       <Card className="text-center py-8">
         <p className="text-xs text-gray-400 mb-4">
