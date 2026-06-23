@@ -22,7 +22,7 @@ export function Dictation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const dictType = (searchParams.get('type') || 'spelling') as DictType;
-  const { state, wordsPerDay } = useApp();
+  const { state, wordsPerDay, updateUserState } = useApp();
 
   const [mode, setMode] = useState<Mode>('today');
   const [currentIdx, setCurrentIdx] = useState(0);
@@ -31,6 +31,7 @@ export function Dictation() {
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [autoPlayed, setAutoPlayed] = useState(false);
+  const [feedback, setFeedback] = useState<{ fuzzyWords: number; masteredWords: number } | null>(null);
 
   // 追踪拼写/听写时长
   const trackType = dictType === 'audio' ? 'review_audio' : 'review_spelling';
@@ -75,6 +76,35 @@ export function Dictation() {
       return () => clearTimeout(timer);
     }
   }, [currentIdx, started, finished, dictType, current]);
+
+  // 听写完成后，将错误单词自动标为 fuzzy，正确单词标为 mastered
+  useEffect(() => {
+    if (!finished || results.length === 0) return;
+    if (feedback) return; // 避免重复保存
+
+    const newStates = { ...state.states };
+    let fuzzyCount = 0;
+    let masteredCount = 0;
+
+    for (const r of results) {
+      if (r.correct) {
+        // 正确 → 标为 mastered
+        if (newStates[r.word] !== 'mastered') {
+          newStates[r.word] = 'mastered';
+          masteredCount++;
+        }
+      } else {
+        // 错误或跳过 → 标为 fuzzy
+        if (newStates[r.word] !== 'fuzzy') {
+          newStates[r.word] = 'fuzzy';
+          fuzzyCount++;
+        }
+      }
+    }
+
+    updateUserState({ ...state, states: newStates });
+    setFeedback({ fuzzyWords: fuzzyCount, masteredWords: masteredCount });
+  }, [finished, results, state, updateUserState, feedback]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -146,24 +176,50 @@ export function Dictation() {
     const pct = Math.round((correct / total) * 100);
     const wrongWords = results.filter(r => !r.correct);
     return (
-      <div className="space-y-4 text-center py-12">
+      <div className="space-y-4 text-center py-8">
         <div className="text-6xl mb-4">{pct >= 80 ? '🌟' : pct >= 50 ? '💪' : '📚'}</div>
         <h1 className="text-2xl font-bold text-gray-800">{modeTitle}完成！</h1>
         <p className="text-gray-500">{correct}/{total} 正确 ({pct}%)</p>
-        {wrongWords.length > 0 && (
-          <div className="max-h-40 overflow-y-auto">
-            <p className="text-xs text-gray-400 mb-1">错误的单词：</p>
-            {wrongWords.map((r, i) => (
-              <div key={i} className="text-sm py-1 text-red-500">{r.word} ✗</div>
-            ))}
+
+        {/* 结果反馈：哪些词被自动标记 */}
+        {feedback && (
+          <div className="bg-blue-50 rounded-xl px-4 py-3 text-sm text-blue-700 mx-4">
+            {feedback.fuzzyWords > 0 && (
+              <p>✏️ {feedback.fuzzyWords} 个错误词已加入复习列表</p>
+            )}
+            {feedback.masteredWords > 0 && (
+              <p>✅ {feedback.masteredWords} 个正确词已标为掌握</p>
+            )}
           </div>
         )}
+
+        {/* 错误词列表 */}
+        {wrongWords.length > 0 && (
+          <Card className="text-left !p-3">
+            <p className="text-xs text-gray-400 mb-2 text-center">需要复习的单词：</p>
+            <div className="space-y-1.5 max-h-48 overflow-y-auto">
+              {wrongWords.map((r, i) => (
+                <div key={i} className="flex items-center justify-between px-3 py-2 bg-red-50 rounded-lg">
+                  <div>
+                    <span className="text-sm font-medium text-gray-800">{r.word}</span>
+                    <span className="text-xs text-gray-400 ml-2">{MASTER_WORDS.find(w => w.word === r.word)?.meaning || ''}</span>
+                  </div>
+                  <span className="text-lg">✗</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
         <div className="flex gap-3 justify-center mt-4">
           <button
-            onClick={() => { setStarted(false); setFinished(false); setCurrentIdx(0); setResults([]); }}
+            onClick={() => { setStarted(false); setFinished(false); setCurrentIdx(0); setResults([]); setFeedback(null); }}
             className="px-6 py-2.5 bg-primary-500 text-white rounded-lg"
           >
             再来一次
+          </button>
+          <button onClick={() => navigate('/review')} className="px-6 py-2.5 bg-amber-500 text-white rounded-lg">
+            去复习 🔄
           </button>
           <button onClick={() => navigate('/home')} className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg">
             返回首页
