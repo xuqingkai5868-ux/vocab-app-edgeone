@@ -1,12 +1,11 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
 import { UserInfo, login as apiLogin } from '../api/auth';
-import { clearToken, hasToken } from '../api/client';
+import { clearToken } from '../api/client';
 
 interface AuthContextType {
   user: UserInfo | null;
   isLoggedIn: boolean;
   isLoading: boolean;
-  login: (userId: string, pin: string) => Promise<void>;
   logout: () => void;
 }
 
@@ -17,25 +16,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // 检查本地是否有 token，如果有尝试恢复 session
-    if (hasToken()) {
-      // 尝试从 localStorage 恢复用户信息
-      const saved = localStorage.getItem('vocab_user');
-      if (saved) {
-        try {
-          setUser(JSON.parse(saved));
-        } catch {
-          // ignore
-        }
-      }
-    }
-    setIsLoading(false);
-  }, []);
-
-  const login = useCallback(async (userId: string, pin: string) => {
-    const result = await apiLogin(userId, pin);
-    setUser(result.user);
-    localStorage.setItem('vocab_user', JSON.stringify(result.user));
+    // 自动登录弟弟账号
+    apiLogin('di', '5678')
+      .then(result => {
+        setUser(result.user);
+        localStorage.setItem('vocab_user', JSON.stringify(result.user));
+      })
+      .catch(() => {
+        // 登录失败，清掉旧数据
+        clearToken();
+        localStorage.removeItem('vocab_user');
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, []);
 
   const logout = useCallback(() => {
@@ -45,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoggedIn: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoggedIn: !!user, isLoading, logout }}>
       {children}
     </AuthContext.Provider>
   );
