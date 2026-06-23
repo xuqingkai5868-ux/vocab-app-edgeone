@@ -146,7 +146,10 @@ export function Review() {
           释义复习
           <span className="text-sm font-normal text-gray-400 ml-2">({total} 个)</span>
         </h1>
-        <div className="w-12" />
+        <div className="flex gap-1">
+          <button onClick={() => navigate('/dictation?type=spelling')} className="text-emerald-500 text-xs border border-emerald-300 rounded-lg px-2 py-1" title="拼写模式">✍️</button>
+          <button onClick={() => navigate('/dictation?type=audio')} className="text-amber-500 text-xs border border-amber-300 rounded-lg px-2 py-1" title="听写模式">🎧</button>
+        </div>
       </div>
 
       <ProgressBar value={currentIndex} max={total} label="复习进度" />
