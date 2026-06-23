@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { Loading } from '../components/Loading';
 import { getTotalDays } from '../services/utils/petVocabLoader';
+import { getActiveTracking } from '../services/activity/activityTracker';
 
 function getLevel(mastered: number): { level: number; title: string; icon: string } {
   const levels = [
@@ -73,9 +74,14 @@ export function Home() {
 
   const masteredToday = todayNewWords.filter(w => state.states[w.word] === 'mastered').length;
   const fuzzyToday = todayNewWords.filter(w => state.states[w.word] === 'fuzzy').length;
+  const studiedToday = masteredToday + fuzzyToday; // 所有学过（✓或△）的都算
 
   const handleCheckIn = async () => {
-    const ok = await doCheckIn({ newWordsCompleted: masteredToday, reviewWordsCompleted: 0, studyDurationMinutes: 15 });
+    // 从活动追踪器获取本次学习时长
+    const active = getActiveTracking();
+    const sessionSec = active ? Math.round(active.elapsed / 1000) : studiedToday * 10;
+    const min = Math.max(1, Math.round(sessionSec / 60));
+    const ok = await doCheckIn({ newWordsCompleted: studiedToday, reviewWordsCompleted: 0, studyDurationMinutes: min });
     if (!ok) alert('任务未完成，还不能打卡');
   };
 
@@ -104,7 +110,7 @@ export function Home() {
 
       <Card>
         <h2 className="font-semibold text-gray-700 mb-3">今日任务</h2>
-        <ProgressBar value={masteredToday} max={todayNewWords.length} label={`新词 (${todayNewWords.length})`} color="bg-primary-500" />
+        <ProgressBar value={studiedToday} max={todayNewWords.length} label={`新词 (${studiedToday}/${todayNewWords.length})`} color="bg-primary-500" />
         {todayPhrases.length > 0 && (
           <div className="mt-2 text-sm text-gray-500">
             关联短语 {todayPhrases.length} 条

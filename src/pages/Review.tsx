@@ -5,6 +5,7 @@ import { ProgressBar } from '../components/ProgressBar';
 import { useApp } from '../contexts/AppContext';
 import { MASTER_WORDS } from '../services/utils/petVocabLoader';
 import { startTracking, stopTracking } from '../services/activity/activityTracker';
+import { speakWord } from '../services/utils/speak';
 
 type SelfAssessment = 'forgot' | 'vague' | 'known';
 type Mode = 'select' | 'definition' | 'spelling' | 'audio';
@@ -158,7 +159,16 @@ export function Review() {
         <p className="text-xs text-gray-400 mb-4">
           当前：{currentStatus === 'mastered' ? '✓ 已掌握' : currentStatus === 'fuzzy' ? '△ 模糊' : '○ 未标记'}
         </p>
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">{currentWord.word}</h2>
+        <div className="flex items-center justify-center gap-3 mb-6">
+          <h2 className="text-3xl font-bold text-gray-800">{currentWord.word}</h2>
+          <button
+            onClick={() => speakWord(currentWord.word)}
+            className="text-2xl text-primary-400 hover:text-primary-600 active:scale-110 transition-transform"
+            title="点击朗读发音"
+          >
+            🔊
+          </button>
+        </div>
 
         {!showMeaning ? (
           <button onClick={() => setShowMeaning(true)} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg text-sm">

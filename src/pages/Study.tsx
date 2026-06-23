@@ -6,6 +6,7 @@ import { Loading } from '../components/Loading';
 import { useApp } from '../contexts/AppContext';
 import { getDayWords, getDayPhrases } from '../services/utils/petVocabLoader';
 import { startTracking, stopTracking } from '../services/activity/activityTracker';
+import { speakWord } from '../services/utils/speak';
 
 type WordStatus = 'new' | 'fuzzy' | 'mastered';
 
@@ -116,7 +117,16 @@ export function Study() {
             </span>
           )}
           <div className={`transition-all duration-200 ${flipped ? 'opacity-0 scale-95 absolute' : 'opacity-100 scale-100'}`}>
-            <h2 className="text-3xl font-bold text-gray-800">{currentItem.word}</h2>
+            <div className="flex items-center justify-center gap-3">
+              <h2 className="text-3xl font-bold text-gray-800">{currentItem.word}</h2>
+              <button
+                onClick={e => { e.stopPropagation(); speakWord(currentItem.word); }}
+                className="text-2xl text-primary-400 hover:text-primary-600 active:scale-110 transition-transform"
+                title="点击朗读发音"
+              >
+                🔊
+              </button>
+            </div>
             <p className="text-sm text-gray-400 mt-3">点卡片翻转查看释义</p>
           </div>
           <div className={`transition-all duration-200 ${!flipped ? 'opacity-0 scale-95 absolute' : 'opacity-100 scale-100'}`}>
