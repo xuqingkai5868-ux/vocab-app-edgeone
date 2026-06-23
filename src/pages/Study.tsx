@@ -96,7 +96,7 @@ export function Study() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <button onClick={() => navigate('/home')} className="text-primary-500 text-sm">&larr; 返回</button>
-        <div className="text-sm text-gray-500">Day {day} · 第 {currentGroup + 1}/{groups.length} 组</div>
+        <div className="text-sm text-gray-500">Day {day}</div>
       </div>
 
       <ProgressBar value={doneCards} max={totalCards} label="今日进度" />
@@ -136,7 +136,7 @@ export function Study() {
       )}
 
       <div className="text-center text-xs text-gray-400">
-        第 {cardIndex + 1}/{allItems.length} 项 · 共 {totalCards} 项
+        第 {doneCards + 1}/{totalCards} 项
       </div>
     </div>
   );
