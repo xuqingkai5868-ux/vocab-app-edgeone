@@ -28,6 +28,8 @@ const TYPE_COLORS: Record<string, string> = {
   checkin: 'bg-green-100 text-green-700',
 };
 
+const PARENT_PASSWORD = 'scdq';
+
 function formatDuration(ms: number): string {
   const totalSec = Math.round(ms / 1000);
   const min = Math.floor(totalSec / 60);
@@ -50,6 +52,10 @@ export function Settings() {
   const [todayEvents, setTodayEvents] = useState<ActivityEvent[]>([]);
   const [weekStats, setWeekStats] = useState<{ type: string; totalMs: number }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [passwordMode, setPasswordMode] = useState<'wordsPerDay' | 'reset' | null>(null);
+  const [passwordInput, setPasswordInput] = useState('');
+  const [passwordError, setPasswordError] = useState(false);
+  const [sliderUnlocked, setSliderUnlocked] = useState(false); // 密码验证后解锁
 
   useEffect(() => {
     loadActivity();
@@ -77,11 +83,33 @@ export function Settings() {
   };
 
   const handleReset = () => {
+    setPasswordMode('reset');
+    setPasswordInput('');
+    setPasswordError(false);
+  };
+
+  const confirmReset = () => {
     if (!confirm(`确定重置 ${user?.name || '用户'} 的所有学习进度吗？`)) return;
     localStorage.removeItem('vocab_user');
     localStorage.removeItem('di_states');
     alert('已重置');
     logout();
+  };
+
+  const handlePasswordSubmit = () => {
+    if (passwordInput === PARENT_PASSWORD) {
+      setPasswordError(false);
+      if (passwordMode === 'wordsPerDay') {
+        setSliderUnlocked(true);
+      } else if (passwordMode === 'reset') {
+        confirmReset();
+      }
+      setPasswordMode(null);
+      setPasswordInput('');
+    } else {
+      setPasswordError(true);
+      setPasswordInput('');
+    }
   };
 
   const todayTotalMs = todayEvents.reduce((s, e) => s + e.duration, 0);
@@ -182,8 +210,9 @@ export function Settings() {
           <input
             type="range" min={5} max={50} step={5}
             value={wordsPerDay}
+            disabled={!sliderUnlocked}
             onChange={e => setWordsPerDay(parseInt(e.target.value))}
-            className="flex-1 accent-primary-500"
+            className={`flex-1 accent-primary-500 ${!sliderUnlocked ? 'opacity-50 cursor-not-allowed' : ''}`}
           />
           <span className="text-lg font-bold text-primary-500 min-w-[3rem] text-center">{wordsPerDay}</span>
         </div>
@@ -191,8 +220,18 @@ export function Settings() {
           <span>每天 5 词</span>
           <span>每天 50 词</span>
         </div>
-        <div className="mt-2 text-sm text-gray-500">
-          共 {totalDays} 天完成 · 当前 Day {appState.currentDay}
+        <div className="mt-2 text-sm text-gray-500 flex items-center justify-between">
+          <span>共 {totalDays} 天完成 · 当前 Day {appState.currentDay}</span>
+          {!sliderUnlocked ? (
+            <button
+              onClick={() => { setPasswordMode('wordsPerDay'); setPasswordInput(''); setPasswordError(false); }}
+              className="text-xs text-amber-600 border border-amber-300 rounded-lg px-2.5 py-1 hover:bg-amber-50"
+            >
+              🔒 家长验证修改
+            </button>
+          ) : (
+            <span className="text-xs text-green-600">✅ 已解锁</span>
+          )}
         </div>
       </Card>
 
@@ -210,6 +249,44 @@ export function Settings() {
         <button onClick={handleReset} className="w-full py-2.5 bg-red-500 text-white rounded-lg text-sm">重置学习进度</button>
         <button onClick={() => { logout(); navigate('/'); }} className="w-full py-2.5 mt-2 border border-gray-200 text-gray-600 rounded-lg text-sm">退出登录</button>
       </Card>
+
+      {/* 密码验证弹窗 */}
+      {passwordMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setPasswordMode(null); setPasswordInput(''); setPasswordError(false); }}>
+          <div className="bg-white rounded-2xl p-6 w-80 mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
+            <h3 className="text-lg font-bold text-gray-800 mb-2">🔒 家长验证</h3>
+            <p className="text-sm text-gray-500 mb-4">
+              {passwordMode === 'wordsPerDay' ? '修改每日学习量需要家长密码' : '重置学习进度需要家长密码'}
+            </p>
+            <input
+              type="password"
+              value={passwordInput}
+              autoFocus
+              onChange={e => { setPasswordInput(e.target.value); setPasswordError(false); }}
+              onKeyDown={e => e.key === 'Enter' && handlePasswordSubmit()}
+              placeholder="请输入家长密码"
+              className={`w-full px-4 py-3 border rounded-xl text-center text-lg focus:outline-none focus:ring-2 ${passwordError ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-primary-500'}`}
+            />
+            {passwordError && (
+              <p className="text-red-500 text-xs mt-2 text-center">密码错误，请重试</p>
+            )}
+            <div className="flex gap-3 mt-4">
+              <button
+                onClick={() => { setPasswordMode(null); setPasswordInput(''); setPasswordError(false); }}
+                className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm"
+              >
+                取消
+              </button>
+              <button
+                onClick={handlePasswordSubmit}
+                className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium"
+              >
+                确认
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
