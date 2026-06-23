@@ -4,7 +4,7 @@ import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { Loading } from '../components/Loading';
 import { useApp } from '../contexts/AppContext';
-import { petSchedule } from '../services/utils/petVocabLoader';
+import { getTotalDays, petSchedule } from '../services/utils/petVocabLoader';
 
 type WordStatus = 'new' | 'fuzzy' | 'mastered';
 
@@ -78,9 +78,14 @@ export function Study() {
         <p className="text-sm text-gray-400 mt-2">
           掌握了 {Object.values(state.states).filter(v => v === 'mastered').length} 个词
         </p>
-        <button onClick={() => navigate('/home')} className="mt-6 px-8 py-3 bg-primary-500 text-white rounded-xl text-lg">
-          返回首页 🏠
-        </button>
+        <div className="flex gap-3 justify-center mt-6">
+          <button onClick={() => navigate('/grammar/1')} className="px-6 py-3 bg-amber-500 text-white rounded-xl text-lg">
+            查看语法 📘
+          </button>
+          <button onClick={() => navigate('/home')} className="px-6 py-3 bg-primary-500 text-white rounded-xl text-lg">
+            返回首页 🏠
+          </button>
+        </div>
       </div>
     );
   }

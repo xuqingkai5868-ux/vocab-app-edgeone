@@ -1,0 +1,244 @@
+{
+  "stages": [
+    {
+      "stage": 1,
+      "name": "基础构建",
+      "level": "KET 入门",
+      "pdf": "KET 语法 PDF 第 1-40 页",
+      "cards": [
+        {
+          "id": "noun-plural",
+          "title": "名词复数",
+          "rule": "一般名词加 -s；以 s/x/sh/ch 结尾加 -es；辅音+y 变 ies；f/fe 变 ves",
+          "examples": ["cat → cats", "bus → buses", "baby → babies", "knife → knives"],
+          "note": "不规则：child→children, man→men, woman→women, tooth→teeth, foot→feet",
+          "pdf_ref": "KET 语法 PDF 第 12-15 页"
+        },
+        {
+          "id": "be-have",
+          "title": "be 动词和 have 动词",
+          "rule": "be: I am / he/she/it is / we/you/they are\nhave: I/you/we/they have / he/she/it has",
+          "examples": ["I am a student.", "She has a cat.", "They are happy.", "He has two brothers."],
+          "note": "be 否定：am not/is not( isn't)/are not(aren't)\nhave 否定：don't have / doesn't have",
+          "pdf_ref": "KET 语法 PDF 第 16-20 页"
+        },
+        {
+          "id": "present-simple",
+          "title": "一般现在时",
+          "rule": "主语 + 动词原形（第三人称单数加 s/es）\n否定：don't/doesn't + 动词原形\n疑问句：Do/Does + 主语 + 动词原形？",
+          "examples": ["I like apples.", "She reads every day.", "He doesn't play football.", "Do you like music?"],
+          "note": "第三人称单数加 s 规则与名词复数相同",
+          "pdf_ref": "KET 语法 PDF 第 21-25 页"
+        },
+        {
+          "id": "pronouns",
+          "title": "人称代词和物主代词",
+          "rule": "主格：I/you/he/she/it/we/they\n宾格：me/you/him/her/it/us/them\n形容词性物主：my/your/his/her/its/our/their\n名词性物主：mine/yours/his/hers/its/ours/theirs",
+          "examples": ["I love my mother.", "This book is mine.", "She gave it to him.", "Their house is big."],
+          "note": "its（它的）和 it's（it is）不一样！",
+          "pdf_ref": "KET 语法 PDF 第 26-30 页"
+        },
+        {
+          "id": "numbers-quantifiers",
+          "title": "数词和量词",
+          "rule": "基数词：one/two/three...\n序数词：first/second/third...\n量词：some/any/many/much/a lot of/a few/a little",
+          "examples": ["I have three books.", "She is the first in class.", "There is some milk.", "How many apples?"],
+          "note": "many + 可数名词 / much + 不可数名词\na few + 可数 / a little + 不可数",
+          "pdf_ref": "KET 语法 PDF 第 31-35 页"
+        }
+      ]
+    },
+    {
+      "stage": 2,
+      "name": "句子扩展",
+      "level": "KET 进阶",
+      "pdf": "KET 语法 PDF 第 41-80 页",
+      "cards": [
+        {
+          "id": "present-continuous",
+          "title": "现在进行时",
+          "rule": "主语 + be (am/is/are) + 动词 ing\n表示正在发生的动作",
+          "examples": ["I am reading a book.", "She is singing now.", "They are playing football.", "What are you doing?"],
+          "note": "动词加 ing 规则：一般加 ing（read→reading）；以 e 结尾去 e 加 ing（write→writing）；重读闭音节双写（run→running）",
+          "pdf_ref": "KET 语法 PDF 第 41-45 页"
+        },
+        {
+          "id": "modal-verbs",
+          "title": "情态动词",
+          "rule": "can/could（能）\nmust（必须）\nshould（应该）\nmay/might（可能）\n后面直接加动词原形",
+          "examples": ["I can swim.", "You must wear a seatbelt.", "She should study harder.", "May I come in?"],
+          "note": "情态动词没有人称变化，否定直接在后面加 not\nmustn't = 禁止 / don't have to = 不必",
+          "pdf_ref": "KET 语法 PDF 第 46-50 页"
+        },
+        {
+          "id": "comparative-superlative",
+          "title": "形容词比较级和最高级",
+          "rule": "比较级：short→shorter, big→bigger, happy→happier, beautiful→more beautiful\n最高级：short→the shortest, the most beautiful",
+          "examples": ["Tom is taller than Jerry.", "This is the biggest cake.", "She is more careful than me.", "He is the best student."],
+          "note": "不规则：good→better→best, bad→worse→worst, much/many→more→most, little→less→least",
+          "pdf_ref": "KET 语法 PDF 第 51-55 页"
+        },
+        {
+          "id": "questions",
+          "title": "疑问句",
+          "rule": "一般疑问句：be/do/can + 主语 ...？\n特殊疑问句：疑问词(what/when/where/who/why/how) + 一般疑问句？",
+          "examples": ["Do you like pizza?", "Where do you live?", "What time is it?", "How many brothers do you have?"],
+          "note": "疑问词：what(什么)/when(何时)/where(哪里)/who(谁)/why(为什么)/how(怎样)/which(哪个)",
+          "pdf_ref": "KET 语法 PDF 第 56-60 页"
+        },
+        {
+          "id": "prepositions",
+          "title": "介词",
+          "rule": "时间：in(月/年/早中晚) / on(具体某天) / at(时刻)\n地点：in(在里面) / on(在上面) / at(在某点) / under(在下面) / next to(旁边)\n运动：to(向) / from(从) / into(进入)",
+          "examples": ["I get up at 7 o'clock.", "She was born in May.", "The book is on the table.", "He goes to school by bus."],
+          "note": "常见搭配：at night / in the morning / on Monday / on holiday / on foot",
+          "pdf_ref": "KET 语法 PDF 第 61-70 页"
+        }
+      ]
+    },
+    {
+      "stage": 3,
+      "name": "过去时态",
+      "level": "KET→PET 过渡",
+      "pdf": "KET 第 81-139 页",
+      "cards": [
+        {
+          "id": "past-simple",
+          "title": "一般过去时（规则动词）",
+          "rule": "主语 + 动词过去式\n规则动词加 ed：work→worked, live→lived, stop→stopped, carry→carried\n否定：didn't + 动词原形\n疑问：Did + 主语 + 动词原形？",
+          "examples": ["I walked to school yesterday.", "She didn't watch TV.", "Did you visit your grandma?", "They played tennis last Sunday."],
+          "note": "时间标志词：yesterday, last week, ... ago, in 2020",
+          "pdf_ref": "KET 语法 PDF 第 81-85 页"
+        },
+        {
+          "id": "past-irregular",
+          "title": "一般过去时（不规则动词）",
+          "rule": "不规则动词需要单独记忆\n常用不规则动词表见右侧",
+          "examples": ["go→went, see→saw, eat→ate, have→had, do→did, say→said, make→made, take→took, buy→bought, get→got, come→came, give→gave, know→knew, think→thought, tell→told, feel→felt"],
+          "note": "PET 高频不规则动词约 50 个，集中记忆更有效",
+          "pdf_ref": "KET 语法 PDF 第 86-90 页"
+        },
+        {
+          "id": "there-be",
+          "title": "There be 句型",
+          "rule": "There is/was + 单数/不可数名词\nThere are/were + 复数名词\n表示"存在/有"",
+          "examples": ["There is a book on the desk.", "There are five apples.", "There was a party last night.", "There were many people."],
+          "note": "否定：There isn't / aren't / wasn't / weren't\n疑问句：Is/Are/Was/Were there...?",
+          "pdf_ref": "KET 语法 PDF 第 91-95 页"
+        },
+        {
+          "id": "countable-uncountable",
+          "title": "可数名词和不可数名词",
+          "rule": "可数名词：可以数，有复数形式（apple/apples）\n不可数名词：不能数，没有复数（water/rice/information）\n常用修饰词见右侧",
+          "examples": ["可数：an apple, two books, many students", "不可数：some water, a glass of milk, much time", "both：some, a lot of, lots of, plenty of"],
+          "note": "常见不可数名词：water/milk/rice/bread/meat/information/advice/furniture/money/news/homework/weather/traffic",
+          "pdf_ref": "KET 语法 PDF 第 96-100 页"
+        },
+        {
+          "id": "conjunctions",
+          "title": "连词",
+          "rule": "and（和/而且）\nbut（但是）\nor（或者/否则）\nso（所以）\nbecause（因为）\nwhen（当...时）\nif（如果）",
+          "examples": ["I like cats and dogs.", "She is tired but happy.", "Hurry up or you'll be late.", "I stayed home because it rained."],
+          "note": "because 和 so 不能同时用在一句话里！✗ Because it rained, so I stayed home.",
+          "pdf_ref": "KET 语法 PDF 第 101-110 页"
+        }
+      ]
+    },
+    {
+      "stage": 4,
+      "name": "PET 入门",
+      "level": "PET 基础",
+      "pdf": "PET 语法 PDF 第 1-50 页",
+      "cards": [
+        {
+          "id": "present-perfect",
+          "title": "现在完成时",
+          "rule": "主语 + have/has + 过去分词\n表示：①已经完成的事 ②过去的经历 ③持续到现在的状态",
+          "examples": ["I have finished my homework.", "She has never been to London.", "Have you ever seen a tiger?", "They have lived here for 5 years."],
+          "note": "时间标志词：already, yet, ever, never, just, for + 时间段, since + 时间点",
+          "pdf_ref": "PET 语法 PDF 第 1-10 页"
+        },
+        {
+          "id": "passive-present",
+          "title": "被动语态（现在时）",
+          "rule": "主语 + am/is/are + 过去分词 + (by ...)\n强调动作承受者，而非执行者",
+          "examples": ["English is spoken in many countries.", "The window was broken by Tom.", "These books are sold in that shop."],
+          "note": "主动变被动：宾语变主语，动词变 be+过去分词，主语变 by+宾语",
+          "pdf_ref": "PET 语法 PDF 第 11-18 页"
+        },
+        {
+          "id": "infinitive-gerund",
+          "title": "不定式和动名词",
+          "rule": "to + 动词原形（不定式）\n动词 + ing（动名词）\n有些词只能接不定式，有些只能接动名词",
+          "examples": ["I want to go home.", "She enjoys reading books.", "He stopped smoking.", "They decided to leave."],
+          "note": "常见接不定式：want/hope/decide/plan/need/learn/agree\n常见接动名词：enjoy/finish/mind/avoid/suggest/practice/keep\n接两者意义不同：remember/forget/stop/try",
+          "pdf_ref": "PET 语法 PDF 第 19-25 页"
+        },
+        {
+          "id": "relative-clause",
+          "title": "定语从句（基础）",
+          "rule": "先行词 + who/which/that + 从句\nwho 指人 / which 指物 / that 指人或物",
+          "examples": ["The boy who is reading is my brother.", "The book which I bought is interesting.", "This is the house that Jack built."],
+          "note": "who/which/that 在从句中作宾语时可以省略：\nThe book (which) I read was good.",
+          "pdf_ref": "PET 语法 PDF 第 26-35 页"
+        },
+        {
+          "id": "first-conditional",
+          "title": "条件句（第一类）",
+          "rule": "If + 一般现在时，主语 + will/can/may + 动词原形\n表示可能发生的真实条件",
+          "examples": ["If it rains, I will stay home.", "If you study hard, you can pass the exam.", "What will you do if you are late?"],
+          "note": "主将从现：if 从句用一般现在时，主句用将来时",
+          "pdf_ref": "PET 语法 PDF 第 36-42 页"
+        }
+      ]
+    },
+    {
+      "stage": 5,
+      "name": "PET 冲刺",
+      "level": "PET 综合",
+      "pdf": "PET 语法 PDF 第 51-151 页",
+      "cards": [
+        {
+          "id": "past-perfect",
+          "title": "过去完成时",
+          "rule": "主语 + had + 过去分词\n表示"过去的过去"——某一过去动作之前已经完成的动作",
+          "examples": ["When I arrived, the train had left.", "She had already eaten before I came.", "They had never seen snow before last winter."],
+          "note": "常与 when/before/after/by the time 连用",
+          "pdf_ref": "PET 语法 PDF 第 51-60 页"
+        },
+        {
+          "id": "passive-past",
+          "title": "被动语态（过去时）",
+          "rule": "主语 + was/were + 过去分词 + (by ...)\n表示过去发生的被动动作",
+          "examples": ["The letter was sent yesterday.", "The windows were cleaned by my dad.", "Was the house built in 1990?"],
+          "note": "现在完成被动：have/has + been + 过去分词\nThe work has been finished.",
+          "pdf_ref": "PET 语法 PDF 第 61-70 页"
+        },
+        {
+          "id": "second-conditional",
+          "title": "条件句（第二类）",
+          "rule": "If + 一般过去时，主语 + would/could/might + 动词原形\n表示不太可能实现的虚拟条件",
+          "examples": ["If I were you, I would study harder.", "If I had a million dollars, I would travel around the world.", "If she knew the answer, she would tell us."],
+          "note": "be 动词在 if 从句中统一用 were（不用 was）",
+          "pdf_ref": "PET 语法 PDF 第 71-80 页"
+        },
+        {
+          "id": "reported-speech",
+          "title": "间接引语",
+          "rule": "直接引语变间接引语时：\n① 时态倒退：现在→过去 / 过去→过去完成\n② 人称变化\n③ 时间地点变化",
+          "examples": ["She said, 'I am tired.' → She said she was tired.", "He said, 'I will come.' → He said he would come.", "'Do you like it?' → He asked if I liked it."],
+          "note": "时态变化：am/is→was, have/has→had, will→would, can→could\ntoday→that day, now→then, here→there",
+          "pdf_ref": "PET 语法 PDF 第 81-95 页"
+        },
+        {
+          "id": "advanced-relative",
+          "title": "定语从句（进阶）",
+          "rule": "whom（指人，作宾语）\nwhose（指所属关系）\nwhere（指地点）\nwhen（指时间）\n非限制性定语从句用逗号隔开",
+          "examples": ["The man whom you met is my uncle.", "That's the girl whose mother is a doctor.", "This is the school where I studied.", "I remember the day when we first met."],
+          "note": "非限制性定语从句不能用 that：\nMy mother, who is a teacher, loves reading.",
+          "pdf_ref": "PET 语法 PDF 第 96-110 页"
+        }
+      ]
+    }
+  ]
+}

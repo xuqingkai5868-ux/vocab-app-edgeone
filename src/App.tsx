@@ -7,6 +7,7 @@ import { Loading } from './components/Loading';
 import { Login } from './pages/Login';
 import { Home } from './pages/Home';
 import { Study } from './pages/Study';
+import { Grammar } from './pages/Grammar';
 import { Dictation } from './pages/Dictation';
 import { Review } from './pages/Review';
 import { Vocabulary } from './pages/Vocabulary';
@@ -39,6 +40,7 @@ function AppRoutes() {
       >
         <Route path="/home" element={<Home />} />
         <Route path="/study" element={<Study />} />
+        <Route path="/grammar/:stageId" element={<Grammar />} />
         <Route path="/dictation" element={<Dictation />} />
         <Route path="/review" element={<Review />} />
         <Route path="/vocabulary" element={<Vocabulary />} />
