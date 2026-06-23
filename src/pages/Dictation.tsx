@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { useApp } from '../contexts/AppContext';
 import { MASTER_WORDS, getDayWords } from '../services/utils/petVocabLoader';
+import { startTracking, stopTracking } from '../services/activity/activityTracker';
 
 type Mode = 'today' | 'past';
 type DictType = 'spelling' | 'audio';
@@ -30,6 +31,13 @@ export function Dictation() {
   const [started, setStarted] = useState(false);
   const [finished, setFinished] = useState(false);
   const [autoPlayed, setAutoPlayed] = useState(false);
+
+  // 追踪拼写/听写时长
+  const trackType = dictType === 'audio' ? 'review_audio' : 'review_spelling';
+  useEffect(() => {
+    startTracking(trackType);
+    return () => { stopTracking(trackType); };
+  }, [trackType]);
 
   // Generate dictation words
   const words = useMemo(() => {

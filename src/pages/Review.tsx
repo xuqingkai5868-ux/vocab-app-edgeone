@@ -1,9 +1,10 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { useApp } from '../contexts/AppContext';
 import { MASTER_WORDS } from '../services/utils/petVocabLoader';
+import { startTracking, stopTracking } from '../services/activity/activityTracker';
 
 type SelfAssessment = 'forgot' | 'vague' | 'known';
 type Mode = 'select' | 'definition' | 'spelling' | 'audio';
@@ -35,6 +36,14 @@ export function Review() {
   const total = reviewWords.length;
   const meaning = currentWord ? getWordMeaning(currentWord.word) : '';
   const currentStatus = currentWord ? (state.states[currentWord.word] || '') : '';
+
+  // 追踪释义复习时长
+  useEffect(() => {
+    if (mode === 'definition') {
+      startTracking('review_definition');
+      return () => { stopTracking('review_definition'); };
+    }
+  }, [mode]);
 
   const handleAssessment = (assessment: SelfAssessment) => {
     const newStates = { ...state.states };

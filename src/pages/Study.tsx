@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { Loading } from '../components/Loading';
 import { useApp } from '../contexts/AppContext';
 import { getDayWords, getDayPhrases } from '../services/utils/petVocabLoader';
+import { startTracking, stopTracking } from '../services/activity/activityTracker';
 
 type WordStatus = 'new' | 'fuzzy' | 'mastered';
 
@@ -12,6 +13,12 @@ export function Study() {
   const navigate = useNavigate();
   const { state, wordsPerDay, updateUserState } = useApp();
   const day = state.currentDay;
+
+  // 追踪学习时长
+  useEffect(() => {
+    startTracking('study');
+    return () => { stopTracking('study', `Day${day}`); };
+  }, [day]);
 
   const words = getDayWords(day, wordsPerDay);
   const phrases = getDayPhrases(day, wordsPerDay);
