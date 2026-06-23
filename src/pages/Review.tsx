@@ -6,6 +6,7 @@ import { useApp } from '../contexts/AppContext';
 import { MASTER_WORDS } from '../services/utils/petVocabLoader';
 
 type SelfAssessment = 'forgot' | 'vague' | 'known';
+type Mode = 'select' | 'definition' | 'dictation';
 
 function getWordMeaning(word: string): string {
   const w = MASTER_WORDS.find(w => w.word.toLowerCase() === word.toLowerCase());
@@ -15,6 +16,7 @@ function getWordMeaning(word: string): string {
 export function Review() {
   const navigate = useNavigate();
   const { state, updateUserState } = useApp();
+  const [mode, setMode] = useState<Mode>('select');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
 
@@ -51,30 +53,77 @@ export function Review() {
     }
   };
 
-  if (total === 0) {
+  // --- Mode selection screen ---
+  if (mode === 'select') {
+    if (total === 0) {
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <button onClick={() => navigate('/home')} className="text-primary-500 text-sm">&larr; 返回</button>
+            <h1 className="text-lg font-bold text-gray-800">复习</h1>
+          </div>
+          <Card>
+            <p className="text-gray-500 text-center py-8">还没有学过的单词，先去学习吧！📚</p>
+            <button onClick={() => navigate('/study')} className="w-full py-2.5 bg-primary-500 text-white rounded-lg">开始学习</button>
+          </Card>
+        </div>
+      );
+    }
+
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <button onClick={() => navigate('/home')} className="text-primary-500 text-sm">&larr; 返回</button>
-          <h1 className="text-lg font-bold text-gray-800">复习</h1>
+          <h1 className="text-lg font-bold text-gray-800">选择复习模式</h1>
         </div>
-        <Card>
-          <p className="text-gray-500 text-center py-8">还没有学过的单词，先去学习吧！📚</p>
-          <button onClick={() => navigate('/study')} className="w-full py-2.5 bg-primary-500 text-white rounded-lg">开始学习</button>
+
+        <Card className="text-center py-6">
+          <p className="text-sm text-gray-500 mb-6">
+            共 {total} 个已学习的单词
+          </p>
+
+          <div className="space-y-4">
+            {/* 释义模式 - 大按钮 */}
+            <button
+              onClick={() => setMode('definition')}
+              className="w-full py-6 bg-indigo-500 text-white rounded-2xl shadow-lg shadow-indigo-200 active:scale-[0.98] transition-transform"
+            >
+              <div className="text-3xl mb-2">📖</div>
+              <div className="text-lg font-bold">释义模式</div>
+              <div className="text-sm text-indigo-100 mt-1">看英文 → 回想中文含义</div>
+            </button>
+
+            {/* 听写模式 - 大按钮 */}
+            <button
+              onClick={() => setMode('dictation')}
+              className="w-full py-6 bg-amber-500 text-white rounded-2xl shadow-lg shadow-amber-200 active:scale-[0.98] transition-transform"
+            >
+              <div className="text-3xl mb-2">✍️</div>
+              <div className="text-lg font-bold">听写模式</div>
+              <div className="text-sm text-amber-100 mt-1">看中文 → 拼写英文单词</div>
+            </button>
+          </div>
         </Card>
       </div>
     );
   }
 
+  // --- 听写模式：跳转到独立听写页 ---
+  if (mode === 'dictation') {
+    navigate('/dictation');
+    return null;
+  }
+
+  // --- 释义模式：当前复习流程 ---
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <button onClick={() => navigate('/home')} className="text-primary-500 text-sm">&larr; 返回</button>
+        <button onClick={() => setMode('select')} className="text-primary-500 text-sm">&larr; 返回选择</button>
         <h1 className="text-lg font-bold text-gray-800">
           释义复习
           <span className="text-sm font-normal text-gray-400 ml-2">({total} 个)</span>
         </h1>
-        <button onClick={() => navigate('/dictation')} className="text-amber-500 text-sm">听写 ✍️</button>
+        <div className="w-12" />
       </div>
 
       <ProgressBar value={currentIndex} max={total} label="复习进度" />
