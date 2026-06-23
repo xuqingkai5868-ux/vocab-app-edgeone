@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useApp } from '../contexts/AppContext';
 import { getTotalDays } from '../services/utils/petVocabLoader';
 import { getActivity, getActivityRange, ActivityEvent } from '../api/activity';
+import { getDayWords } from '../services/utils/petVocabLoader';
 
 const TYPE_LABELS: Record<string, string> = {
   study: '📚 学习新词',
@@ -46,13 +47,13 @@ function getToday(): string {
 export function Settings() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { wordsPerDay, setWordsPerDay, state: appState } = useApp();
+  const { wordsPerDay, setWordsPerDay, state: appState, updateUserState } = useApp();
   const totalDays = getTotalDays(wordsPerDay);
 
   const [todayEvents, setTodayEvents] = useState<ActivityEvent[]>([]);
   const [weekStats, setWeekStats] = useState<{ type: string; totalMs: number }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [passwordMode, setPasswordMode] = useState<'wordsPerDay' | 'reset' | null>(null);
+  const [passwordMode, setPasswordMode] = useState<'wordsPerDay' | 'resetToday' | 'resetAll' | null>(null);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [sliderUnlocked, setSliderUnlocked] = useState(false); // 密码验证后解锁
@@ -82,18 +83,36 @@ export function Settings() {
     setLoading(false);
   };
 
-  const handleReset = () => {
-    setPasswordMode('reset');
+  const handleResetToday = () => {
+    setPasswordMode('resetToday');
     setPasswordInput('');
     setPasswordError(false);
   };
 
-  const confirmReset = () => {
-    if (!confirm(`确定重置 ${user?.name || '用户'} 的所有学习进度吗？`)) return;
-    localStorage.removeItem('vocab_user');
-    localStorage.removeItem('di_states');
-    alert('已重置');
-    logout();
+  const handleResetAll = () => {
+    setPasswordMode('resetAll');
+    setPasswordInput('');
+    setPasswordError(false);
+  };
+
+  const confirmResetToday = () => {
+    const todayWords = getDayWords(appState.currentDay, wordsPerDay);
+    const todayWordKeys = new Set(todayWords.map(w => w.word));
+    const newStates: Record<string, 'mastered' | 'fuzzy'> = {};
+    for (const [word, status] of Object.entries(appState.states)) {
+      if (!todayWordKeys.has(word)) {
+        newStates[word] = status;
+      }
+    }
+    const newDay = Math.max(1, appState.currentDay - 1);
+    updateUserState({ currentDay: newDay, states: newStates });
+    alert(`已重置到今天之前（Day ${newDay}），今日学习记录已清除`);
+  };
+
+  const confirmResetAll = () => {
+    if (!confirm(`确定完全重置 ${user?.name || '用户'} 的所有学习进度吗？\n此操作不可撤销！`)) return;
+    updateUserState({ currentDay: 1, states: {} });
+    alert('已完全重置，从 Day 1 重新开始');
   };
 
   const handlePasswordSubmit = () => {
@@ -101,8 +120,10 @@ export function Settings() {
       setPasswordError(false);
       if (passwordMode === 'wordsPerDay') {
         setSliderUnlocked(true);
-      } else if (passwordMode === 'reset') {
-        confirmReset();
+      } else if (passwordMode === 'resetToday') {
+        confirmResetToday();
+      } else if (passwordMode === 'resetAll') {
+        confirmResetAll();
       }
       setPasswordMode(null);
       setPasswordInput('');
@@ -246,8 +267,17 @@ export function Settings() {
 
       <Card>
         <h2 className="font-semibold text-gray-700 mb-3">操作</h2>
-        <button onClick={handleReset} className="w-full py-2.5 bg-red-500 text-white rounded-lg text-sm">重置学习进度</button>
-        <button onClick={() => { logout(); navigate('/'); }} className="w-full py-2.5 mt-2 border border-gray-200 text-gray-600 rounded-lg text-sm">退出登录</button>
+        <div className="space-y-3">
+          <button onClick={handleResetToday} className="w-full py-2.5 bg-amber-500 text-white rounded-lg text-sm">
+            🔄 只重置今天
+            <span className="text-amber-100 text-xs ml-2">今日学习记录清空，回到前一天</span>
+          </button>
+          <button onClick={handleResetAll} className="w-full py-2.5 bg-red-500 text-white rounded-lg text-sm">
+            ⚠️ 完全重置
+            <span className="text-red-200 text-xs ml-2">所有进度归零，从 Day 1 开始</span>
+          </button>
+          <button onClick={() => { logout(); navigate('/'); }} className="w-full py-2.5 mt-1 border border-gray-200 text-gray-600 rounded-lg text-sm">退出登录</button>
+        </div>
       </Card>
 
       {/* 密码验证弹窗 */}
@@ -256,7 +286,9 @@ export function Settings() {
           <div className="bg-white rounded-2xl p-6 w-80 mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold text-gray-800 mb-2">🔒 家长验证</h3>
             <p className="text-sm text-gray-500 mb-4">
-              {passwordMode === 'wordsPerDay' ? '修改每日学习量需要家长密码' : '重置学习进度需要家长密码'}
+              {passwordMode === 'wordsPerDay' ? '修改每日学习量需要家长密码' : 
+               passwordMode === 'resetToday' ? '重置今日学习记录需要家长密码' : 
+               '完全重置学习进度需要家长密码'}
             </p>
             <input
               type="password"
