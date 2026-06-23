@@ -1,13 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { Card } from '../components/Card';
-import { MASTER_WORDS, PETWord } from '../services/utils/petVocabLoader';
+import { MASTER_WORDS } from '../services/utils/petVocabLoader';
 
+const PAGE_SIZE = 50;
 type FilterType = 'all' | 'mastered' | 'fuzzy';
 
 export function Vocabulary() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
-  const [saved, setSaved] = useState<Record<string, string>>(() => {
+  const [page, setPage] = useState(1);
+  const [saved] = useState<Record<string, string>>(() => {
     try { return JSON.parse(localStorage.getItem('di_states') || '{}'); }
     catch { return {}; }
   });
@@ -29,37 +31,32 @@ export function Vocabulary() {
     }
   }, [allWords, query, filter, saved]);
 
+  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
+  const paged = filtered.slice(0, page * PAGE_SIZE);
+  const hasMore = page < totalPages;
+
   return (
     <div className="space-y-4">
       <h1 className="text-lg font-bold text-gray-800">PET 词库</h1>
 
-      <input
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        placeholder="搜索单词..."
-        className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+      <input value={query} onChange={e => { setQuery(e.target.value); setPage(1); }}
+        placeholder="搜索单词..." className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
       />
 
       <div className="flex gap-2">
         {[
-          { id: 'all' as FilterType, label: `全部 (${allWords.length})` },
+          { id: 'all' as FilterType, label: `全部 (${filtered.length})` },
           { id: 'mastered' as FilterType, label: '已掌握' },
           { id: 'fuzzy' as FilterType, label: '△ 模糊' },
         ].map(f => (
-          <button
-            key={f.id}
-            onClick={() => setFilter(f.id)}
-            className={`px-3 py-1.5 rounded-full text-xs ${
-              filter === f.id ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'
-            }`}
-          >
-            {f.label}
-          </button>
+          <button key={f.id} onClick={() => { setFilter(f.id); setPage(1); }}
+            className={`px-3 py-1.5 rounded-full text-xs ${filter === f.id ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'}`}
+          >{f.label}</button>
         ))}
       </div>
 
       <div className="space-y-2">
-        {filtered.slice(0, 100).map(i => {
+        {paged.map(i => {
           const s = saved[i.word.word];
           return (
             <Card key={i.word.word} className="py-3">
@@ -81,10 +78,14 @@ export function Vocabulary() {
             </Card>
           );
         })}
-        {filtered.length === 0 && (
-          <p className="text-center text-gray-400 py-8">没有匹配结果</p>
-        )}
+        {filtered.length === 0 && <p className="text-center text-gray-400 py-8">没有匹配结果</p>}
       </div>
+
+      {hasMore && (
+        <button onClick={() => setPage(p => p + 1)} className="w-full py-2.5 bg-gray-100 text-gray-600 rounded-lg text-sm">
+          加载更多（已显示 {paged.length}/{filtered.length}）
+        </button>
+      )}
     </div>
   );
 }
