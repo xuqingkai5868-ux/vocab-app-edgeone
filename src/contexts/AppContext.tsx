@@ -108,12 +108,19 @@ export function AppProvider({ children }: { children: ReactNode }) {
         reviewWordsCount: params.reviewWordsCompleted,
         conversationRounds: 0,
       });
+      // 打卡成功后，推进到下一天
+      const totalDays = getTotalDays(wordsPerDay);
+      const nextDay = Math.min(userState.currentDay + 1, totalDays);
+      const newState = { ...userState, currentDay: nextDay };
+      await updateState(user.id, newState);
+      setUserState(newState);
+      loadDayData(nextDay, wordsPerDay);
       await refreshCheckIns();
       return true;
     } catch {
       return false;
     }
-  }, [user, wordsPerDay, refreshCheckIns]);
+  }, [user, wordsPerDay, userState, loadDayData, refreshCheckIns]);
 
   const totalDays = getTotalDays(wordsPerDay);
 
