@@ -20,8 +20,8 @@ interface AppContextType {
   wordsPerDay: number;
   loadAll: () => Promise<void>;
   updateUserState: (newState: UserState) => Promise<void>;
-  /** 轻量更新单词状态（仅修改 states，不触发热 day data 重载），使用乐观更新模式 */
-  updateWordStates: (newStates: Record<string, 'mastered' | 'fuzzy'>) => Promise<void>;
+  /** 轻量更新单词状态（增量更新，只传变化的词），乐观更新模式，不触发热 day data 重载 */
+  updateWordStates: (partialUpdates: Record<string, 'mastered' | 'fuzzy' | null>) => Promise<void>;
   setWordsPerDay: (n: number) => void;
   doCheckIn: (params: { newWordsCompleted: number; reviewWordsCompleted: number; studyDurationMinutes: number }) => Promise<boolean>;
 }
@@ -95,20 +95,36 @@ export function AppProvider({ children }: { children: ReactNode }) {
   }, [user, wordsPerDay, loadDayData, userState.currentDay]);
 
   /** 轻量更新单词状态：乐观更新（先更新本地，再异步同步服务器），不重载日数据 */
-  const updateWordStates = useCallback(async (newStates: Record<string, 'mastered' | 'fuzzy'>) => {
+  const updateWordStates = useCallback(async (partialUpdates: Record<string, 'mastered' | 'fuzzy' | null>) => {
     if (!user) return;
-    // 乐观更新：立即更新本地状态
-    const prevState = userState;
-    const newUserState = { ...prevState, states: newStates };
-    setUserState(newUserState);
+
+    // 使用函数式更新：将增量更新合并到最新 state.states 中
+    // null 值表示删除该词的标记（回退到未标记状态）
+    let prevForRollback: UserState | null = null;
+    setUserState(prev => {
+      prevForRollback = prev;
+      const merged = { ...prev.states };
+      for (const [word, status] of Object.entries(partialUpdates)) {
+        if (status === null) delete merged[word];
+        else merged[word] = status;
+      }
+      return { ...prev, states: merged };
+    });
+
+    // 异步同步服务器（prevForRollback 在 setUserState updater 中同步赋值完成）
     try {
-      await updateState(user.id, newUserState);
+      const merged = { ...prevForRollback!.states };
+      for (const [word, status] of Object.entries(partialUpdates)) {
+        if (status === null) delete merged[word];
+        else merged[word] = status;
+      }
+      await updateState(user.id, { ...prevForRollback!, states: merged });
     } catch (e) {
-      // 失败时回滚
+      // 失败时回滚到更新前的状态
       console.error('Failed to sync word states:', e);
-      setUserState(prevState);
+      if (prevForRollback) setUserState(prevForRollback);
     }
-  }, [user, userState]);
+  }, [user]);
 
   const setWordsPerDay = useCallback((n: number) => {
     const clamped = Math.max(5, Math.min(50, n));
@@ -132,13 +148,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
       // 打卡成功后，推进到下一天（使用函数式更新避免闭包过期）
       const totalDays = getTotalDays(wordsPerDay);
       let nextDay: number;
+      let updatedState: UserState | null = null;
       setUserState(prev => {
         nextDay = Math.min(prev.currentDay + 1, totalDays);
-        const newState = { ...prev, currentDay: nextDay! };
-        // 异步同步服务器（不等待）
-        updateState(user.id, newState).catch(e => console.error('Failed to sync checkin state:', e));
-        return newState;
+        updatedState = { ...prev, currentDay: nextDay! };
+        return updatedState;
       });
+      // 异步同步服务器（不等待），在 updater 外执行避免副作用
+      if (updatedState) {
+        updateState(user.id, updatedState).catch(e => console.error('Failed to sync checkin state:', e));
+      }
       // 加载下一天数据
       loadDayData(nextDay!, wordsPerDay);
       await refreshCheckIns();

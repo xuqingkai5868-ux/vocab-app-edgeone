@@ -64,3 +64,14 @@ export interface AppSettings {
   learningMode: 'immersion' | 'quick';
   darkMode: 'system' | 'light' | 'dark';
 }
+
+// ===== 语法卡片 =====
+export interface GrammarCard {
+  id: string; title: string; rule: string;
+  examples: string[]; note: string; pdf_ref: string;
+}
+
+export interface GrammarStage {
+  stage: number; name: string; level: string; pdf: string;
+  cards: GrammarCard[];
+}

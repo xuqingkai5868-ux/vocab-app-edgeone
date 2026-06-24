@@ -7,15 +7,15 @@ const PAGE_SIZE = 50;
 type FilterType = 'all' | 'mastered' | 'fuzzy';
 
 export function Vocabulary() {
-  const { state } = useApp();
+  const { state, wordsPerDay } = useApp();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
   const saved = state.states;
 
   const allWords = useMemo(() => {
-    return MASTER_WORDS.map((w, i) => ({ word: w, day: Math.floor(i / 30) + 1 }));
-  }, []);
+    return MASTER_WORDS.map((w, i) => ({ word: w, day: Math.floor(i / wordsPerDay) + 1 }));
+  }, [wordsPerDay]);
 
   const filtered = useMemo(() => {
     let items = allWords;

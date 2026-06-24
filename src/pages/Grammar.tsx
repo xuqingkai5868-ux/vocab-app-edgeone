@@ -2,16 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Loading } from '../components/Loading';
-
-interface GrammarCard {
-  id: string; title: string; rule: string;
-  examples: string[]; note: string; pdf_ref: string;
-}
-
-interface StageData {
-  stage: number; name: string; level: string; pdf: string;
-  cards: GrammarCard[];
-}
+import type { GrammarCard, GrammarStage as StageData } from '../types/study';
 
 export function Grammar() {
   const navigate = useNavigate();

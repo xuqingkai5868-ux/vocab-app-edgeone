@@ -49,10 +49,7 @@ export async function getStats(userId: string): Promise<DashboardStats> {
     }
   }
 
-  const totalCheckInDays = Math.max(
-    ...completed.map((r) => parseInt(r.date.replace(/-/g, ''), 10)),
-    0
-  ) ? completed.length : 0;
+  const totalCheckInDays = completed.length;
 
   // 本周统计
   const weekStart = getWeekStart(now);

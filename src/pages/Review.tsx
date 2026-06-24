@@ -51,14 +51,9 @@ export function Review() {
   const goAudio = () => navigate('/dictation?type=audio');
 
   const handleAssessment = (assessment: SelfAssessment) => {
-    const newStates = { ...state.states };
-    if (assessment === 'known') {
-      newStates[currentWord.word] = 'mastered';
-    } else {
-      newStates[currentWord.word] = 'fuzzy';
-    }
-    // 使用乐观更新，不阻塞 UI
-    updateWordStates(newStates);
+    const status = assessment === 'known' ? 'mastered' : 'fuzzy';
+    // 增量更新，只传当前词的标记变化
+    updateWordStates({ [currentWord.word]: status });
     setShowMeaning(false);
     if (currentIndex < total - 1) {
       setCurrentIndex(i => i + 1);

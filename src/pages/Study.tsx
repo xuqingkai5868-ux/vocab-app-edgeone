@@ -7,15 +7,7 @@ import { useApp } from '../contexts/AppContext';
 import { getDayWords, getDayPhrases, getGrammarStage, MASTER_WORDS } from '../services/utils/petVocabLoader';
 import { startTracking, stopTracking } from '../services/activity/activityTracker';
 import { speakWord } from '../services/utils/speak';
-
-interface GrammarCard {
-  id: string; title: string; rule: string;
-  examples: string[]; note: string; pdf_ref: string;
-}
-interface GrammarStage {
-  stage: number; name: string; level: string; pdf: string;
-  cards: GrammarCard[];
-}
+import type { GrammarCard, GrammarStage } from '../types/study';
 
 type WordStatus = 'new' | 'fuzzy' | 'mastered';
 type Tab = 'list' | 'study';
@@ -98,12 +90,9 @@ export function Study() {
   const markStatus = (status: WordStatus) => {
     if (!currentItem) return;
     const key = currentItem.word;
-    const newStates = { ...state.states };
-    if (status === 'mastered') newStates[key] = 'mastered';
-    else if (status === 'fuzzy') newStates[key] = 'fuzzy';
-    else delete newStates[key];
-    // 乐观更新：本地立即变化，API 异步同步
-    updateWordStates(newStates);
+    if (status === 'mastered') updateWordStates({ [key]: 'mastered' });
+    else if (status === 'fuzzy') updateWordStates({ [key]: 'fuzzy' });
+    else updateWordStates({ [key]: null });
     nextCard();
   };
 
@@ -125,8 +114,7 @@ export function Study() {
     if (!current) next = 'fuzzy';
     else if (current === 'fuzzy') next = 'mastered';
     else next = 'fuzzy';
-    // 乐观更新：本地立即变化，API 异步同步（不阻塞 UI）
-    updateWordStates({ ...state.states, [word]: next });
+    updateWordStates({ [word]: next });
   };
 
 const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
