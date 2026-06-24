@@ -64,8 +64,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
         getState(user.id),
         getCheckIns(`${getCurrentYear()}-${String(getCurrentMonth()).padStart(2, '0')}`),
       ]);
-      setUserState(stateResp.state);
-      loadDayData(stateResp.state.currentDay, wordsPerDay);
+      // 迁移：将老版本的字符串 states ('mastered'/'fuzzy') 转为数字等级
+      const migratedStates: Record<string, number> = {};
+      for (const [word, val] of Object.entries(stateResp.state.states)) {
+        if (typeof val === 'number') {
+          migratedStates[word] = val;
+        } else if (val === 'mastered') {
+          migratedStates[word] = 4;
+        } else if (val === 'fuzzy') {
+          migratedStates[word] = 2;
+        } else {
+          migratedStates[word] = 0;
+        }
+      }
+      const migratedState = { ...stateResp.state, states: migratedStates };
+      setUserState(migratedState);
+      loadDayData(migratedState.currentDay, wordsPerDay);
+      // 如果有数据迁移，同步回服务器
+      if (JSON.stringify(stateResp.state.states) !== JSON.stringify(migratedStates)) {
+        updateState(user.id, migratedState).catch(e => console.error('Failed to migrate states:', e));
+      }
       setCheckIns(checkinResp.records);
       setStreak(calculateStreak(Object.values(checkinResp.records)));
     } catch (e) {
