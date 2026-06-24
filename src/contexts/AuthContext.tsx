@@ -27,7 +27,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = localStorage.getItem('vocab_token');
     if (saved && token) {
       try {
-        setUser(JSON.parse(saved));
+        const parsed = JSON.parse(saved) as UserInfo;
+        // 应用本地显示名覆盖（防止服务器存的旧名称被缓存）
+        const displayName = USER_DISPLAY_NAMES[parsed.id];
+        if (displayName && parsed.name !== displayName) {
+          parsed.name = displayName;
+          localStorage.setItem('vocab_user', JSON.stringify(parsed));
+        }
+        setUser(parsed);
       } catch { /* ignore */ }
     }
     setIsLoading(false);
