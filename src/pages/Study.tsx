@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
@@ -34,21 +34,6 @@ export function Study() {
   const [grammarCardIdx, setGrammarCardIdx] = useState(0);
   const [grammarStages, setGrammarStages] = useState<GrammarStage[]>([]);
 
-  // 防抖：连续点击只触发最后一次 API 同步
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const pendingStatesRef = useRef<Record<string, 'mastered' | 'fuzzy'> | null>(null);
-  const flushPendingStates = useCallback(() => {
-    if (pendingStatesRef.current && Object.keys(pendingStatesRef.current).length > 0) {
-      updateWordStates(pendingStatesRef.current);
-      pendingStatesRef.current = null;
-    }
-  }, [updateWordStates]);
-  const debouncedUpdateWordStates = useCallback((newStates: Record<string, 'mastered' | 'fuzzy'>) => {
-    pendingStatesRef.current = { ...(pendingStatesRef.current || {}), ...newStates };
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    debounceRef.current = setTimeout(flushPendingStates, 300);
-  }, [flushPendingStates]);
-
   // Load grammar data
   useEffect(() => {
     fetch('/grammar_cards.json')
@@ -65,13 +50,8 @@ export function Study() {
   // 追踪学习时长
   useEffect(() => {
     startTracking('study');
-    return () => {
-      stopTracking('study', `Day${day}`);
-      // 组件卸载时刷新防抖中未同步的状态
-      flushPendingStates();
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [day, flushPendingStates]);
+    return () => { stopTracking('study', `Day${day}`); };
+  }, [day]);
 
   const words = getDayWords(day, wordsPerDay);
   const phrases = getDayPhrases(day, wordsPerDay);
@@ -122,8 +102,8 @@ export function Study() {
     if (status === 'mastered') newStates[key] = 'mastered';
     else if (status === 'fuzzy') newStates[key] = 'fuzzy';
     else delete newStates[key];
-    // 使用乐观更新 + 防抖，不阻塞 UI
-    debouncedUpdateWordStates(newStates);
+    // 乐观更新：本地立即变化，API 异步同步
+    updateWordStates(newStates);
     nextCard();
   };
 
@@ -145,8 +125,8 @@ export function Study() {
     if (!current) next = 'fuzzy';
     else if (current === 'fuzzy') next = 'mastered';
     else next = 'fuzzy';
-    // 使用乐观更新 + 防抖，立即更新本地状态，异步同步服务器
-    debouncedUpdateWordStates({ ...state.states, [word]: next });
+    // 乐观更新：本地立即变化，API 异步同步（不阻塞 UI）
+    updateWordStates({ ...state.states, [word]: next });
   };
 
 const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
