@@ -2,6 +2,12 @@ import React, { createContext, useContext, useState, useCallback, useEffect, Rea
 import { UserInfo, login as apiLogin } from '../api/auth';
 import { clearToken } from '../api/client';
 
+// 本地用户显示名映射（覆盖服务器返回的 name）
+const USER_DISPLAY_NAMES: Record<string, string> = {
+  di: '薯条',
+  kiki: 'Kiki',
+};
+
 interface AuthContextType {
   user: UserInfo | null;
   isLoggedIn: boolean;
@@ -29,8 +35,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = useCallback(async (userId: string, pin: string) => {
     const result = await apiLogin(userId, pin);
-    setUser(result.user);
-    localStorage.setItem('vocab_user', JSON.stringify(result.user));
+    // 本地覆盖用户显示名（防止服务器存的是旧名称）
+    const displayName = USER_DISPLAY_NAMES[userId];
+    const userWithLocalName = displayName ? { ...result.user, name: displayName } : result.user;
+    setUser(userWithLocalName);
+    localStorage.setItem('vocab_user', JSON.stringify(userWithLocalName));
   }, []);
 
   const logout = useCallback(() => {

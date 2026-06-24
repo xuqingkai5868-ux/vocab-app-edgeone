@@ -1,6 +1,7 @@
 import React, { useEffect, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useApp } from '../contexts/AppContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
 import { Loading } from '../components/Loading';
@@ -100,6 +101,7 @@ function MiniCalendar({ checkIns, streak }: { checkIns: Record<string, { isCompl
 
 export function Home() {
   const { state, streak, todayNewWords, todayPhrases, todayStage, wordsPerDay, loadAll, updateUserState, doCheckIn, checkIns, advanceDay, isTodayComplete } = useApp();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const totalDays = getTotalDays(wordsPerDay);
 
@@ -136,7 +138,7 @@ export function Home() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl font-bold text-gray-800">
-            弟弟，加油！{level.icon}
+            {user?.name || '同学'}，加油！{level.icon}
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
             PET 备考 · Day {state.currentDay}/{totalDays}
