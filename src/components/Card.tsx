@@ -6,7 +6,7 @@ interface CardProps {
   onClick?: () => void;
 }
 
-export function Card({ children, className = '', onClick }: CardProps) {
+export const Card = React.memo(function Card({ children, className = '', onClick }: CardProps) {
   return (
     <div
       className={`bg-white rounded-xl shadow-sm border border-gray-100 p-4 ${
@@ -17,4 +17,4 @@ export function Card({ children, className = '', onClick }: CardProps) {
       {children}
     </div>
   );
-}
+});

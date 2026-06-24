@@ -1,18 +1,17 @@
 import React, { useState, useMemo } from 'react';
 import { Card } from '../components/Card';
+import { useApp } from '../contexts/AppContext';
 import { MASTER_WORDS } from '../services/utils/petVocabLoader';
 
 const PAGE_SIZE = 50;
 type FilterType = 'all' | 'mastered' | 'fuzzy';
 
 export function Vocabulary() {
+  const { state } = useApp();
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<FilterType>('all');
   const [page, setPage] = useState(1);
-  const [saved] = useState<Record<string, string>>(() => {
-    try { return JSON.parse(localStorage.getItem('di_states') || '{}'); }
-    catch { return {}; }
-  });
+  const saved = state.states;
 
   const allWords = useMemo(() => {
     return MASTER_WORDS.map((w, i) => ({ word: w, day: Math.floor(i / 30) + 1 }));

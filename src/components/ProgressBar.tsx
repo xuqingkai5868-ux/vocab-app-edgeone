@@ -8,7 +8,7 @@ interface ProgressBarProps {
   className?: string;
 }
 
-export function ProgressBar({ value, max, label, color = 'bg-primary-500', className = '' }: ProgressBarProps) {
+const ProgressBarComponent = ({ value, max, label, color = 'bg-primary-500', className = '' }: ProgressBarProps) => {
   const pct = max > 0 ? Math.min(Math.round((value / max) * 100), 100) : 0;
 
   return (
@@ -27,4 +27,6 @@ export function ProgressBar({ value, max, label, color = 'bg-primary-500', class
       </div>
     </div>
   );
-}
+};
+
+export const ProgressBar = React.memo(ProgressBarComponent);

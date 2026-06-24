@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
@@ -12,6 +12,7 @@ import { Dictation } from './pages/Dictation';
 import { Review } from './pages/Review';
 import { WrongWords } from './pages/WrongWords';
 import { Settings } from './pages/Settings';
+import { warmUpTTS } from './services/utils/speak';
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, isLoading } = useAuth();
@@ -22,6 +23,29 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
 function AppRoutes() {
   const { isLoggedIn, isLoading } = useAuth();
+
+  // 在首次用户交互时唤醒 TTS 引擎（Android 需要用户手势才能初始化）
+  useEffect(() => {
+    if (!isLoggedIn) return;
+
+    // 立即尝试（部分浏览器可用）
+    warmUpTTS();
+
+    // 监听首次点击/触摸来真正唤醒
+    const handleFirstInteraction = () => {
+      warmUpTTS();
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    };
+    document.addEventListener('click', handleFirstInteraction, { once: true });
+    document.addEventListener('touchstart', handleFirstInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener('click', handleFirstInteraction);
+      document.removeEventListener('touchstart', handleFirstInteraction);
+    };
+  }, [isLoggedIn]);
+
   if (isLoading) return <Loading />;
 
   return (

@@ -20,6 +20,8 @@ interface AppContextType {
   wordsPerDay: number;
   loadAll: () => Promise<void>;
   updateUserState: (newState: UserState) => Promise<void>;
+  /** 轻量更新单词状态（仅修改 states，不触发热 day data 重载），使用乐观更新模式 */
+  updateWordStates: (newStates: Record<string, 'mastered' | 'fuzzy'>) => Promise<void>;
   setWordsPerDay: (n: number) => void;
   doCheckIn: (params: { newWordsCompleted: number; reviewWordsCompleted: number; studyDurationMinutes: number }) => Promise<boolean>;
 }
@@ -83,11 +85,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     try {
       await updateState(user.id, newState);
       setUserState(newState);
-      loadDayData(newState.currentDay, wordsPerDay);
+      // 仅当 currentDay 实际变化时才重载日数据，避免每次 states 变化都触发
+      if (newState.currentDay !== userState.currentDay) {
+        loadDayData(newState.currentDay, wordsPerDay);
+      }
     } catch (e) {
       console.error('Failed to update state:', e);
     }
-  }, [user, wordsPerDay, loadDayData]);
+  }, [user, wordsPerDay, loadDayData, userState.currentDay]);
+
+  /** 轻量更新单词状态：乐观更新（先更新本地，再异步同步服务器），不重载日数据 */
+  const updateWordStates = useCallback(async (newStates: Record<string, 'mastered' | 'fuzzy'>) => {
+    if (!user) return;
+    // 乐观更新：立即更新本地状态
+    const prevState = userState;
+    const newUserState = { ...prevState, states: newStates };
+    setUserState(newUserState);
+    try {
+      await updateState(user.id, newUserState);
+    } catch (e) {
+      // 失败时回滚
+      console.error('Failed to sync word states:', e);
+      setUserState(prevState);
+    }
+  }, [user, userState]);
 
   const setWordsPerDay = useCallback((n: number) => {
     const clamped = Math.max(5, Math.min(50, n));
@@ -108,19 +129,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
         reviewWordsCount: params.reviewWordsCompleted,
         conversationRounds: 0,
       });
-      // 打卡成功后，推进到下一天
+      // 打卡成功后，推进到下一天（使用函数式更新避免闭包过期）
       const totalDays = getTotalDays(wordsPerDay);
-      const nextDay = Math.min(userState.currentDay + 1, totalDays);
-      const newState = { ...userState, currentDay: nextDay };
-      await updateState(user.id, newState);
-      setUserState(newState);
-      loadDayData(nextDay, wordsPerDay);
+      let nextDay: number;
+      setUserState(prev => {
+        nextDay = Math.min(prev.currentDay + 1, totalDays);
+        const newState = { ...prev, currentDay: nextDay! };
+        // 异步同步服务器（不等待）
+        updateState(user.id, newState).catch(e => console.error('Failed to sync checkin state:', e));
+        return newState;
+      });
+      // 加载下一天数据
+      loadDayData(nextDay!, wordsPerDay);
       await refreshCheckIns();
       return true;
     } catch {
       return false;
     }
-  }, [user, wordsPerDay, userState, loadDayData, refreshCheckIns]);
+  }, [user, wordsPerDay, loadDayData, refreshCheckIns]);
 
   const totalDays = getTotalDays(wordsPerDay);
 
@@ -128,7 +154,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     <AppContext.Provider value={{
       state: userState, checkIns, streak,
       todayNewWords, todayPhrases, todayStage, wordsPerDay,
-      loadAll, updateUserState, setWordsPerDay, doCheckIn,
+      loadAll, updateUserState, updateWordStates, setWordsPerDay, doCheckIn,
     }}>
       {children}
     </AppContext.Provider>

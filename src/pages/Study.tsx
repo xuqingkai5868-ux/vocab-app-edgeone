@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
@@ -22,7 +22,7 @@ type Tab = 'list' | 'study';
 
 export function Study() {
   const navigate = useNavigate();
-  const { state, wordsPerDay, updateUserState } = useApp();
+  const { state, wordsPerDay, updateUserState, updateWordStates } = useApp();
   const day = state.currentDay;
 
   const [tab, setTab] = useState<Tab>('list');
@@ -33,6 +33,21 @@ export function Study() {
   const [completed, setCompleted] = useState(false);
   const [grammarCardIdx, setGrammarCardIdx] = useState(0);
   const [grammarStages, setGrammarStages] = useState<GrammarStage[]>([]);
+
+  // 防抖：连续点击只触发最后一次 API 同步
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingStatesRef = useRef<Record<string, 'mastered' | 'fuzzy'> | null>(null);
+  const flushPendingStates = useCallback(() => {
+    if (pendingStatesRef.current && Object.keys(pendingStatesRef.current).length > 0) {
+      updateWordStates(pendingStatesRef.current);
+      pendingStatesRef.current = null;
+    }
+  }, [updateWordStates]);
+  const debouncedUpdateWordStates = useCallback((newStates: Record<string, 'mastered' | 'fuzzy'>) => {
+    pendingStatesRef.current = { ...(pendingStatesRef.current || {}), ...newStates };
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    debounceRef.current = setTimeout(flushPendingStates, 300);
+  }, [flushPendingStates]);
 
   // Load grammar data
   useEffect(() => {
@@ -50,8 +65,13 @@ export function Study() {
   // 追踪学习时长
   useEffect(() => {
     startTracking('study');
-    return () => { stopTracking('study', `Day${day}`); };
-  }, [day]);
+    return () => {
+      stopTracking('study', `Day${day}`);
+      // 组件卸载时刷新防抖中未同步的状态
+      flushPendingStates();
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [day, flushPendingStates]);
 
   const words = getDayWords(day, wordsPerDay);
   const phrases = getDayPhrases(day, wordsPerDay);
@@ -80,10 +100,11 @@ export function Study() {
       gs.push({ words: words.slice(i, i + 6), phrases: [] });
     }
     let pi = 0;
-    for (const g of gs) {
+    const gsLen = gs.length;
+    for (let gi = 0; gi < gsLen; gi++) {
       if (pi < phrases.length) {
-        const chunkSize = Math.ceil((phrases.length - pi) / (gs.length - gs.indexOf(g)));
-        g.phrases = phrases.slice(pi, pi + chunkSize);
+        const chunkSize = Math.ceil((phrases.length - pi) / (gsLen - gi));
+        gs[gi].phrases = phrases.slice(pi, pi + chunkSize);
         pi += chunkSize;
       }
     }
@@ -101,7 +122,8 @@ export function Study() {
     if (status === 'mastered') newStates[key] = 'mastered';
     else if (status === 'fuzzy') newStates[key] = 'fuzzy';
     else delete newStates[key];
-    updateUserState({ ...state, states: newStates });
+    // 使用乐观更新 + 防抖，不阻塞 UI
+    debouncedUpdateWordStates(newStates);
     nextCard();
   };
 
@@ -123,7 +145,8 @@ export function Study() {
     if (!current) next = 'fuzzy';
     else if (current === 'fuzzy') next = 'mastered';
     else next = 'fuzzy';
-    updateUserState({ ...state, states: { ...state.states, [word]: next } });
+    // 使用乐观更新 + 防抖，立即更新本地状态，异步同步服务器
+    debouncedUpdateWordStates({ ...state.states, [word]: next });
   };
 
 const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);

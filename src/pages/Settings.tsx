@@ -31,6 +31,16 @@ const TYPE_COLORS: Record<string, string> = {
 
 const PARENT_PASSWORD = 'scdq';
 
+// 获取上次重置时间戳，用于过滤活动日志
+function getResetTimestamp(): number {
+  try {
+    return parseInt(localStorage.getItem('vocab_activity_reset_at') || '0', 10);
+  } catch { return 0; }
+}
+function setResetTimestamp() {
+  localStorage.setItem('vocab_activity_reset_at', String(Date.now()));
+}
+
 function formatDuration(ms: number): string {
   const totalSec = Math.round(ms / 1000);
   const min = Math.floor(totalSec / 60);
@@ -106,12 +116,14 @@ export function Settings() {
     }
     const newDay = Math.max(1, appState.currentDay - 1);
     updateUserState({ currentDay: newDay, states: newStates });
+    setResetTimestamp(); // 标记重置时间，成绩单将过滤掉此时间之前的记录
     alert(`已重置到今天之前（Day ${newDay}），今日学习记录已清除`);
   };
 
   const confirmResetAll = () => {
     if (!confirm(`确定完全重置 ${user?.name || '用户'} 的所有学习进度吗？\n此操作不可撤销！`)) return;
     updateUserState({ currentDay: 1, states: {} });
+    setResetTimestamp(); // 标记重置时间，所有历史活动日志将被过滤
     alert('已完全重置，从 Day 1 重新开始');
   };
 
@@ -134,6 +146,16 @@ export function Settings() {
   };
 
   const todayTotalMs = todayEvents.reduce((s, e) => s + e.duration, 0);
+  const resetAt = getResetTimestamp();
+  // 过滤掉重置时间之前的事件
+  const filteredTodayEvents = resetAt > 0
+    ? todayEvents.filter(e => e.startTime >= resetAt)
+    : todayEvents;
+  const filteredTodayTotalMs = filteredTodayEvents.reduce((s, e) => s + e.duration, 0);
+  // 成绩单事件也需要过滤
+  const filteredResultEvents = resetAt > 0
+    ? todayEvents.filter(e => (e.type === 'review_spelling_result' || e.type === 'review_audio_result') && e.startTime >= resetAt)
+    : todayEvents.filter(e => e.type === 'review_spelling_result' || e.type === 'review_audio_result');
 
   return (
     <div className="space-y-4">
@@ -147,7 +169,7 @@ export function Settings() {
       {/* 学习报告 */}
       <Card>
         <h2 className="font-semibold text-gray-700 mb-3">📊 今日学习报告</h2>
-        {todayEvents.length === 0 ? (
+        {filteredTodayEvents.length === 0 ? (
           <p className="text-sm text-gray-400 py-4 text-center">
             {loading ? '加载中...' : '今日暂无学习记录'}
           </p>
@@ -155,10 +177,10 @@ export function Settings() {
           <div className="space-y-3">
             <div className="flex justify-between items-center">
               <span className="text-sm text-gray-500">今日学习时长</span>
-              <span className="text-lg font-bold text-primary-500">{formatDuration(todayTotalMs)}</span>
+              <span className="text-lg font-bold text-primary-500">{formatDuration(filteredTodayTotalMs)}</span>
             </div>
             <div className="space-y-2 max-h-48 overflow-y-auto">
-              {todayEvents.filter(e => e.duration > 0).sort((a, b) => b.startTime - a.startTime).slice(0, 20).map((e, i) => (
+              {filteredTodayEvents.filter(e => e.duration > 0).sort((a, b) => b.startTime - a.startTime).slice(0, 20).map((e, i) => (
                 <div key={i} className="flex items-center justify-between text-sm py-1.5 border-b border-gray-50 last:border-0">
                   <div className="flex items-center gap-2">
                     <span className={`text-xs px-1.5 py-0.5 rounded ${TYPE_COLORS[e.type] || 'bg-gray-100 text-gray-500'}`}>
@@ -191,13 +213,12 @@ export function Settings() {
       <Card>
         <h2 className="font-semibold text-gray-700 mb-3">📋 拼写/听写成绩单</h2>
         {(() => {
-          const resultEvents = todayEvents.filter(e => e.type === 'review_spelling_result' || e.type === 'review_audio_result');
-          if (resultEvents.length === 0) {
+          if (filteredResultEvents.length === 0) {
             return <p className="text-sm text-gray-400 py-4 text-center">今日暂无听写记录</p>;
           }
           return (
             <div className="space-y-3">
-              {resultEvents.sort((a, b) => b.startTime - a.startTime).map((e, i) => {
+              {filteredResultEvents.sort((a, b) => b.startTime - a.startTime).map((e, i) => {
                 // 从 details 解析成绩，格式: "20/30 正确，错误：apple、banana"
                 const match = e.details.match(/(\d+)\/(\d+) 正确/);
                 const correct = match ? parseInt(match[1]) : 0;

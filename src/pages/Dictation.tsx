@@ -23,16 +23,81 @@ export function Dictation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const dictType = (searchParams.get('type') || 'spelling') as DictType;
-  const { state, wordsPerDay, updateUserState } = useApp();
+  const { state, wordsPerDay, updateUserState, updateWordStates } = useApp();
 
   const [mode, setMode] = useState<Mode>('today');
-  const [currentIdx, setCurrentIdx] = useState(0);
+  const [currentIdx, setCurrentIdx] = useState(() => {
+    // 尝试恢复保存的听写进度
+    try {
+      const saved = localStorage.getItem('vocab_dictation_progress');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.dictType === (searchParams.get('type') || 'spelling') && parsed.mode) {
+          return parsed.currentIdx || 0;
+        }
+      }
+    } catch { /* ignore */ }
+    return 0;
+  });
   const [input, setInput] = useState('');
-  const [results, setResults] = useState<{ word: string; correct: boolean }[]>([]);
-  const [started, setStarted] = useState(false);
+  const [results, setResults] = useState<{ word: string; correct: boolean }[]>(() => {
+    // 尝试恢复保存的听写进度
+    try {
+      const saved = localStorage.getItem('vocab_dictation_progress');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.dictType === (searchParams.get('type') || 'spelling') && parsed.mode) {
+          return parsed.results || [];
+        }
+      }
+    } catch { /* ignore */ }
+    return [];
+  });
+  const [started, setStarted] = useState(() => {
+    // 如果检测到保存的进度，自动进入开始状态
+    try {
+      const saved = localStorage.getItem('vocab_dictation_progress');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.dictType === (searchParams.get('type') || 'spelling') && parsed.mode) {
+          return parsed.results && parsed.results.length > 0;
+        }
+      }
+    } catch { /* ignore */ }
+    return false;
+  });
   const [finished, setFinished] = useState(false);
   const [autoPlayed, setAutoPlayed] = useState(false);
   const [feedback, setFeedback] = useState<{ fuzzyWords: number; masteredWords: number } | null>(null);
+  // 是否刚恢复进度，首次渲染时跳过自动播放
+  const [resumed, setResumed] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vocab_dictation_progress');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        return parsed.results && parsed.results.length > 0;
+      }
+    } catch { /* ignore */ }
+    return false;
+  });
+
+  const saveDictationProgress = (idx: number, res: { word: string; correct: boolean }[]) => {
+    try {
+      localStorage.setItem('vocab_dictation_progress', JSON.stringify({
+        currentIdx: idx,
+        results: res,
+        mode,
+        dictType,
+        wordsPerDay,
+        currentDay: state.currentDay,
+        timestamp: Date.now(),
+      }));
+    } catch { /* ignore */ }
+  };
+
+  const clearDictationProgress = () => {
+    try { localStorage.removeItem('vocab_dictation_progress'); } catch { /* ignore */ }
+  };
 
   // 追踪拼写/听写时长
   const trackType = dictType === 'audio' ? 'review_audio' : 'review_spelling';
@@ -66,8 +131,12 @@ export function Dictation() {
   const current = words[currentIdx];
   const total = words.length;
 
-  // Auto-play audio when entering a new word (audio mode)
+  // Auto-play audio when entering a new word (audio mode), skip if just resumed
   useEffect(() => {
+    if (resumed) {
+      setResumed(false);
+      return;
+    }
     if (started && !finished && dictType === 'audio' && current) {
       // Short delay to ensure rendering before playing
       const timer = setTimeout(() => {
@@ -76,7 +145,7 @@ export function Dictation() {
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [currentIdx, started, finished, dictType, current]);
+  }, [currentIdx, started, finished, dictType, current, resumed]);
 
   // 听写完成后，将错误单词自动标为 fuzzy，正确单词标为 mastered，并记录成绩
   useEffect(() => {
@@ -103,7 +172,8 @@ export function Dictation() {
       }
     }
 
-    updateUserState({ ...state, states: newStates });
+    // 使用轻量更新，避免重载日数据
+    updateWordStates(newStates);
     setFeedback({ fuzzyWords: fuzzyCount, masteredWords: masteredCount });
 
     // 将听写结果上报到活动日志，家长端可查看
@@ -123,26 +193,36 @@ export function Dictation() {
     e.preventDefault();
     if (!current || !input.trim()) return;
     const isCorrect = input.trim().toLowerCase() === current.word.toLowerCase();
-    setResults(prev => [...prev, { word: current.word, correct: isCorrect }]);
+    const newResults = [...results, { word: current.word, correct: isCorrect }];
+    setResults(newResults);
     setInput('');
     setAutoPlayed(false);
 
     if (currentIdx < total - 1) {
-      setCurrentIdx(i => i + 1);
+      const nextIdx = currentIdx + 1;
+      setCurrentIdx(nextIdx);
+      // 每次作答后持久化进度
+      saveDictationProgress(nextIdx, newResults);
     } else {
       setFinished(true);
+      clearDictationProgress();
     }
   };
 
   const handleSkip = () => {
     if (!current) return;
-    setResults(prev => [...prev, { word: current.word, correct: false }]);
+    const newResults = [...results, { word: current.word, correct: false }];
+    setResults(newResults);
     setInput('');
     setAutoPlayed(false);
     if (currentIdx < total - 1) {
-      setCurrentIdx(i => i + 1);
+      const nextIdx = currentIdx + 1;
+      setCurrentIdx(nextIdx);
+      // 每次跳过也持久化进度
+      saveDictationProgress(nextIdx, newResults);
     } else {
       setFinished(true);
+      clearDictationProgress();
     }
   };
 
@@ -226,7 +306,7 @@ export function Dictation() {
 
         <div className="flex gap-3 justify-center mt-4">
           <button
-            onClick={() => { setStarted(false); setFinished(false); setCurrentIdx(0); setResults([]); setFeedback(null); }}
+            onClick={() => { setStarted(false); setFinished(false); setCurrentIdx(0); setResults([]); setFeedback(null); clearDictationProgress(); }}
             className="px-6 py-2.5 bg-primary-500 text-white rounded-lg"
           >
             再来一次

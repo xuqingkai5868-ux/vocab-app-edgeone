@@ -17,7 +17,7 @@ function getWordMeaning(word: string): string {
 
 export function Review() {
   const navigate = useNavigate();
-  const { state, updateUserState } = useApp();
+  const { state, updateWordStates } = useApp();
   const [mode, setMode] = useState<Mode>('select');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
@@ -46,14 +46,9 @@ export function Review() {
     }
   }, [mode]);
 
-  // 拼写/听写模式：跳转到独立页面
-  useEffect(() => {
-    if (mode === 'spelling') {
-      navigate('/dictation?type=spelling');
-    } else if (mode === 'audio') {
-      navigate('/dictation?type=audio');
-    }
-  }, [mode, navigate]);
+  // 拼写/听写模式：使用按钮直接导航（避免 useEffect 导航反模式）
+  const goSpelling = () => navigate('/dictation?type=spelling');
+  const goAudio = () => navigate('/dictation?type=audio');
 
   const handleAssessment = (assessment: SelfAssessment) => {
     const newStates = { ...state.states };
@@ -62,7 +57,8 @@ export function Review() {
     } else {
       newStates[currentWord.word] = 'fuzzy';
     }
-    updateUserState({ ...state, states: newStates });
+    // 使用乐观更新，不阻塞 UI
+    updateWordStates(newStates);
     setShowMeaning(false);
     if (currentIndex < total - 1) {
       setCurrentIndex(i => i + 1);
@@ -114,7 +110,7 @@ export function Review() {
 
             {/* 拼写模式 - 大按钮 */}
             <button
-              onClick={() => setMode('spelling')}
+              onClick={goSpelling}
               className="w-full py-6 bg-emerald-500 text-white rounded-2xl shadow-lg shadow-emerald-200 active:scale-[0.98] transition-transform"
             >
               <div className="text-3xl mb-2">✍️</div>
@@ -124,7 +120,7 @@ export function Review() {
 
             {/* 听写模式 - 大按钮 */}
             <button
-              onClick={() => setMode('audio')}
+              onClick={goAudio}
               className="w-full py-6 bg-amber-500 text-white rounded-2xl shadow-lg shadow-amber-200 active:scale-[0.98] transition-transform"
             >
               <div className="text-3xl mb-2">🎧</div>
