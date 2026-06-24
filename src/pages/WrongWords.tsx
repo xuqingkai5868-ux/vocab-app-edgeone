@@ -12,8 +12,8 @@ export function WrongWords() {
   // 收集所有 △ 模糊的词
   const wrongWords = useMemo(() => {
     const result: { word: string; meaning: string; pos: string }[] = [];
-    for (const [word, status] of Object.entries(state.states)) {
-      if (status === 'fuzzy') {
+    for (const [word, level] of Object.entries(state.states)) {
+      if (level >= 1 && level <= 3) {
         const w = MASTER_WORDS.find(mw => mw.word.toLowerCase() === word.toLowerCase());
         result.push({ word, meaning: w?.meaning || '', pos: w?.pos || '' });
       }

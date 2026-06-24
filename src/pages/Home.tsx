@@ -99,23 +99,26 @@ function MiniCalendar({ checkIns, streak }: { checkIns: Record<string, { isCompl
 }
 
 export function Home() {
-  const { state, streak, todayNewWords, todayPhrases, todayStage, wordsPerDay, loadAll, updateUserState, doCheckIn, checkIns } = useApp();
+  const { state, streak, todayNewWords, todayPhrases, todayStage, wordsPerDay, loadAll, updateUserState, doCheckIn, checkIns, advanceDay, isTodayComplete } = useApp();
   const navigate = useNavigate();
   const totalDays = getTotalDays(wordsPerDay);
 
   useEffect(() => { loadAll(); }, []);
 
   const mastered = useMemo(() =>
-    Object.values(state.states).filter(v => v === 'mastered').length,
+    Object.values(state.states).filter(v => v >= 4).length,
   [state.states]);
 
   const level = useMemo(() => getLevel(mastered), [mastered]);
   const pct = Math.min(100, Math.round((mastered / MASTER_WORDS.length) * 100));
 
-  const masteredToday = todayNewWords.filter(w => state.states[w.word] === 'mastered').length;
-  const fuzzyToday = todayNewWords.filter(w => state.states[w.word] === 'fuzzy').length;
+  const masteredToday = todayNewWords.filter(w => (state.states[w.word] || 0) >= 4).length;
+  const fuzzyToday = todayNewWords.filter(w => {
+    const lvl = state.states[w.word] || 0;
+    return lvl >= 1 && lvl <= 3;
+  }).length;
   const studiedToday = masteredToday + fuzzyToday;
-  const fuzzyCount = Object.values(state.states).filter(v => v === 'fuzzy').length;
+  const fuzzyCount = Object.values(state.states).filter(v => v >= 1 && v <= 3).length;
 
   const handleCheckIn = async () => {
     const active = getActiveTracking();
@@ -136,7 +139,7 @@ export function Home() {
             弟弟，加油！{level.icon}
           </h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            PET 备考 · 第 {state.currentDay}/{totalDays} 天
+            PET 备考 · Day {state.currentDay}/{totalDays}
           </p>
         </div>
         <div className="flex items-center gap-3">
@@ -151,21 +154,39 @@ export function Home() {
         </div>
       </div>
 
-      {/* 今日任务 + 打卡 */}
+      {/* 双进度条：学习进度 + 打卡 */}
       <Card className="!p-4">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="font-semibold text-gray-700 text-sm">今日任务</h2>
-          <span className="text-xs text-gray-400">{studiedToday}/{todayNewWords.length} 词</span>
+        <h2 className="font-semibold text-gray-700 text-sm mb-3">今日任务</h2>
+        <div className="mb-2">
+          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+            <span>学习进度 · Day {state.currentDay}</span>
+            <span>{studiedToday}/{todayNewWords.length} 词</span>
+          </div>
+          <ProgressBar value={studiedToday} max={todayNewWords.length} label="" color="bg-primary-500" />
         </div>
-        <ProgressBar value={studiedToday} max={todayNewWords.length} label="" color="bg-primary-500" />
+        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
+          <span>连续打卡</span>
+          <span>{streak} 天</span>
+        </div>
         <div className="flex gap-2 mt-3">
           <button onClick={() => navigate('/study')} className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl font-medium text-sm">
             开始学习 📚
           </button>
-          <button onClick={handleCheckIn} className="px-5 py-2.5 bg-success-500 text-white rounded-xl font-medium text-sm">
+          <button onClick={handleCheckIn} className="px-4 py-2.5 bg-success-500 text-white rounded-xl font-medium text-sm">
             打卡 🐣
           </button>
+          {isTodayComplete && state.currentDay < totalDays && (
+            <button
+              onClick={advanceDay}
+              className="px-4 py-2.5 bg-amber-500 text-white rounded-xl font-medium text-sm animate-pulse"
+            >
+              进入 Day {state.currentDay + 1} →
+            </button>
+          )}
         </div>
+        {isTodayComplete && state.currentDay < totalDays && (
+          <p className="text-xs text-amber-600 mt-2 text-center">所有词都学过了，可以进入下一天！</p>
+        )}
       </Card>
 
       {/* 打卡日历（紧凑周视图） */}

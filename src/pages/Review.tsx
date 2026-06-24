@@ -51,9 +51,9 @@ export function Review() {
   const goAudio = () => navigate('/dictation?type=audio');
 
   const handleAssessment = (assessment: SelfAssessment) => {
-    const status = assessment === 'known' ? 'mastered' : 'fuzzy';
-    // 增量更新，只传当前词的标记变化
-    updateWordStates({ [currentWord.word]: status });
+    // forgot → level 1 (刚学), vague → level 2 (模糊), known → level 4 (掌握)
+    const level = assessment === 'known' ? 4 : assessment === 'vague' ? 2 : 1;
+    updateWordStates({ [currentWord.word]: level });
     setShowMeaning(false);
     if (currentIndex < total - 1) {
       setCurrentIndex(i => i + 1);
@@ -62,6 +62,13 @@ export function Review() {
       navigate('/home');
     }
   };
+
+  /** 获取当前等级的显示文字 */
+  function getLevelLabel(word: string): string {
+    const level = state.states[word] || 0;
+    const labels = ['○ 未标记', '◐ 刚学', '△ 模糊', '◑ 已知', '✓ 已掌握'];
+    return labels[Math.min(level, 4)];
+  }
 
   // --- Mode selection screen ---
   if (mode === 'select') {
@@ -150,7 +157,7 @@ export function Review() {
           第 {currentIndex + 1}/{total} 个
         </p>
         <p className="text-xs text-gray-400 mb-4">
-          当前：{currentStatus === 'mastered' ? '✓ 已掌握' : currentStatus === 'fuzzy' ? '△ 模糊' : '○ 未标记'}
+          当前：{getLevelLabel(currentWord.word)}
         </p>
         <div className="flex items-center justify-center gap-3 mb-6">
           <h2 className="text-3xl font-bold text-gray-800">{currentWord.word}</h2>

@@ -130,19 +130,21 @@ export function Dictation() {
     if (!finished || results.length === 0) return;
     if (feedback) return; // 避免重复保存
 
-    const partialUpdates: Record<string, 'mastered' | 'fuzzy'> = {};
+    const partialUpdates: Record<string, number> = {};
     let fuzzyCount = 0;
     let masteredCount = 0;
     const wrongList: string[] = [];
 
     for (const r of results) {
       if (r.correct) {
-        // 避免覆盖已有 mastered 的判断逻辑由 updateWordStates 内部处理
-        partialUpdates[r.word] = 'mastered';
+        // 正确：当前等级+1（最高4），如果已经是4则保持不变
+        const currentLevel = state.states[r.word] || 0;
+        partialUpdates[r.word] = Math.min(currentLevel + 1, 4);
         masteredCount++;
       } else {
         wrongList.push(r.word);
-        partialUpdates[r.word] = 'fuzzy';
+        // 错误：降到 level 2 (模糊)
+        partialUpdates[r.word] = 2;
         fuzzyCount++;
       }
     }

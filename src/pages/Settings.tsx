@@ -108,10 +108,10 @@ export function Settings() {
   const confirmResetToday = () => {
     const todayWords = getDayWords(appState.currentDay, wordsPerDay);
     const todayWordKeys = new Set(todayWords.map(w => w.word));
-    const newStates: Record<string, 'mastered' | 'fuzzy'> = {};
-    for (const [word, status] of Object.entries(appState.states)) {
+    const newStates: Record<string, number> = {};
+    for (const [word, level] of Object.entries(appState.states)) {
       if (!todayWordKeys.has(word)) {
-        newStates[word] = status;
+        newStates[word] = level as number;
       }
     }
     const newDay = Math.max(1, appState.currentDay - 1);
@@ -282,7 +282,7 @@ export function Settings() {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between"><span className="text-gray-500">学员</span><span>{user?.name || '-'}</span></div>
           <div className="flex justify-between"><span className="text-gray-500">词库</span><span>PET {totalDays * wordsPerDay} 词</span></div>
-          <div className="flex justify-between"><span className="text-gray-500">已掌握</span><span>{Object.values(appState.states).filter(v => v === 'mastered').length} 词</span></div>
+          <div className="flex justify-between"><span className="text-gray-500">已掌握</span><span>{Object.values(appState.states).filter(v => v >= 4).length} 词</span></div>
         </div>
       </Card>
 

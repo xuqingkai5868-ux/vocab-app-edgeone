@@ -9,20 +9,43 @@ import { startTracking, stopTracking } from '../services/activity/activityTracke
 import { speakWord } from '../services/utils/speak';
 import type { GrammarCard, GrammarStage } from '../types/study';
 
-type WordStatus = 'new' | 'fuzzy' | 'mastered';
+/** 单词等级显示方案 */
+const LEVEL_META = [
+  { label: '未学', icon: '○', bg: 'bg-gray-100', text: 'text-gray-400' },
+  { label: '刚学', icon: '◐', bg: 'bg-blue-100', text: 'text-blue-700' },
+  { label: '模糊', icon: '△', bg: 'bg-yellow-100', text: 'text-yellow-700' },
+  { label: '已知', icon: '◑', bg: 'bg-teal-100', text: 'text-teal-700' },
+  { label: '掌握', icon: '✓', bg: 'bg-green-100', text: 'text-green-700' },
+];
+
+function getLevelInfo(level: number) {
+  return LEVEL_META[Math.max(0, Math.min(4, level))];
+}
+
+const FILTER_OPTIONS = [
+  { key: 'all', label: '全部' },
+  { key: 'learning', label: '◐ 刚学', level: 1 },
+  { key: 'fuzzy', label: '△ 模糊', level: 2 },
+  { key: 'known', label: '◑ 已知', level: 3 },
+  { key: 'mastered', label: '✓ 掌握', level: 4 },
+] as const;
+
+type FilterKey = (typeof FILTER_OPTIONS)[number]['key'];
 type Tab = 'list' | 'study';
 
 export function Study() {
   const navigate = useNavigate();
-  const { state, wordsPerDay, updateUserState, updateWordStates } = useApp();
+  const { state, wordsPerDay, updateWordStates, advanceDay, isTodayComplete } = useApp();
   const day = state.currentDay;
 
   const [tab, setTab] = useState<Tab>('list');
-  const [filter, setFilter] = useState<'all' | 'mastered' | 'fuzzy' | 'new'>('all');
+  const [filter, setFilter] = useState<FilterKey>('all');
   const [currentGroup, setCurrentGroup] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [completed, setCompleted] = useState(false);
+  const [feedbackWord, setFeedbackWord] = useState<string | null>(null);
+  const [feedbackType, setFeedbackType] = useState<'mastered' | 'fuzzy' | null>(null);
   const [grammarCardIdx, setGrammarCardIdx] = useState(0);
   const [grammarStages, setGrammarStages] = useState<GrammarStage[]>([]);
 
@@ -51,19 +74,25 @@ export function Study() {
   // 过滤后的单词列表
   const filteredWords = useMemo(() => {
     if (filter === 'all') return words;
+    // 从 FILTER_OPTIONS 中获取当前筛选对应的等级
+    const targetLevel = (FILTER_OPTIONS.find(o => o.key === filter) as { key: string; level: number } | undefined)?.level;
     return words.filter(w => {
-      const s = state.states[w.word];
-      if (filter === 'mastered') return s === 'mastered';
-      if (filter === 'fuzzy') return s === 'fuzzy';
-      if (filter === 'new') return !s;
-      return true;
+      const level = state.states[w.word] || 0;
+      return targetLevel ? level === targetLevel : true;
     });
   }, [words, state.states, filter]);
 
-  // 统计
-  const masteredCount = words.filter(w => state.states[w.word] === 'mastered').length;
-  const fuzzyCount = words.filter(w => state.states[w.word] === 'fuzzy').length;
-  const newCount = words.filter(w => !state.states[w.word]).length;
+  // 统计（按等级）
+  const stats = useMemo(() => {
+    const counts = [0, 0, 0, 0, 0];
+    for (const w of words) {
+      const level = state.states[w.word] || 0;
+      counts[Math.min(level, 4)]++;
+    }
+    return counts; // [new, learning, fuzzy, known, mastered]
+  }, [words, state.states]);
+
+  const completedCount = stats[1] + stats[2] + stats[3] + stats[4]; // 所有学过（level > 0）
 
   // Group into groups of 6
   const groups = useMemo(() => {
@@ -87,12 +116,16 @@ export function Study() {
   const allItems = group ? [...group.words.map(w => ({ type: 'word' as const, word: w.word, meaning: `${w.meaning} (${w.pos})`, source: null, assoc: null })), ...group.phrases.map(p => ({ type: 'phrase' as const, word: p.phrase, meaning: p.meaning, source: p.source, assoc: p.associated_word }))] : [];
   const currentItem = allItems[cardIndex];
 
-  const markStatus = (status: WordStatus) => {
+  const markStatus = (isKnown: boolean) => {
     if (!currentItem) return;
     const key = currentItem.word;
-    if (status === 'mastered') updateWordStates({ [key]: 'mastered' });
-    else if (status === 'fuzzy') updateWordStates({ [key]: 'fuzzy' });
-    else updateWordStates({ [key]: null });
+    const currentLevel = state.states[key] || 0;
+    // known → level 4, fuzzy → level 2
+    const newLevel = isKnown ? 4 : 2;
+    updateWordStates({ [key]: newLevel });
+    setFeedbackWord(key);
+    setFeedbackType(isKnown ? 'mastered' : 'fuzzy');
+    setTimeout(() => { setFeedbackWord(null); setFeedbackType(null); }, 600);
     nextCard();
   };
 
@@ -108,13 +141,11 @@ export function Study() {
     }
   };
 
+  /** 点击单词列表中某个词 → 升级（0→1→2→3→4→1 循环） */
   const toggleWordStatus = (word: string) => {
-    const current = state.states[word];
-    let next: 'mastered' | 'fuzzy';
-    if (!current) next = 'fuzzy';
-    else if (current === 'fuzzy') next = 'mastered';
-    else next = 'fuzzy';
-    updateWordStates({ [word]: next });
+    const currentLevel = state.states[word] || 0;
+    const nextLevel = currentLevel >= 4 ? 1 : currentLevel + 1;
+    updateWordStates({ [word]: nextLevel });
   };
 
 const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
@@ -128,6 +159,18 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
         <div className="text-6xl mb-2">🎉</div>
         <h1 className="text-2xl font-bold text-gray-800">今日学习完成！</h1>
         <p className="text-gray-500 text-sm">Day {day}/{totalDays}</p>
+
+        {/* 进度摘要 */}
+        <Card className="!p-3">
+          <div className="flex justify-around text-sm">
+            {LEVEL_META.map((m, i) => (
+              <div key={i} className="text-center">
+                <div className={`text-lg ${m.text}`}>{m.icon}</div>
+                <div className={`text-xs ${m.text}`}>{stats[i]}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
 
         {/* 语法卡片嵌入 */}
         {grammarCards.length > 0 && currentGrammar && (
@@ -163,13 +206,27 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
         )}
 
         <p className="text-xs text-gray-400 mt-1">
-          掌握了 {Object.values(state.states).filter(v => v === 'mastered').length} 个词
+          {stats[4]} 个词已达到掌握 (Lv.4)
         </p>
         <div className="flex gap-3 justify-center mt-4">
           {grammarCards.length > 1 && grammarCardIdx < grammarCards.length - 1 ? (
             <button onClick={() => setGrammarCardIdx(i => i + 1)} className="px-6 py-2.5 bg-amber-500 text-white rounded-lg">
               下一个语法点 →
             </button>
+          ) : day < totalDays ? (
+            <>
+              {isTodayComplete && (
+                <button
+                  onClick={() => { advanceDay(); navigate('/study'); }}
+                  className="px-6 py-2.5 bg-amber-500 text-white rounded-lg animate-pulse"
+                >
+                  进入 Day {day + 1} 🚀
+                </button>
+              )}
+              <button onClick={() => navigate('/home')} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg">
+                返回首页 🏠
+              </button>
+            </>
           ) : (
             <button onClick={() => navigate('/home')} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg">
               返回首页 🏠
@@ -210,30 +267,32 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
       {/* ===== 词表视图 ===== */}
       {tab === 'list' && (
         <>
-          {/* 进度概览 */}
+          {/* 进度概览：5 级显示 */}
           <Card className="!p-3">
-            <div className="flex items-center justify-between">
-              <div className="flex gap-3 text-sm">
-                <span className="text-green-600 font-medium">✓ {masteredCount}</span>
-                <span className="text-yellow-600 font-medium">△ {fuzzyCount}</span>
-                <span className="text-gray-400">{words.length - masteredCount - fuzzyCount} 未学</span>
-              </div>
-              <div className="text-xs text-gray-400">{masteredCount + fuzzyCount}/{words.length} 已完成</div>
+            <div className="flex justify-around text-sm">
+              {LEVEL_META.map((m, i) => (
+                <div key={i} className="text-center">
+                  <div className={`text-lg ${stats[i] > 0 ? m.text : 'text-gray-300'}`}>{m.icon}{stats[i]}</div>
+                  <div className={`text-[10px] ${stats[i] > 0 ? m.text : 'text-gray-400'}`}>{m.label}</div>
+                </div>
+              ))}
             </div>
-            <ProgressBar value={masteredCount + fuzzyCount} max={words.length} label="" />
+            <div className="mt-2">
+              <ProgressBar value={completedCount} max={words.length} label="" />
+            </div>
           </Card>
 
           {/* 过滤标签 */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar">
-            {(['all', 'mastered', 'fuzzy', 'new'] as const).map(f => (
+          <div className="flex gap-1 overflow-x-auto no-scrollbar">
+            {FILTER_OPTIONS.map(f => (
               <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap ${
-                  filter === f ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'
+                key={f.key}
+                onClick={() => setFilter(f.key)}
+                className={`px-2.5 py-1.5 rounded-xl text-xs font-medium whitespace-nowrap ${
+                  filter === f.key ? 'bg-primary-500 text-white' : 'bg-gray-100 text-gray-600'
                 }`}
               >
-                {f === 'all' ? '全部' : f === 'mastered' ? '✓ 已掌握' : f === 'fuzzy' ? '△ 模糊' : '○ 未学'}
+                {f.label}
               </button>
             ))}
           </div>
@@ -244,13 +303,14 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
               <p className="text-gray-400 text-center py-6 text-sm">没有符合条件的单词</p>
             ) : (
               filteredWords.map((w, i) => {
-                const s = state.states[w.word];
+                const level = state.states[w.word] || 0;
+                const info = getLevelInfo(level);
                 return (
                   <div
                     key={w.word}
                     onClick={() => toggleWordStatus(w.word)}
-                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer ${
-                      s === 'mastered' ? 'bg-green-50' : s === 'fuzzy' ? 'bg-yellow-50' : ''
+                    className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-300 ${
+                      level >= 4 ? 'bg-green-50' : level >= 2 ? 'bg-yellow-50' : level >= 1 ? 'bg-blue-50' : ''
                     }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
@@ -266,8 +326,8 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
                       >
                         🔊
                       </button>
-                      <span className={`text-base w-5 text-center ${s ? '' : 'text-gray-300'}`}>
-                        {s === 'mastered' ? '✓' : s === 'fuzzy' ? '△' : '○'}
+                      <span className={`text-sm px-1.5 py-0.5 rounded-full ${info.bg} ${info.text}`}>
+                        {info.icon}
                       </span>
                     </div>
                   </div>
@@ -316,7 +376,13 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
 
           {currentItem && (
             <Card
-              className="text-center py-12 min-h-[280px] flex flex-col items-center justify-center cursor-pointer select-none"
+              className={`text-center py-12 min-h-[280px] flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-300 ${
+                feedbackWord === currentItem.word
+                  ? feedbackType === 'mastered'
+                    ? 'ring-4 ring-green-300 scale-[0.97]'
+                    : 'ring-4 ring-yellow-300 scale-[1.02]'
+                  : ''
+              }`}
               onClick={() => setFlipped(!flipped)}
             >
               {currentItem.type === 'phrase' && (
@@ -341,8 +407,8 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
 
           {flipped && (
             <div className="flex gap-3">
-              <button onClick={() => markStatus('fuzzy')} className="flex-1 py-3 bg-yellow-500 text-white rounded-xl font-medium text-lg">△ 模糊</button>
-              <button onClick={() => markStatus('mastered')} className="flex-1 py-3 bg-green-500 text-white rounded-xl font-medium text-lg">✓ 认识</button>
+              <button onClick={() => markStatus(false)} className="flex-1 py-3 bg-yellow-500 text-white rounded-xl font-medium text-lg">△ 模糊</button>
+              <button onClick={() => markStatus(true)} className="flex-1 py-3 bg-green-500 text-white rounded-xl font-medium text-lg">✓ 认识</button>
             </div>
           )}
 

@@ -3,7 +3,8 @@ import { apiGet, apiPut } from './client';
 
 export interface UserState {
   currentDay: number;
-  states: Record<string, 'mastered' | 'fuzzy'>;
+  /** 单词掌握等级: 0=未学, 1=刚学, 2=模糊, 3=已知, 4=掌握 */
+  states: Record<string, number>;
   lastUpdated?: number;
 }
 
