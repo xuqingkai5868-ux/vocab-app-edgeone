@@ -1,7 +1,7 @@
 {
-  "name": "弟弟的 PET 闯关",
-  "short_name": "PET 闯关",
-  "description": "弟弟专属 PET 备考学习工具",
+  "name": "进击的单词",
+  "short_name": "单词闯关",
+  "description": "PET 英语单词闯关学习工具",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
