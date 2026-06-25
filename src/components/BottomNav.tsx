@@ -19,9 +19,9 @@ export function BottomNav() {
         {navItems.map((item) => (
           <button
             key={item.path}
-            onClick={() => navigate(item.path)}
+            onClick={() => navigate(item.path, { replace: true })}
             className={`flex flex-col items-center py-2 px-3 min-w-0 flex-1 transition-colors ${
-              location.pathname === item.path
+              location.pathname === item.path || location.pathname.startsWith(item.path + '/') || (item.path === '/study' && location.pathname === '/')
                 ? 'text-primary-500'
                 : 'text-gray-400'
             }`}

@@ -55,10 +55,10 @@ export async function onRequestPut({ request }) {
     return json({ error: 'invalid_states' }, 400);
   }
 
-  // 兼容三种格式：
+  // 兼容多种格式：
   // - 旧版字符串: 'mastered'(4), 'fuzzy'(2)
   // - 新版数字: 0-4
-  // - 其他字符串/数字: 转为数字 0-4
+  // - 字符串数字: "3" → 3
   const normalizedStates = {};
   for (const [k, v] of Object.entries(state.states)) {
     let nv;
@@ -68,8 +68,10 @@ export async function onRequestPut({ request }) {
       nv = 4;
     } else if (v === 'fuzzy') {
       nv = 2;
+    } else if (typeof v === 'string' && /^\d+$/.test(v)) {
+      // 字符串数字（如 "3"）转为数字
+      nv = Math.max(0, Math.min(4, parseInt(v, 10)));
     } else {
-      // 其他字符串值 → 0（未学）
       nv = 0;
     }
     normalizedStates[k] = nv;

@@ -74,6 +74,9 @@ export function getDayPhrases(day: number, wordsPerDay: number): PETPhrase[] {
   });
 }
 
+// Pre-built flat array for search performance (built once at module load)
+export const ALL_FLAT_WORDS: PETWord[] = [...MASTER_WORDS];
+
 /**
  * Search all words
  */
@@ -81,16 +84,12 @@ export function searchWords(query: string, wordsPerDay: number): { word: PETWord
   const q = query.toLowerCase().trim();
   if (!q) return [];
   const results: { word: PETWord; day: number }[] = [];
-  const totalDays = getTotalDays(wordsPerDay);
-  for (let day = 1; day <= totalDays; day++) {
-    const words = getDayWords(day, wordsPerDay);
-    for (const w of words) {
-      if (w.word.toLowerCase().includes(q) || w.meaning.includes(q)) {
-        results.push({ word: w, day });
-        if (results.length >= 50) break;
-      }
+  for (let i = 0; i < ALL_FLAT_WORDS.length; i++) {
+    const w = ALL_FLAT_WORDS[i];
+    if (w.word.toLowerCase().includes(q) || w.meaning.toLowerCase().includes(q)) {
+      results.push({ word: w, day: Math.floor(i / wordsPerDay) + 1 });
+      if (results.length >= 50) break;
     }
-    if (results.length >= 50) break;
   }
   return results;
 }

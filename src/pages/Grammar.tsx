@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { Loading } from '../components/Loading';
@@ -11,31 +11,49 @@ export function Grammar() {
   const [current, setCurrent] = useState<GrammarCard | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [cardIdx, setCardIdx] = useState(0);
+  const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
     fetch('/grammar_cards.json')
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        return r.json();
+      })
       .then(d => {
         setStages(d.stages);
         const s = d.stages.find((s: StageData) => s.stage === Number(stageId));
         if (s && s.cards.length > 0) setCurrent(s.cards[0]);
+      })
+      .catch(e => {
+        console.error('Failed to load grammar cards:', e);
+        setFetchError(true);
       });
   }, [stageId]);
 
-  if (!stages.length || !current) return <Loading />;
+  const handleNext = useCallback(() => {
+    setShowAnswer(false);
+    setCardIdx(prevIdx => {
+      const nextIdx = prevIdx + 1;
+      const stage = stages.find(s => s.stage === Number(stageId));
+      if (stage && stage.cards[nextIdx]) {
+        setCurrent(stage.cards[nextIdx]);
+      }
+      return nextIdx;
+    });
+  }, [stages, stageId]);
+
+  if (fetchError) {
+    return (
+      <div className="p-8 text-center">
+        <p className="text-gray-500 mb-3">语法卡片加载失败</p>
+        <button onClick={() => navigate('/home')} className="text-primary-500 text-sm">返回首页</button>
+      </div>
+    );
+  }
+  if (!stages.length || !current) return <Loading text="加载语法卡片..." />;
 
   const stage = stages.find(s => s.stage === Number(stageId));
   if (!stage) return <div className="p-4">阶段不存在</div>;
-
-  const handleNext = () => {
-    setShowAnswer(false);
-    if (cardIdx < stage.cards.length - 1) {
-      setCardIdx(i => i + 1);
-      setCurrent(stage.cards[cardIdx + 1]);
-    } else {
-      navigate('/home');
-    }
-  };
 
   return (
     <div className="space-y-4">

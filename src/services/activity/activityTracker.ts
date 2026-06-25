@@ -12,9 +12,10 @@ function getToday(): string {
 
 /**
  * 当用户进入某个活动页时调用
+ * 默认使用 type 作为 key，确保 start 和 stop 的 key 一致
  */
-export function startTracking(type: ActivityType, key = 'default') {
-  trackers[key] = { type, startTime: Date.now() };
+export function startTracking(type: ActivityType, key?: string) {
+  trackers[key ?? type] = { type, startTime: Date.now() };
 }
 
 /**

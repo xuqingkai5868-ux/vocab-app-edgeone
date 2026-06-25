@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
@@ -10,8 +10,14 @@ import { speakWord } from '../services/utils/speak';
 type SelfAssessment = 'forgot' | 'vague' | 'known';
 type Mode = 'select' | 'definition' | 'spelling' | 'audio';
 
+// 建索引，O(1) 查找，避免每次 O(n) 遍历
+const wordMap = new Map<string, { meaning: string; pos: string }>();
+MASTER_WORDS.forEach(w => {
+  wordMap.set(w.word.toLowerCase(), { meaning: w.meaning, pos: w.pos });
+});
+
 function getWordMeaning(word: string): string {
-  const w = MASTER_WORDS.find(w => w.word.toLowerCase() === word.toLowerCase());
+  const w = wordMap.get(word.toLowerCase());
   return w ? `${w.meaning} (${w.pos})` : '';
 }
 
@@ -22,16 +28,22 @@ export function Review() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
 
-  // All words the user has interacted with, randomly shuffled
+  // All words the user has interacted with, only shuffle once on mount
+  // 使用 ref 防止每次 state.states 变化时重新洗牌打断复习流程
+  const reviewWordsRef = useRef<{ word: string }[] | null>(null);
   const reviewWords = useMemo(() => {
-    const all = Object.entries(state.states).map(([word]) => ({ word }));
+    if (reviewWordsRef.current) return reviewWordsRef.current;
+    const all = Object.entries(state.states)
+      .filter(([, level]) => (level as number) > 0) // 只复习有等级的词（>0）
+      .map(([word]) => ({ word }));
     // Shuffle
     for (let i = all.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
       [all[i], all[j]] = [all[j], all[i]];
     }
+    reviewWordsRef.current = all;
     return all;
-  }, [state.states]);
+  }, []); // 空依赖：只跑一次，挂载时洗牌
 
   const currentWord = reviewWords[currentIndex];
   const total = reviewWords.length;
@@ -41,7 +53,7 @@ export function Review() {
   // 追踪释义复习时长
   useEffect(() => {
     if (mode === 'definition') {
-      startTracking('review_definition');
+      startTracking('review_definition', 'review_definition');
       return () => { stopTracking('review_definition'); };
     }
   }, [mode]);

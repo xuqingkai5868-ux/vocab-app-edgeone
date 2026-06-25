@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
@@ -48,6 +48,16 @@ export function Study() {
   const [feedbackType, setFeedbackType] = useState<'mastered' | 'fuzzy' | null>(null);
   const [grammarCardIdx, setGrammarCardIdx] = useState(0);
   const [grammarStages, setGrammarStages] = useState<GrammarStage[]>([]);
+  const feedbackTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const animatingTimerRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // 组件卸载时清除定时器
+  useEffect(() => {
+    return () => {
+      if (feedbackTimerRef.current) clearTimeout(feedbackTimerRef.current);
+      if (animatingTimerRef.current) clearTimeout(animatingTimerRef.current);
+    };
+  }, []);
 
   // Load grammar data
   useEffect(() => {
@@ -64,7 +74,7 @@ export function Study() {
 
   // 追踪学习时长
   useEffect(() => {
-    startTracking('study');
+    startTracking('study', 'study');
     return () => { stopTracking('study', `Day${day}`); };
   }, [day]);
 
@@ -125,7 +135,7 @@ export function Study() {
     updateWordStates({ [key]: newLevel });
     setFeedbackWord(key);
     setFeedbackType(isKnown ? 'mastered' : 'fuzzy');
-    setTimeout(() => { setFeedbackWord(null); setFeedbackType(null); }, 600);
+    feedbackTimerRef.current = setTimeout(() => { setFeedbackWord(null); setFeedbackType(null); }, 600);
     nextCard();
   };
 
@@ -149,7 +159,7 @@ export function Study() {
     updateWordStates({ [word]: nextLevel });
     // 触发闪烁动画
     setAnimatingWord(word);
-    setTimeout(() => setAnimatingWord(null), 400);
+    animatingTimerRef.current = setTimeout(() => setAnimatingWord(null), 400);
   };
 
 const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);

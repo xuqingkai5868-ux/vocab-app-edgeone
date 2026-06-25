@@ -30,7 +30,8 @@ export function middleware({ request, next }) {
     path === '/api/login' ||    // 登录（拿 token 前不能要求有 token）
     path === '/api/seed' ||     // 首次初始化；再次 seed 需要 adminConfirmPin
     path === '/api/ping' ||     // 最小连通性测试
-    path === '/api/tts'         // 语音合成（不需要用户身份）
+    path === '/api/tts' ||      // 语音合成（不需要用户身份）
+    path === '/api/verify-admin-pin' // 家长密码验证（不需要 token）
   ) {
     return next();
   }

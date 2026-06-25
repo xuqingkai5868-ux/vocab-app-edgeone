@@ -69,6 +69,8 @@ export function getDateFromParts(year: number, month: number, day: number): Date
 }
 
 export function formatTime(minutes: number): string {
+  if (!Number.isFinite(minutes) || minutes < 0) minutes = 0;
+  minutes = Math.round(minutes);
   if (minutes < 60) {
     return `${minutes}分钟`;
   }

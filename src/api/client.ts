@@ -2,6 +2,21 @@
 
 const API_BASE = '/api';
 
+/**
+ * API 强制登出事件
+ * 当收到 401 时触发，AuthContext 监听此事件自动登出
+ */
+const FORCE_LOGOUT_EVENT = 'api-force-logout';
+
+export function triggerForceLogout(): void {
+  window.dispatchEvent(new CustomEvent(FORCE_LOGOUT_EVENT));
+}
+
+export function onForceLogout(handler: () => void): () => void {
+  window.addEventListener(FORCE_LOGOUT_EVENT, handler);
+  return () => window.removeEventListener(FORCE_LOGOUT_EVENT, handler);
+}
+
 export class APIError extends Error {
   constructor(
     message: string,
@@ -43,23 +58,45 @@ async function request<T>(
     headers['Authorization'] = `Bearer ${token}`;
   }
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...options,
-    headers,
-  });
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 30000); // 30s 超时
 
-  if (!response.ok) {
-    let data: unknown;
-    try {
-      data = await response.json();
-    } catch {
-      data = { message: response.statusText };
+  try {
+    const response = await fetch(`${API_BASE}${path}`, {
+      ...options,
+      headers,
+      signal: controller.signal,
+    });
+
+    if (response.status === 401) {
+      // Token 过期或无效 → 触发强制登出
+      triggerForceLogout();
+      const msg = '登录已过期，请重新登录';
+      throw new APIError(msg, 401);
     }
-    const msg = (data as { message?: string })?.message || `请求失败 (${response.status})`;
-    throw new APIError(msg, response.status, data);
-  }
 
-  return response.json() as Promise<T>;
+    if (!response.ok) {
+      let data: unknown;
+      try {
+        data = await response.json();
+      } catch {
+        data = { message: response.statusText };
+      }
+      const msg = (data as { message?: string })?.message || `请求失败 (${response.status})`;
+      throw new APIError(msg, response.status, data);
+    }
+
+    return response.json() as Promise<T>;
+  } catch (e) {
+    if (e instanceof APIError) throw e;
+    // 网络错误或超时
+    const msg = e instanceof DOMException && e.name === 'AbortError'
+      ? '请求超时'
+      : '网络错误，请检查网络连接';
+    throw new APIError(msg, 0);
+  } finally {
+    clearTimeout(timeoutId);
+  }
 }
 
 export async function apiGet<T>(path: string): Promise<T> {

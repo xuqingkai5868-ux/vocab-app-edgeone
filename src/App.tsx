@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Component, ErrorInfo, ReactNode } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
@@ -13,6 +13,44 @@ import { Review } from './pages/Review';
 import { WrongWords } from './pages/WrongWords';
 import { Settings } from './pages/Settings';
 import { warmUpTTS } from './services/utils/speak';
+
+class ErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+  constructor(props: { children: ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error: Error, errorInfo: ErrorInfo) {
+    console.error('ErrorBoundary caught:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="flex items-center justify-center min-h-screen bg-gray-50 px-4">
+          <div className="text-center">
+            <div className="text-5xl mb-4">⚠️</div>
+            <h1 className="text-xl font-bold text-gray-800 mb-2">应用出错了</h1>
+            <p className="text-sm text-gray-500 mb-4">
+              {this.state.error?.message || '发生了意外错误'}
+            </p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-2.5 bg-primary-500 text-white rounded-xl font-medium"
+            >
+              刷新页面
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { isLoggedIn, isLoading } = useAuth();
@@ -73,19 +111,21 @@ function AppRoutes() {
   if (isLoading) return <Loading />;
 
   return (
-    <Routes>
-      <Route path="/" element={isLoggedIn ? <Navigate to="/home" replace /> : <Login />} />
-      <Route element={<ProtectedRoute><AppProvider><Layout /></AppProvider></ProtectedRoute>}>
-        <Route path="/home" element={<Home />} />
-        <Route path="/study" element={<Study />} />
-        <Route path="/grammar/:stageId" element={<Grammar />} />
-        <Route path="/dictation" element={<Dictation />} />
-        <Route path="/review" element={<Review />} />
-        <Route path="/wrong-words" element={<WrongWords />} />
-        <Route path="/settings" element={<Settings />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <ErrorBoundary>
+      <Routes>
+        <Route path="/" element={isLoggedIn ? <Navigate to="/home" replace /> : <Login />} />
+        <Route element={<ProtectedRoute><AppProvider><Layout /></AppProvider></ProtectedRoute>}>
+          <Route path="/home" element={<Home />} />
+          <Route path="/study" element={<Study />} />
+          <Route path="/grammar/:stageId" element={<Grammar />} />
+          <Route path="/dictation" element={<Dictation />} />
+          <Route path="/review" element={<Review />} />
+          <Route path="/wrong-words" element={<WrongWords />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </ErrorBoundary>
   );
 }
 

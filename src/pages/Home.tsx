@@ -114,13 +114,16 @@ export function Home() {
   const level = useMemo(() => getLevel(mastered), [mastered]);
   const pct = Math.min(100, Math.round((mastered / MASTER_WORDS.length) * 100));
 
-  const masteredToday = todayNewWords.filter(w => (state.states[w.word] || 0) >= 4).length;
-  const fuzzyToday = todayNewWords.filter(w => {
-    const lvl = state.states[w.word] || 0;
-    return lvl >= 1 && lvl <= 3;
-  }).length;
-  const studiedToday = masteredToday + fuzzyToday;
-  const fuzzyCount = Object.values(state.states).filter(v => v >= 1 && v <= 3).length;
+  const { masteredToday, fuzzyToday, studiedToday, fuzzyCount } = useMemo(() => {
+    const masteredToday = todayNewWords.filter(w => (state.states[w.word] || 0) >= 4).length;
+    const fuzzyToday = todayNewWords.filter(w => {
+      const lvl = state.states[w.word] || 0;
+      return lvl >= 1 && lvl <= 3;
+    }).length;
+    const studiedToday = masteredToday + fuzzyToday;
+    const fuzzyCount = Object.values(state.states).filter(v => v >= 1 && v <= 3).length;
+    return { masteredToday, fuzzyToday, studiedToday, fuzzyCount };
+  }, [todayNewWords, state.states]);
 
   const handleCheckIn = async () => {
     const active = getActiveTracking();

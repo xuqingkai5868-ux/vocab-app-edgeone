@@ -12,6 +12,8 @@
 
 import { json } from './_lib/respond.js';
 
+// **注意**：生产环境建议限制 CORS 域名
+
 // Google Translate TTS 端点（免费、高音质、广泛使用）
 // client=tw-ob 是 Google Translate Web 客户端的标识
 const GOOGLE_TTS_URL = 'https://translate.google.com/translate_tts';
@@ -47,8 +49,12 @@ export async function onRequestPost({ request }) {
     return audioResponse(cached);
   }
 
-  // 构建 Google TTS URL
-  const url = `${GOOGLE_TTS_URL}?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+  // 语言白名单，防止参数注入
+  const ALLOWED_LANGS = ['en', 'zh-CN', 'zh-TW', 'ja', 'ko', 'fr', 'de', 'es'];
+  const safeLang = ALLOWED_LANGS.includes(lang) ? lang : 'en';
+
+  // 构建 Google TTS URL（参数全部编码，防止注入）
+  const url = `${GOOGLE_TTS_URL}?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${encodeURIComponent(safeLang)}&client=tw-ob`;
 
   try {
     console.log(`[TTS] 请求: "${text}" (${lang})`);

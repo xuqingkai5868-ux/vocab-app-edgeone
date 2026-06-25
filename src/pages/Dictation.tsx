@@ -42,7 +42,10 @@ export function Dictation() {
   const dictType = (searchParams.get('type') || 'spelling') as DictType;
   const { state, wordsPerDay, updateUserState, updateWordStates } = useApp();
 
-  const [mode, setMode] = useState<Mode>('today');
+  const [mode, setMode] = useState<Mode>(() => {
+    const saved = loadDictationProgress(searchParams.get('type') || 'spelling');
+    return (saved?.mode as Mode) || 'today';
+  });
   const [currentIdx, setCurrentIdx] = useState(() => {
     const saved = loadDictationProgress(searchParams.get('type') || 'spelling');
     return saved?.currentIdx ?? 0;
@@ -80,7 +83,7 @@ export function Dictation() {
   // 追踪拼写/听写时长
   const trackType = dictType === 'audio' ? 'review_audio' : 'review_spelling';
   useEffect(() => {
-    startTracking(trackType);
+    startTracking(trackType, trackType);
     return () => { stopTracking(trackType); };
   }, [trackType]);
 
@@ -243,7 +246,7 @@ export function Dictation() {
 
   if (finished) {
     const correct = results.filter(r => r.correct).length;
-    const pct = Math.round((correct / total) * 100);
+    const pct = total > 0 ? Math.round((correct / total) * 100) : 0;
     const wrongWords = results.filter(r => !r.correct);
     return (
       <div className="space-y-4 text-center py-8">
@@ -283,7 +286,7 @@ export function Dictation() {
 
         <div className="flex gap-3 justify-center mt-4">
           <button
-            onClick={() => { setStarted(false); setFinished(false); setCurrentIdx(0); setResults([]); setFeedback(null); clearDictationProgress(); }}
+            onClick={() => { setStarted(false); setFinished(false); setCurrentIdx(0); setResults([]); setMode('today'); setFeedback(null); clearDictationProgress(); }}
             className="px-6 py-2.5 bg-primary-500 text-white rounded-lg"
           >
             再来一次

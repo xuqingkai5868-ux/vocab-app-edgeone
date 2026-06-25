@@ -46,14 +46,35 @@ const VOICE_PRIORITY_PATTERNS = [
 ];
 
 let cachedEnglishVoice: SpeechSynthesisVoice | null = null;
-let voiceLoadAttempted = false;
+let voiceListenerRegistered = false;
 
+/** 
+ * 尝试加载英语语音
+ * 如果 voices 尚未就绪，注册 voiceschanged 事件等待异步加载
+ */
 function ensureEnglishVoice(): void {
-  if (!window.speechSynthesis || voiceLoadAttempted) return;
-  voiceLoadAttempted = true;
+  if (!window.speechSynthesis || cachedEnglishVoice) return;
+  
   const voices = window.speechSynthesis.getVoices();
-  if (voices.length === 0) return;
+  if (voices.length > 0) {
+    selectBestEnglishVoice(voices);
+    return;
+  }
+  
+  // voices 还没加载完成，注册事件等待
+  if (!voiceListenerRegistered) {
+    voiceListenerRegistered = true;
+    window.speechSynthesis.addEventListener('voiceschanged', function onChanged() {
+      const vs = window.speechSynthesis.getVoices();
+      if (vs.length > 0) {
+        selectBestEnglishVoice(vs);
+        window.speechSynthesis.removeEventListener('voiceschanged', onChanged);
+      }
+    });
+  }
+}
 
+function selectBestEnglishVoice(voices: SpeechSynthesisVoice[]): void {
   // 按优先级找到第一个匹配的英语语音
   for (const pattern of VOICE_PRIORITY_PATTERNS) {
     const found = voices.find(v => v.lang.startsWith('en') && pattern.test(v.name));
@@ -84,7 +105,7 @@ function normalizeForTTS(text: string): string {
   });
 }
 
-let lastUtterance: SpeechSynthesisUtterance | null = null;
+let lastUtterance: { utterance: SpeechSynthesisUtterance; resolve: () => void; reject: (e: any) => void } | null = null;
 
 function speakWithWebSpeech(word: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -93,17 +114,14 @@ function speakWithWebSpeech(word: string): Promise<void> {
       return;
     }
 
-    if (!cachedEnglishVoice) {
-      ensureEnglishVoice();
-      if (!cachedEnglishVoice && !voiceLoadAttempted) {
-        voiceLoadAttempted = true;
-        window.speechSynthesis.onvoiceschanged = () => {
-          ensureEnglishVoice();
-          window.speechSynthesis.onvoiceschanged = null;
-        };
-      }
-    }
+    // 确保英语语音已加载
+    ensureEnglishVoice();
 
+    // 取消前一次发音，并 resolve 前一次 Promise（避免 Promise 永久 hang）
+    if (lastUtterance) {
+      lastUtterance.resolve();
+      lastUtterance = null;
+    }
     window.speechSynthesis.cancel();
 
     const normalized = normalizeForTTS(word);
@@ -117,9 +135,18 @@ function speakWithWebSpeech(word: string): Promise<void> {
       utterance.voice = cachedEnglishVoice;
     }
 
-    lastUtterance = utterance;
-    utterance.onend = () => { lastUtterance = null; resolve(); };
-    utterance.onerror = (e) => { lastUtterance = null; reject(e); };
+    lastUtterance = { utterance, resolve, reject };
+    utterance.onend = () => {
+      window.speechSynthesis.cancel();
+      const l = lastUtterance;
+      lastUtterance = null;
+      if (l && l.resolve === resolve) l.resolve();
+    };
+    utterance.onerror = (e) => {
+      const l = lastUtterance;
+      lastUtterance = null;
+      if (l && l.reject === reject) l.reject(e);
+    };
 
     window.speechSynthesis.speak(utterance);
   });
@@ -172,23 +199,33 @@ export function warmUpTTS(): void {
   // 优先尝试 API TTS 暖机（发个空请求预热缓存）
   fetchTtsAudio('hello', 'en').catch(() => {});
 
-  // 同时预热 Web Speech 作为降级
+  // 预热 Web Speech 作为降级
   ensureEnglishVoice();
-  if (!window.speechSynthesis.onvoiceschanged) {
-    window.speechSynthesis.onvoiceschanged = () => {
-      ensureEnglishVoice();
-      const wake = new SpeechSynthesisUtterance(' ');
-      if (cachedEnglishVoice) wake.voice = cachedEnglishVoice;
-      wake.volume = 0;
-      window.speechSynthesis.speak(wake);
-      window.speechSynthesis.onvoiceschanged = null;
-    };
-    setTimeout(() => {
-      ensureEnglishVoice();
-      if (window.speechSynthesis.onvoiceschanged) {
-        (window.speechSynthesis.onvoiceschanged as () => void)();
+
+  // 如果还没加载到 voice，注册事件等待
+  if (!cachedEnglishVoice && !voiceListenerRegistered) {
+    voiceListenerRegistered = true;
+    window.speechSynthesis.addEventListener('voiceschanged', function onChanged() {
+      const vs = window.speechSynthesis.getVoices();
+      if (vs.length > 0) {
+        selectBestEnglishVoice(vs);
+        // 用静音空字符唤醒引擎
+        const wake = new SpeechSynthesisUtterance(' ');
+        if (cachedEnglishVoice) wake.voice = cachedEnglishVoice;
+        wake.volume = 0;
+        window.speechSynthesis.speak(wake);
+        window.speechSynthesis.removeEventListener('voiceschanged', onChanged);
       }
-    }, 100);
+    });
+    // 备用：有些浏览器不触发 voiceschanged，尝试主动加载
+    setTimeout(() => {
+      if (!cachedEnglishVoice) {
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+          selectBestEnglishVoice(voices);
+        }
+      }
+    }, 500);
   }
 }
 

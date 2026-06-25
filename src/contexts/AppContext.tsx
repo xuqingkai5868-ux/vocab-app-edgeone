@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useCallback, useEffect, useMemo, useRef, ReactNode } from 'react';
 import { useAuth } from './AuthContext';
 import { getState, updateState, UserState } from '../api/state';
 import { createCheckIn, getCheckIns } from '../api/checkin';
@@ -47,9 +47,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [todayStage, setTodayStage] = useState(1);
   const [wordsPerDay, setWordsPerDayState] = useState(() => {
     const saved = localStorage.getItem('vocab_wordsPerDay');
-    return saved ? parseInt(saved, 10) : DEFAULT_WORDS_PER_DAY;
+    const parsed = parseInt(saved ?? '', 10);
+    return Number.isFinite(parsed) ? parsed : DEFAULT_WORDS_PER_DAY;
   });
   const [isSyncing, setIsSyncing] = useState(false);
+
+  // 登出时重置所有状态，防止跨用户数据泄漏
+  useEffect(() => {
+    if (!user) {
+      setUserState(defaultState);
+      setCheckIns({});
+      setStreak(0);
+      setTodayNewWords([]);
+      setTodayPhrases([]);
+      setTodayStage(1);
+    }
+  }, [user]);
 
   const loadDayData = useCallback((day: number, wpd: number) => {
     const words = getDayWords(day, wpd);
@@ -64,9 +77,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     setIsSyncing(true);
     try {
-      const [stateResp, checkinResp] = await Promise.all([
+      const thisMonth = `${getCurrentYear()}-${String(getCurrentMonth()).padStart(2, '0')}`;
+      // 同时获取上月数据以支持跨月连续打卡计算
+      const prevDate = new Date();
+      prevDate.setMonth(prevDate.getMonth() - 1);
+      const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+
+      const [stateResp, checkinResp, prevCheckinResp] = await Promise.all([
         getState(user.id),
-        getCheckIns(`${getCurrentYear()}-${String(getCurrentMonth()).padStart(2, '0')}`),
+        getCheckIns(thisMonth),
+        getCheckIns(prevMonth),
       ]);
       // 迁移：将老版本的字符串 states ('mastered'/'fuzzy') 转为数字等级
       const migratedStates: Record<string, number> = {};
@@ -88,8 +108,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (JSON.stringify(stateResp.state.states) !== JSON.stringify(migratedStates)) {
         updateState(user.id, migratedState).catch(e => console.error('Failed to migrate states:', e));
       }
-      setCheckIns(checkinResp.records);
-      setStreak(calculateStreak(Object.values(checkinResp.records)));
+      // 合并本月和上月打卡记录
+      const allRecords = { ...checkinResp.records, ...prevCheckinResp.records };
+      setCheckIns(allRecords);
+      // 计算连续天数时传入上月记录，支持跨月连续
+      setStreak(calculateStreak(Object.values(checkinResp.records), Object.values(prevCheckinResp.records)));
     } catch (e) {
       console.error('Failed to load data:', e);
     } finally {
@@ -146,15 +169,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   }, [user, wordsPerDay, loadDayData, userState.currentDay]);
 
+  // 用 ref 持有最新状态，供乐观更新回滚使用
+  const stateRef = useRef(userState);
+  stateRef.current = userState;
+
   /** 轻量更新单词状态（等级 0-4），乐观更新模式，不触发热 day data 重载 */
   const updateWordStates = useCallback(async (partialUpdates: Record<string, number | null>) => {
     if (!user) return;
 
-    // 使用函数式更新：将增量更新合并到最新 state.states 中
-    // null 值表示删除该词的标记（回退到未标记状态 0）
-    let prevForRollback: UserState | null = null;
+    // 记录回滚点（用 ref 中最新值，不用 updater 副作用）
+    const stateBeforeUpdate = stateRef.current;
+
+    // 计算合并后的 states
+    const mergedStates = { ...stateBeforeUpdate.states };
+    for (const [word, level] of Object.entries(partialUpdates)) {
+      if (level === null) delete mergedStates[word];
+      else mergedStates[word] = level;
+    }
+    const newState: UserState = { ...stateBeforeUpdate, states: mergedStates };
+
+    // 先更新 UI（函数式更新确保合并正确）
     setUserState(prev => {
-      prevForRollback = prev;
       const merged = { ...prev.states };
       for (const [word, level] of Object.entries(partialUpdates)) {
         if (level === null) delete merged[word];
@@ -165,15 +200,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     // 异步同步服务器
     try {
-      const merged = { ...prevForRollback!.states };
-      for (const [word, level] of Object.entries(partialUpdates)) {
-        if (level === null) delete merged[word];
-        else merged[word] = level;
-      }
-      await updateState(user.id, { ...prevForRollback!, states: merged });
+      await updateState(user.id, newState);
     } catch (e) {
       console.error('Failed to sync word states:', e);
-      if (prevForRollback) setUserState(prevForRollback);
+      if (stateBeforeUpdate) setUserState(stateBeforeUpdate);
     }
   }, [user]);
 
@@ -181,12 +211,25 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const clamped = Math.max(5, Math.min(50, n));
     setWordsPerDayState(clamped);
     localStorage.setItem('vocab_wordsPerDay', String(clamped));
-    loadDayData(userState.currentDay, clamped);
+    // 检查 currentDay 是否超过新的总天数，防止用户卡死
+    const newTotalDays = getTotalDays(clamped);
+    const correctedDay = Math.min(userState.currentDay, newTotalDays);
+    if (correctedDay !== userState.currentDay) {
+      setUserState(prev => ({ ...prev, currentDay: correctedDay }));
+    }
+    loadDayData(correctedDay, clamped);
   }, [userState.currentDay, loadDayData]);
 
   /** 打卡：仅记录打卡，不再推进 currentDay */
   const doCheckIn = useCallback(async (params: { newWordsCompleted: number; reviewWordsCompleted: number; studyDurationMinutes: number }) => {
     if (!user) return false;
+
+    // 防止重复打卡：今天已打卡则跳过
+    if (checkIns[getToday()]?.isCompleted) {
+      console.log('[CheckIn] 今日已打卡，跳过');
+      return false;
+    }
+
     const checkable = canCheckIn({ ...params, newWordsTarget: wordsPerDay, reviewWordsTarget: 15 });
     if (!checkable) return false;
     try {
@@ -230,13 +273,15 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const totalDays = getTotalDays(wordsPerDay);
 
+  const contextValue = useMemo(() => ({
+    state: userState, checkIns, streak,
+    todayNewWords, todayPhrases, todayStage, wordsPerDay,
+    loadAll, updateUserState, updateWordStates, setWordsPerDay, doCheckIn,
+    advanceDay, isTodayComplete, isSyncing,
+  }), [userState, checkIns, streak, todayNewWords, todayPhrases, todayStage, wordsPerDay, loadAll, updateUserState, updateWordStates, setWordsPerDay, doCheckIn, advanceDay, isTodayComplete, isSyncing]);
+
   return (
-    <AppContext.Provider value={{
-      state: userState, checkIns, streak,
-      todayNewWords, todayPhrases, todayStage, wordsPerDay,
-      loadAll, updateUserState, updateWordStates, setWordsPerDay, doCheckIn,
-      advanceDay, isTodayComplete, isSyncing,
-    }}>
+    <AppContext.Provider value={contextValue}>
       {children}
     </AppContext.Provider>
   );

@@ -6,6 +6,7 @@ import { useApp } from '../contexts/AppContext';
 import { getTotalDays } from '../services/utils/petVocabLoader';
 import { getActivity, getActivityRange, ActivityEvent } from '../api/activity';
 import { getDayWords } from '../services/utils/petVocabLoader';
+import { verifyAdminPin } from '../api/verifyPin';
 
 const TYPE_LABELS: Record<string, string> = {
   study: '📚 学习新词',
@@ -28,8 +29,6 @@ const TYPE_COLORS: Record<string, string> = {
   vocabulary: 'bg-gray-100 text-gray-700',
   checkin: 'bg-green-100 text-green-700',
 };
-
-const PARENT_PASSWORD = 'scdq';
 
 // 获取上次重置时间戳，用于过滤活动日志
 function getResetTimestamp(): number {
@@ -127,8 +126,9 @@ export function Settings() {
     alert('已完全重置，从 Day 1 重新开始');
   };
 
-  const handlePasswordSubmit = () => {
-    if (passwordInput === PARENT_PASSWORD) {
+  const handlePasswordSubmit = async () => {
+    const ok = await verifyAdminPin(passwordInput);
+    if (ok) {
       setPasswordError(false);
       if (passwordMode === 'wordsPerDay') {
         setSliderUnlocked(true);

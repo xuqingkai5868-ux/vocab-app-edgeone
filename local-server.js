@@ -55,7 +55,7 @@ async function authMiddleware(req) {
   const urlPath = url.pathname;
 
   // 开放端点
-  if (urlPath === '/api/login' || urlPath === '/api/seed' || urlPath === '/api/tts') return null;
+  if (urlPath === '/api/login' || urlPath === '/api/seed' || urlPath === '/api/tts' || urlPath === '/api/verify-admin-pin') return null;
 
   const auth = req.headers['authorization'] || '';
   const token = auth.replace(/^Bearer\s+/i, '').trim();
@@ -224,8 +224,15 @@ async function handleSummary(user) {
       const u = JSON.parse(KV.get(k));
       const stateRaw = await my_kv.get(`state:${id}`);
       const state = stateRaw ? JSON.parse(stateRaw) : { currentDay: 1, states: {} };
-      const mastered = state.states ? Object.values(state.states).filter(v => v === 'mastered').length : 0;
-      const fuzzy = state.states ? Object.values(state.states).filter(v => v === 'fuzzy').length : 0;
+      const mastered = state.states ? Object.values(state.states).filter(v => {
+        // 兼容新旧两种格式
+        if (typeof v === 'number') return v >= 4;
+        return v === 'mastered';
+      }).length : 0;
+      const fuzzy = state.states ? Object.values(state.states).filter(v => {
+        if (typeof v === 'number') return v >= 2 && v <= 3;
+        return v === 'fuzzy';
+      }).length : 0;
       result[id] = {
         name: u.name, role: u.role, grade: u.grade || null,
         mastered, fuzzy, currentDay: state.currentDay || 1
@@ -252,6 +259,23 @@ async function handleReset(req, user, body) {
   }
   await my_kv.put(`state:${targetId}`, JSON.stringify({ currentDay: 1, states: {}, lastUpdated: Date.now() }));
   return jsonResponse({ ok: true, userId: targetId });
+}
+
+// ===== 家长密码验证（本地开发）=====
+async function handleVerifyPin(body) {
+  const pin = body && body.pin;
+  if (!pin || typeof pin !== 'string') return jsonResponse({ ok: false }, 400);
+  const storedPin = await my_kv.get('pin:admin');
+  if (!storedPin) {
+    return jsonResponse({ ok: pin === 'scdq' });
+  }
+  // 恒定时间比较
+  let result = 0;
+  const maxLen = Math.max(String(pin).length, String(storedPin).length);
+  for (let i = 0; i < maxLen; i++) {
+    result |= (String(pin).charCodeAt(i) || 0) ^ (String(storedPin).charCodeAt(i) || 0);
+  }
+  return jsonResponse({ ok: result === 0 });
 }
 
 // ===== 主路由 =====
@@ -307,6 +331,11 @@ const server = http.createServer(async (req, res) => {
         if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));
         const body = await readJson(req);
         return send(res, await handleLogin(body));
+      }
+      if (urlPath === '/api/verify-admin-pin') {
+        if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));
+        const body = await readJson(req);
+        return send(res, await handleVerifyPin(body));
       }
 
       // 受保护端点
