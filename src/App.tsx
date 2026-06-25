@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { AppProvider } from './contexts/AppContext';
@@ -19,6 +19,30 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   if (isLoading) return <Loading />;
   if (!isLoggedIn) return <Navigate to="/" replace />;
   return <>{children}</>;
+}
+
+function UpdateBanner() {
+  const [showUpdate, setShowUpdate] = useState(false);
+
+  useEffect(() => {
+    const handler = () => setShowUpdate(true);
+    window.addEventListener('sw-update-ready', handler);
+    return () => window.removeEventListener('sw-update-ready', handler);
+  }, []);
+
+  if (!showUpdate) return null;
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-amber-500 text-white px-4 py-2.5 flex items-center justify-between shadow-lg animate-slide-down">
+      <span className="text-sm font-medium">📦 新版本已就绪</span>
+      <button
+        onClick={() => window.location.reload()}
+        className="text-xs bg-white text-amber-700 px-3 py-1 rounded-full font-medium hover:bg-amber-50"
+      >
+        立即刷新
+      </button>
+    </div>
+  );
 }
 
 function AppRoutes() {
@@ -69,6 +93,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <UpdateBanner />
         <AppRoutes />
       </AuthProvider>
     </BrowserRouter>

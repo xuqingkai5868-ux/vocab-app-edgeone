@@ -55,15 +55,29 @@ export async function onRequestPut({ request }) {
     return json({ error: 'invalid_states' }, 400);
   }
 
+  // 兼容三种格式：
+  // - 旧版字符串: 'mastered'(4), 'fuzzy'(2)
+  // - 新版数字: 0-4
+  // - 其他字符串/数字: 转为数字 0-4
+  const normalizedStates = {};
   for (const [k, v] of Object.entries(state.states)) {
-    if (v !== 'mastered' && v !== 'fuzzy') {
-      return json({ error: 'invalid_state_value', key: k, value: v }, 400);
+    let nv;
+    if (typeof v === 'number') {
+      nv = Math.max(0, Math.min(4, Math.floor(v)));
+    } else if (v === 'mastered') {
+      nv = 4;
+    } else if (v === 'fuzzy') {
+      nv = 2;
+    } else {
+      // 其他字符串值 → 0（未学）
+      nv = 0;
     }
+    normalizedStates[k] = nv;
   }
 
   const payload = {
     currentDay: Math.min(Math.floor(state.currentDay), 1000),
-    states: state.states,
+    states: normalizedStates,
     lastUpdated: Date.now()
   };
 

@@ -29,6 +29,8 @@ interface AppContextType {
   advanceDay: () => Promise<void>;
   /** 当前 day 的词是否全部已完成 */
   isTodayComplete: boolean;
+  /** 数据同步状态 */
+  isSyncing: boolean;
 }
 
 const defaultState: UserState = { currentDay: 1, states: {} };
@@ -47,6 +49,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const saved = localStorage.getItem('vocab_wordsPerDay');
     return saved ? parseInt(saved, 10) : DEFAULT_WORDS_PER_DAY;
   });
+  const [isSyncing, setIsSyncing] = useState(false);
 
   const loadDayData = useCallback((day: number, wpd: number) => {
     const words = getDayWords(day, wpd);
@@ -59,6 +62,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const loadAll = useCallback(async () => {
     if (!user) return;
+    setIsSyncing(true);
     try {
       const [stateResp, checkinResp] = await Promise.all([
         getState(user.id),
@@ -88,8 +92,33 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setStreak(calculateStreak(Object.values(checkinResp.records)));
     } catch (e) {
       console.error('Failed to load data:', e);
+    } finally {
+      setIsSyncing(false);
     }
   }, [user, wordsPerDay, loadDayData]);
+
+  // 跨设备同步：页面从后台切到前台时自动刷新数据
+  useEffect(() => {
+    if (!user) return;
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('[Sync] 页面可见，自动刷新数据');
+        loadAll();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [user, loadAll]);
+
+  // 跨设备同步：定期轮询（每 60 秒检查一次）
+  useEffect(() => {
+    if (!user) return;
+    const interval = setInterval(() => {
+      console.log('[Sync] 定时轮询，刷新数据');
+      loadAll();
+    }, 60000);
+    return () => clearInterval(interval);
+  }, [user, loadAll]);
 
   const refreshCheckIns = useCallback(async () => {
     if (!user) return;
@@ -185,9 +214,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const totalDays = getTotalDays(wordsPerDay);
     const nextDay = Math.min(userState.currentDay + 1, totalDays);
     const newState = { ...userState, currentDay: nextDay };
+    // 先乐观更新 UI
     setUserState(newState);
     loadDayData(nextDay, wordsPerDay);
-    updateState(user.id, newState).catch(e => console.error('Failed to sync advance day:', e));
+    // 再同步服务器，失败则回滚
+    try {
+      await updateState(user.id, newState);
+    } catch (e) {
+      console.error('Failed to sync advance day, rolling back:', e);
+      // 回滚到原来的 day
+      setUserState(userState);
+      loadDayData(userState.currentDay, wordsPerDay);
+    }
   }, [user, isTodayComplete, wordsPerDay, userState, loadDayData]);
 
   const totalDays = getTotalDays(wordsPerDay);
@@ -197,7 +235,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       state: userState, checkIns, streak,
       todayNewWords, todayPhrases, todayStage, wordsPerDay,
       loadAll, updateUserState, updateWordStates, setWordsPerDay, doCheckIn,
-      advanceDay, isTodayComplete,
+      advanceDay, isTodayComplete, isSyncing,
     }}>
       {children}
     </AppContext.Provider>

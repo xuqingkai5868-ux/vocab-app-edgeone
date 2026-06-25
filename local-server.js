@@ -4,6 +4,7 @@
 // 数据：进程内存，**重启清空**，仅供开发
 
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
 const pathMod = require('path');
 const crypto = require('crypto');
@@ -54,7 +55,7 @@ async function authMiddleware(req) {
   const urlPath = url.pathname;
 
   // 开放端点
-  if (urlPath === '/api/login' || urlPath === '/api/seed') return null;
+  if (urlPath === '/api/login' || urlPath === '/api/seed' || urlPath === '/api/tts') return null;
 
   const auth = req.headers['authorization'] || '';
   const token = auth.replace(/^Bearer\s+/i, '').trim();
@@ -100,6 +101,57 @@ async function handleSeed(body) {
     }
   }
   return jsonResponse({ ok: true, seeded: Object.keys(users), overwritten: !!existingAdmin });
+}
+
+// ===== TTS 代理（本地开发用） =====
+// 本地开发时直接转发到 Google TTS
+const ttsCache = new Map();
+async function handleTTS(req) {
+  const body = await readJson(req);
+  const text = (body?.text || '').trim();
+  const lang = body?.lang || 'en';
+  if (!text) return jsonResponse({ error: 'missing_text' }, 400);
+  if (text.length > 200) return jsonResponse({ error: 'text_too_long' }, 400);
+
+  const cacheKey = `${lang}:${text.toLowerCase()}`;
+  const cached = ttsCache.get(cacheKey);
+  if (cached) {
+    return {
+      status: 200,
+      headers: { 'Content-Type': 'audio/mpeg', 'Content-Length': cached.length, 'Cache-Control': 'public, max-age=86400', 'Access-Control-Allow-Origin': '*' },
+      body: cached
+    };
+  }
+
+  return new Promise((resolve) => {
+    const url = `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=${lang}&client=tw-ob`;
+    https.get(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'Accept': 'audio/mpeg,audio/*,*/*',
+        'Accept-Language': 'en-US,en;q=0.9',
+        'Referer': 'https://translate.google.com/',
+      }
+    }, (resp) => {
+      const chunks = [];
+      resp.on('data', c => chunks.push(c));
+      resp.on('end', () => {
+        const buf = Buffer.concat(chunks);
+        if (resp.statusCode !== 200) {
+          resolve(jsonResponse({ error: 'tts_failed', status: resp.statusCode }, 502));
+          return;
+        }
+        if (ttsCache.size >= 500) { const firstKey = ttsCache.keys().next().value; ttsCache.delete(firstKey); }
+        ttsCache.set(cacheKey, buf);
+        resolve({
+          status: 200,
+          headers: { 'Content-Type': 'audio/mpeg', 'Content-Length': buf.length, 'Cache-Control': 'public, max-age=86400', 'Access-Control-Allow-Origin': '*' },
+          body: buf
+        });
+      });
+      resp.on('error', (e) => { resolve(jsonResponse({ error: 'tts_error', message: e.message }, 502)); });
+    }).on('error', (e) => { resolve(jsonResponse({ error: 'tts_error', message: e.message }, 502)); });
+  });
 }
 
 async function handleLogin(body) {
@@ -246,6 +298,10 @@ const server = http.createServer(async (req, res) => {
         if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));
         const body = await readJson(req);
         return send(res, await handleSeed(body));
+      }
+      if (urlPath === '/api/tts') {
+        if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));
+        return send(res, await handleTTS(req));
       }
       if (urlPath === '/api/login') {
         if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));

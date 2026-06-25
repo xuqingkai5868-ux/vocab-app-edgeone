@@ -141,11 +141,15 @@ export function Study() {
     }
   };
 
-  /** 点击单词列表中某个词 → 升级（0→1→2→3→4→1 循环） */
+  /** 点击单词列表中某个词 → 升级循环（0→1→2→3→4→0），回到未学状态更直观 */
+  const [animatingWord, setAnimatingWord] = useState<string | null>(null);
   const toggleWordStatus = (word: string) => {
     const currentLevel = state.states[word] || 0;
-    const nextLevel = currentLevel >= 4 ? 1 : currentLevel + 1;
+    const nextLevel = currentLevel >= 4 ? 0 : currentLevel + 1;
     updateWordStates({ [word]: nextLevel });
+    // 触发闪烁动画
+    setAnimatingWord(word);
+    setTimeout(() => setAnimatingWord(null), 400);
   };
 
 const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
@@ -311,6 +315,8 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
                     onClick={() => toggleWordStatus(w.word)}
                     className={`flex items-center justify-between px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-300 ${
                       level >= 4 ? 'bg-green-50' : level >= 2 ? 'bg-yellow-50' : level >= 1 ? 'bg-blue-50' : ''
+                    } ${
+                      animatingWord === w.word ? 'animate-status-flash ring-2 ring-primary-400 scale-[1.02]' : ''
                     }`}
                   >
                     <div className="flex items-center gap-2 min-w-0">
@@ -390,14 +396,14 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
                   {currentItem.source === 'book' ? '📗 书本短语' : '📘 剑桥短语'}
                 </span>
               )}
-              <div className={`transition-all duration-200 ${flipped ? 'opacity-0 scale-95 absolute' : 'opacity-100 scale-100'}`}>
+              <div className={`relative w-full transition-all duration-300 ease-out ${flipped ? 'opacity-0 scale-90' : 'opacity-100 scale-100'}`}>
                 <div className="flex items-center justify-center gap-3">
                   <h2 className="text-3xl font-bold text-gray-800">{currentItem.word}</h2>
                   <button onClick={e => { e.stopPropagation(); speakWord(currentItem.word); }} className="text-2xl text-primary-400 hover:text-primary-600 active:scale-110 transition-transform">🔊</button>
                 </div>
                 <p className="text-sm text-gray-400 mt-3">点卡片翻转查看释义</p>
               </div>
-              <div className={`transition-all duration-200 ${!flipped ? 'opacity-0 scale-95 absolute' : 'opacity-100 scale-100'}`}>
+              <div className={`relative w-full transition-all duration-300 ease-out ${!flipped ? 'opacity-0 scale-90' : 'opacity-100 scale-100'}`}>
                 <p className="text-xl text-gray-700">{currentItem.meaning}</p>
                 {currentItem.assoc && <p className="text-xs text-gray-400 mt-2">关联词：{currentItem.assoc}</p>}
                 <p className="text-xs text-gray-400 mt-4">点卡片返回</p>
