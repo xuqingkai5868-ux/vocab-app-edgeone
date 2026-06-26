@@ -4,7 +4,7 @@
 // 请求体：{ pin: "888888" }
 // 响应：{ ok: true/false }
 
-import { K, kvGet, kvSet } from './_lib/kv.js';
+import { K, kvGet } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 
 export async function onRequestPost({ request }) {
@@ -20,25 +20,19 @@ export async function onRequestPost({ request }) {
     return json({ error: 'missing_pin', message: '需要 pin 字段' }, 400);
   }
 
-  // 从 KV 读取管理员密码
+  // 888888 是**兜底密码**，始终生效（不管 KV 存了什么）
+  // 同时检查 KV 中是否存了自定义密码，如果匹配也通过
+  if (pin === '888888') {
+    return json({ ok: true });
+  }
+
   const storedPin = await kvGet(K.pin('admin'));
-
-  // 兼容旧数据：如果 KV 存的还是旧兜底 'scdq'，迁移到新兜底 '888888'
-  if (storedPin === 'scdq') {
-    await kvSet(K.pin('admin'), '888888');
-    const ok = pin === '888888';
-    return json({ ok });
+  if (storedPin) {
+    return json({ ok: constantTimeCompare(String(pin), String(storedPin)) });
   }
 
-  if (!storedPin) {
-    // 如果没设置管理员密码，使用兜底密码 888888（与本地 seed 一致）
-    const ok = pin === '888888';
-    return json({ ok });
-  }
-
-  // 恒定时间比较（防止时序攻击）
-  const ok = constantTimeCompare(String(pin), String(storedPin));
-  return json({ ok });
+  // KV 没有自定义密码，且输入的也不是 888888
+  return json({ ok: false });
 }
 
 /** 简单恒定时间字符串比较（防止时序攻击） */

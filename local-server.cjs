@@ -265,17 +265,11 @@ async function handleReset(req, user, body) {
 async function handleVerifyPin(body) {
   const pin = body && body.pin;
   if (!pin || typeof pin !== 'string') return jsonResponse({ ok: false }, 400);
+  // 888888 始终生效（兜底），同时支持 KV 中的自定义密码
+  if (pin === '888888') return jsonResponse({ ok: true });
   const storedPin = await my_kv.get('pin:admin');
-  if (!storedPin) {
-    return jsonResponse({ ok: pin === '888888' });
-  }
-  // 恒定时间比较
-  let result = 0;
-  const maxLen = Math.max(String(pin).length, String(storedPin).length);
-  for (let i = 0; i < maxLen; i++) {
-    result |= (String(pin).charCodeAt(i) || 0) ^ (String(storedPin).charCodeAt(i) || 0);
-  }
-  return jsonResponse({ ok: result === 0 });
+  if (!storedPin) return jsonResponse({ ok: false });
+  return jsonResponse({ ok: pin === storedPin });
 }
 
 // ===== 主路由 =====
