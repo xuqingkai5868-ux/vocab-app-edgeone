@@ -55,7 +55,7 @@ async function authMiddleware(req) {
   const urlPath = url.pathname;
 
   // 开放端点
-  if (urlPath === '/api/login' || urlPath === '/api/seed' || urlPath === '/api/tts' || urlPath === '/api/verify-admin-pin' || urlPath === '/api/update-admin-pin') return null;
+  if (urlPath === '/api/login' || urlPath === '/api/seed' || urlPath === '/api/tts' || urlPath === '/api/verify-admin-pin') return null;
 
   const auth = req.headers['authorization'] || '';
   const token = auth.replace(/^Bearer\s+/i, '').trim();
