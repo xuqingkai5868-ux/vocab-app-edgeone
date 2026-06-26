@@ -4,7 +4,7 @@
 // 兜底策略：API 不通时（如新 Edge Function 尚未部署），
 // 回退到本地验证，确保不因为服务端问题导致家长无法操作
 
-const LOCAL_DEFAULT_PIN = 'scdq';
+const LOCAL_DEFAULT_PIN = '888888';
 
 export async function verifyAdminPin(pin: string): Promise<boolean> {
   // 优先调 API（生产环境）

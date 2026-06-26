@@ -183,17 +183,24 @@ export function Review() {
         </div>
 
         {!showMeaning ? (
-          <button onClick={() => setShowMeaning(true)} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg text-sm">
-            查看释义
-          </button>
+          <div className="space-y-3">
+            <button onClick={() => setShowMeaning(true)} className="inline-flex items-center gap-1 border-none bg-indigo-50 text-indigo-600 text-xs px-3 py-1.5 rounded-full cursor-pointer hover:bg-indigo-100 active:scale-95 transition-all">
+              🔊 查看释义
+            </button>
+            <div className="flex gap-2">
+              <button onClick={() => handleAssessment('forgot')} className="flex-1 py-2.5 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm font-medium hover:bg-red-100 active:scale-[0.98] transition-all">忘记</button>
+              <button onClick={() => handleAssessment('vague')} className="flex-1 py-2.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl text-sm font-medium hover:bg-amber-100 active:scale-[0.98] transition-all">模糊</button>
+              <button onClick={() => handleAssessment('known')} className="flex-1 py-2.5 bg-green-50 text-green-700 border border-green-200 rounded-xl text-sm font-medium hover:bg-green-100 active:scale-[0.98] transition-all">认识</button>
+            </div>
+          </div>
         ) : (
           <div className="space-y-4">
             <p className="text-lg text-gray-600">{meaning}</p>
             <p className="text-xs text-gray-400">自评</p>
             <div className="flex gap-2">
-              <button onClick={() => handleAssessment('forgot')} className="flex-1 py-2.5 bg-red-500 text-white rounded-lg text-sm">忘记 ✗</button>
-              <button onClick={() => handleAssessment('vague')} className="flex-1 py-2.5 bg-yellow-500 text-white rounded-lg text-sm">模糊 △</button>
-              <button onClick={() => handleAssessment('known')} className="flex-1 py-2.5 bg-green-500 text-white rounded-lg text-sm">认识 ✓</button>
+              <button onClick={() => handleAssessment('forgot')} className="flex-1 py-2.5 bg-red-50 text-red-700 border border-red-200 rounded-xl text-sm font-medium hover:bg-red-100 active:scale-[0.98] transition-all">忘记</button>
+              <button onClick={() => handleAssessment('vague')} className="flex-1 py-2.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl text-sm font-medium hover:bg-amber-100 active:scale-[0.98] transition-all">模糊</button>
+              <button onClick={() => handleAssessment('known')} className="flex-1 py-2.5 bg-green-50 text-green-700 border border-green-200 rounded-xl text-sm font-medium hover:bg-green-100 active:scale-[0.98] transition-all">认识</button>
             </div>
           </div>
         )}

@@ -422,25 +422,34 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
                 )}
 
                 {/* 单词 + 发音 */}
-                <div className="flex items-center justify-center gap-3 mt-4 mb-6">
-                  <h2 className="text-3xl font-bold text-gray-800">{currentItem.word}</h2>
-                  <button onClick={e => { e.stopPropagation(); speakWord(currentItem.word); }} className="text-2xl text-primary-400 hover:text-primary-600 active:scale-110 transition-transform">🔊</button>
+                <div className="text-center mb-5">
+                  <h2 className="text-3xl font-bold text-gray-800 mb-2">{currentItem.word}</h2>
+                  <button
+                    onClick={e => { e.stopPropagation(); speakWord(currentItem.word); }}
+                    className="inline-flex items-center gap-1 border-none bg-indigo-50 text-indigo-600 text-xs px-3 py-1.5 rounded-full cursor-pointer hover:bg-indigo-100 active:scale-95 transition-all"
+                  >
+                    🔊 发音
+                  </button>
                 </div>
 
-                {/* 释义 */}
-                <div className="mb-4">
-                  <p className="text-lg text-gray-700 leading-relaxed">{currentItem.meaning}</p>
-                </div>
-
-                {/* 例句 + 翻译 */}
-                {currentItem.example && (
-                  <div className="border-t border-gray-100 pt-3 mt-1">
-                    <p className="text-sm text-gray-600 leading-relaxed">{currentItem.example}</p>
-                    {currentItem.translation && (
-                      <p className="text-sm text-gray-400 mt-1 leading-relaxed">{currentItem.translation}</p>
-                    )}
+                <div className="border-t border-gray-100 pt-4">
+                  {/* 释义 */}
+                  <div className="mb-3">
+                    <p className="text-xs text-gray-400 mb-1 font-medium">释义</p>
+                    <p className="text-base text-gray-800 leading-relaxed">{currentItem.meaning}</p>
                   </div>
-                )}
+
+                  {/* 例句 + 翻译 */}
+                  {currentItem.example && (
+                    <div>
+                      <p className="text-xs text-gray-400 mb-1 font-medium">例句</p>
+                      <p className="text-sm text-gray-600 leading-relaxed">{currentItem.example}</p>
+                      {currentItem.translation && (
+                        <p className="text-sm text-gray-400 mt-1 leading-relaxed">{currentItem.translation}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {currentItem.assoc && (
                   <p className="text-xs text-gray-400 mt-2">关联词：{currentItem.assoc}</p>
@@ -449,8 +458,8 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
 
               {/* 操作按钮（始终可见） */}
               <div className="flex gap-3">
-                <button onClick={() => markStatus(false)} className="flex-1 py-3 bg-yellow-500 text-white rounded-xl font-medium text-lg">△ 模糊</button>
-                <button onClick={() => markStatus(true)} className="flex-1 py-3 bg-green-500 text-white rounded-xl font-medium text-lg">✓ 认识</button>
+                <button onClick={() => markStatus(false)} className="flex-1 py-3.5 bg-amber-50 text-amber-700 border border-amber-200 rounded-xl font-medium text-base hover:bg-amber-100 active:scale-[0.98] transition-all">模糊</button>
+                <button onClick={() => markStatus(true)} className="flex-1 py-3.5 bg-green-50 text-green-700 border border-green-200 rounded-xl font-medium text-base hover:bg-green-100 active:scale-[0.98] transition-all">认识</button>
               </div>
             </>
           )}

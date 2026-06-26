@@ -99,7 +99,7 @@ export function WrongWords() {
             <input type="text" autoFocus value={input} onChange={e => setInput(e.target.value)}
               placeholder="输入英文..." className="w-full px-4 py-3 border border-gray-300 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-amber-500" />
             <div className="flex gap-2">
-              <button type="submit" className="flex-1 py-3 bg-amber-500 text-white rounded-xl font-medium disabled:opacity-50" disabled={!input.trim()}>确认 ✓</button>
+              <button type="submit" className="flex-1 py-3 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-sm font-medium hover:bg-indigo-100 active:scale-[0.98] transition-all disabled:opacity-50" disabled={!input.trim()}>确认</button>
               <button type="button" onClick={handleSkip} className="px-4 py-3 bg-gray-100 text-gray-500 rounded-xl text-sm">跳过</button>
             </div>
           </form>
@@ -132,7 +132,7 @@ export function WrongWords() {
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">共 <strong className="text-amber-600">{total}</strong> 个词需要复习</span>
               <button onClick={() => { setSelectedTab('dictation'); setCurrentIdx(0); setResults([]); }}
-                className="px-4 py-2 bg-amber-500 text-white rounded-xl text-sm font-medium">
+                className="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-sm font-medium hover:bg-indigo-100 active:scale-[0.98] transition-all">
                 错词本听写 ✍️
               </button>
             </div>

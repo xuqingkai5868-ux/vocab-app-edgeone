@@ -145,65 +145,122 @@ export function Home() {
     if (!ok) alert('任务未完成，还不能打卡');
   };
 
+  // 5级掌握分布统计
+  const levelStats = useMemo(() => {
+    const counts = [0, 0, 0, 0, 0];
+    for (const w of MASTER_WORDS) {
+      const lvl = state.states[w.word] || 0;
+      counts[Math.min(lvl, 4)]++;
+    }
+    return counts; // [未学, 刚学, 模糊, 已知, 掌握]
+  }, [state.states]);
+
   if (!state) return <Loading text="加载中..." />;
+
+  const levelBarColors = ['bg-gray-200', 'bg-blue-300', 'bg-amber-300', 'bg-teal-300', 'bg-green-400'];
+  const levelLabels = ['未学', '刚学', '模糊', '已知', '掌握'];
 
   return (
     <div className="space-y-4">
       {/* 头部：等级 + 进度环 */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-xl font-bold text-gray-800">
-            {user?.name || '同学'}，加油！{level.icon}
+          <h1 className="text-lg font-bold text-gray-800">
+            {user?.name || '同学'}，加油！
           </h1>
-          <p className="text-sm text-gray-500 mt-0.5">
+          <div className="flex gap-2 mt-2">
+            <span className="inline-flex items-center gap-1 bg-indigo-50 text-indigo-700 text-xs px-2.5 py-1 rounded-full font-medium">
+              Lv.{level.level} {level.title}
+            </span>
+            <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs px-2.5 py-1 rounded-full font-medium">
+              连续 {streak} 天
+            </span>
+          </div>
+          <p className="text-xs text-gray-400 mt-1.5">
             PET 备考 · Day {state.currentDay}/{totalDays}
           </p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="relative flex items-center justify-center" style={{ width: 60, height: 60 }}>
-            <ProgressRing pct={pct} size={60} />
-            <span className="absolute text-xs font-bold text-primary-500">{pct}%</span>
-          </div>
-          <div className="text-right">
-            <div className="text-lg font-bold text-primary-500">{level.title}</div>
-            <div className="text-xs text-gray-400">Lv.{level.level}</div>
-          </div>
+        <div className="relative" style={{ width: 52, height: 52 }}>
+          <svg width="52" height="52" viewBox="0 0 52 52">
+            <circle cx="26" cy="26" r="21" fill="none" stroke="#e5e7eb" stroke-width="4"/>
+            <circle cx="26" cy="26" r="21" fill="none" stroke="#4f46e5" stroke-width="4" stroke-dasharray={(2 * Math.PI * 21).toFixed(1)} stroke-dashoffset={(2 * Math.PI * 21 * (1 - pct / 100)).toFixed(1)} stroke-linecap="round" transform="rotate(-90 26 26)"/>
+          </svg>
+          <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-indigo-500">{pct}%</span>
         </div>
       </div>
 
-      {/* 双进度条：学习进度 + 打卡 */}
+      {/* 今日任务 */}
       <Card className="!p-4">
-        <h2 className="font-semibold text-gray-700 text-sm mb-3">今日任务</h2>
-        <div className="mb-2">
-          <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-            <span>学习进度 · Day {state.currentDay}</span>
-            <span>{studiedToday}/{todayNewWords.length} 词</span>
-          </div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-gray-700 text-sm">今日任务</h2>
+          <span className="text-xs text-gray-400">{studiedToday}/{todayNewWords.length} 词</span>
+        </div>
+        <div className="mb-3">
           <ProgressBar value={studiedToday} max={todayNewWords.length} label="" color="bg-primary-500" />
         </div>
-        <div className="flex items-center justify-between text-xs text-gray-500 mb-1">
-          <span>连续打卡</span>
-          <span>{streak} 天</span>
+        {/* 三格统计 */}
+        <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="bg-green-50 rounded-lg p-2.5 text-center">
+            <p className="text-lg font-bold text-green-700">{masteredToday}</p>
+            <p className="text-[10px] text-green-600">已掌握</p>
+          </div>
+          <div className="bg-amber-50 rounded-lg p-2.5 text-center">
+            <p className="text-lg font-bold text-amber-700">{fuzzyToday}</p>
+            <p className="text-[10px] text-amber-600">待复习</p>
+          </div>
+          <div className="bg-indigo-50 rounded-lg p-2.5 text-center">
+            <p className="text-lg font-bold text-indigo-700">{todayNewWords.length - studiedToday}</p>
+            <p className="text-[10px] text-indigo-600">刚学</p>
+          </div>
         </div>
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2">
           <button onClick={() => navigate('/study')} className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl font-medium text-sm">
-            开始学习 📚
+            开始学习
           </button>
-          <button onClick={handleCheckIn} className="px-4 py-2.5 bg-success-500 text-white rounded-xl font-medium text-sm">
-            打卡 🐣
+          <button onClick={handleCheckIn} className="px-4 py-2.5 bg-orange-500 text-white rounded-xl font-medium text-sm">
+            打卡
           </button>
           {isTodayComplete && state.currentDay < totalDays && (
             <button
               onClick={advanceDay}
               className="px-4 py-2.5 bg-amber-500 text-white rounded-xl font-medium text-sm animate-pulse"
             >
-              进入 Day {state.currentDay + 1} →
+              Day {state.currentDay + 1} →
             </button>
           )}
         </div>
         {isTodayComplete && state.currentDay < totalDays && (
           <p className="text-xs text-amber-600 mt-2 text-center">所有词都学过了，可以进入下一天！</p>
         )}
+      </Card>
+
+      {/* 掌握分布（5级独立色块） */}
+      <Card className="!p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold text-gray-700 text-sm">掌握分布</h2>
+          <span className="text-xs text-gray-400">共 {MASTER_WORDS.length} 词</span>
+        </div>
+        <div className="grid grid-cols-5 gap-2">
+          {levelStats.map((count, i) => {
+            const colors = [
+              { bg: 'bg-gray-200', text: 'text-gray-500' },
+              { bg: 'bg-blue-300', text: 'text-blue-700' },
+              { bg: 'bg-amber-300', text: 'text-amber-700' },
+              { bg: 'bg-teal-300', text: 'text-teal-700' },
+              { bg: 'bg-green-400', text: 'text-green-700' },
+            ];
+            return (
+              <div key={i} className="text-center">
+                <div className={`${colors[i].bg} rounded-lg ${count > 0 ? 'opacity-100' : 'opacity-30'} p-2`}>
+                  <p className={`text-base font-bold ${colors[i].text}`}>
+                    {count > 0 ? count : '-'}
+                  </p>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-1">{levelLabels[i]}</p>
+              </div>
+            );
+          })}
+        </div>
       </Card>
 
       {/* 打卡日历（紧凑周视图） */}
@@ -238,22 +295,6 @@ export function Home() {
           </div>
         </div>
       </Card>
-
-      {/* 底部导航卡片 */}
-      <div className="grid grid-cols-3 gap-3">
-        <Card onClick={() => navigate('/review')} className="text-center py-4 cursor-pointer">
-          <div className="text-2xl mb-1">🔄</div>
-          <div className="text-sm text-gray-600">复习</div>
-        </Card>
-        <Card onClick={() => navigate('/wrong-words')} className="text-center py-4 cursor-pointer">
-          <div className="text-2xl mb-1">📕</div>
-          <div className="text-sm text-gray-600">错词本 {fuzzyCount > 0 ? `(${fuzzyCount})` : ''}</div>
-        </Card>
-        <Card onClick={() => navigate('/settings')} className="text-center py-4 cursor-pointer">
-          <div className="text-2xl mb-1">⚙️</div>
-          <div className="text-sm text-gray-600">设置</div>
-        </Card>
-      </div>
     </div>
   );
 }

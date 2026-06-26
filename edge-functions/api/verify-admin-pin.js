@@ -23,8 +23,8 @@ export async function onRequestPost({ request }) {
   // 从 KV 读取管理员密码
   const storedPin = await kvGet(K.pin('admin'));
   if (!storedPin) {
-    // 如果没设置管理员密码，使用默认密码（与前端旧版一致）
-    const ok = pin === 'scdq';
+    // 如果没设置管理员密码，使用默认密码（与本地 seed 一致）
+    const ok = pin === '888888';
     return json({ ok });
   }
 
