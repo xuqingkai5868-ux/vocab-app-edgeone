@@ -4,7 +4,7 @@
 // 请求体：{ pin: "888888" }
 // 响应：{ ok: true/false }
 
-import { K, kvGet } from './_lib/kv.js';
+import { K, kvGet, kvSet } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 
 export async function onRequestPost({ request }) {
@@ -22,8 +22,16 @@ export async function onRequestPost({ request }) {
 
   // 从 KV 读取管理员密码
   const storedPin = await kvGet(K.pin('admin'));
+
+  // 兼容旧数据：如果 KV 存的还是旧兜底 'scdq'，迁移到新兜底 '888888'
+  if (storedPin === 'scdq') {
+    await kvSet(K.pin('admin'), '888888');
+    const ok = pin === '888888';
+    return json({ ok });
+  }
+
   if (!storedPin) {
-    // 如果没设置管理员密码，使用默认密码（与本地 seed 一致）
+    // 如果没设置管理员密码，使用兜底密码 888888（与本地 seed 一致）
     const ok = pin === '888888';
     return json({ ok });
   }
