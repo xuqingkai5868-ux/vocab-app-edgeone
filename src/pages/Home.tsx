@@ -49,8 +49,6 @@ function ProgressRing({ pct, size = 80 }: { pct: number; size?: number }) {
     </svg>
   );
 }
-
-// 迷你打卡日历（周视图）
 function MiniCalendar({ checkIns, streak }: { checkIns: Record<string, { isCompleted: boolean }>; streak: number }) {
   const now = new Date();
   const year = now.getFullYear();
@@ -157,7 +155,13 @@ export function Home() {
 
   if (!state) return <Loading text="加载中..." />;
 
-  const levelBarColors = ['bg-gray-200', 'bg-blue-300', 'bg-amber-300', 'bg-teal-300', 'bg-green-400'];
+  const LEVEL_COLORS = [
+    { bg: 'bg-gray-200', text: 'text-gray-500' },
+    { bg: 'bg-blue-300', text: 'text-blue-700' },
+    { bg: 'bg-amber-300', text: 'text-amber-700' },
+    { bg: 'bg-teal-300', text: 'text-teal-700' },
+    { bg: 'bg-green-400', text: 'text-green-700' },
+  ];
   const levelLabels = ['未学', '刚学', '模糊', '已知', '掌握'];
 
   return (
@@ -242,17 +246,10 @@ export function Home() {
         </div>
         <div className="grid grid-cols-5 gap-2">
           {levelStats.map((count, i) => {
-            const colors = [
-              { bg: 'bg-gray-200', text: 'text-gray-500' },
-              { bg: 'bg-blue-300', text: 'text-blue-700' },
-              { bg: 'bg-amber-300', text: 'text-amber-700' },
-              { bg: 'bg-teal-300', text: 'text-teal-700' },
-              { bg: 'bg-green-400', text: 'text-green-700' },
-            ];
             return (
               <div key={i} className="text-center">
-                <div className={`${colors[i].bg} rounded-lg ${count > 0 ? 'opacity-100' : 'opacity-30'} p-2`}>
-                  <p className={`text-base font-bold ${colors[i].text}`}>
+                <div className={`${LEVEL_COLORS[i].bg} rounded-lg ${count > 0 ? 'opacity-100' : 'opacity-30'} p-2`}>
+                  <p className={`text-base font-bold ${LEVEL_COLORS[i].text}`}>
                     {count > 0 ? count : '-'}
                   </p>
                 </div>

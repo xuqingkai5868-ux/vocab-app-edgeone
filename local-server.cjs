@@ -267,7 +267,7 @@ async function handleVerifyPin(body) {
   if (!pin || typeof pin !== 'string') return jsonResponse({ ok: false }, 400);
   const storedPin = await my_kv.get('pin:admin');
   if (!storedPin) {
-    return jsonResponse({ ok: pin === 'scdq' });
+    return jsonResponse({ ok: pin === '888888' });
   }
   // 恒定时间比较
   let result = 0;

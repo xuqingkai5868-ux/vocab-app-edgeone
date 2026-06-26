@@ -1,7 +1,7 @@
 // ===== POST /api/verify-admin-pin =====
 // EdgeOne Pages Edge Function
 // 验证家长密码（不存储在前端，防止孩子通过源码查看密码）
-// 请求体：{ pin: "scdq" }
+// 请求体：{ pin: "888888" }
 // 响应：{ ok: true/false }
 
 import { K, kvGet } from './_lib/kv.js';
