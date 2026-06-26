@@ -20,19 +20,16 @@ export async function onRequestPost({ request }) {
     return json({ error: 'missing_pin', message: '需要 pin 字段' }, 400);
   }
 
-  // 888888 是**兜底密码**，始终生效（不管 KV 存了什么）
-  // 同时检查 KV 中是否存了自定义密码，如果匹配也通过
-  if (pin === '888888') {
-    return json({ ok: true });
-  }
-
   const storedPin = await kvGet(K.pin('admin'));
-  if (storedPin) {
-    return json({ ok: constantTimeCompare(String(pin), String(storedPin)) });
+  if (!storedPin) {
+    // 如果 KV 里没设密码，用兜底密码 888888
+    const ok = pin === '888888';
+    return json({ ok });
   }
 
-  // KV 没有自定义密码，且输入的也不是 888888
-  return json({ ok: false });
+  // 恒定时间比较（防止时序攻击）
+  const ok = constantTimeCompare(String(pin), String(storedPin));
+  return json({ ok });
 }
 
 /** 简单恒定时间字符串比较（防止时序攻击） */

@@ -55,7 +55,7 @@ async function authMiddleware(req) {
   const urlPath = url.pathname;
 
   // 开放端点
-  if (urlPath === '/api/login' || urlPath === '/api/seed' || urlPath === '/api/tts' || urlPath === '/api/verify-admin-pin') return null;
+  if (urlPath === '/api/login' || urlPath === '/api/seed' || urlPath === '/api/tts' || urlPath === '/api/verify-admin-pin' || urlPath === '/api/update-admin-pin') return null;
 
   const auth = req.headers['authorization'] || '';
   const token = auth.replace(/^Bearer\s+/i, '').trim();
@@ -265,11 +265,31 @@ async function handleReset(req, user, body) {
 async function handleVerifyPin(body) {
   const pin = body && body.pin;
   if (!pin || typeof pin !== 'string') return jsonResponse({ ok: false }, 400);
-  // 888888 始终生效（兜底），同时支持 KV 中的自定义密码
-  if (pin === '888888') return jsonResponse({ ok: true });
   const storedPin = await my_kv.get('pin:admin');
-  if (!storedPin) return jsonResponse({ ok: false });
+  if (!storedPin) {
+    return jsonResponse({ ok: pin === '888888' });
+  }
   return jsonResponse({ ok: pin === storedPin });
+}
+
+async function handleUpdatePin(body) {
+  const { currentPin, newPin } = body || {};
+  if (!currentPin || !newPin || typeof currentPin !== 'string' || typeof newPin !== 'string') {
+    return jsonResponse({ error: 'missing_fields', message: '需要 currentPin 和 newPin' }, 400);
+  }
+  if (!/^\d{4,8}$/.test(newPin)) {
+    return jsonResponse({ error: 'invalid_pin', message: '新密码必须是 4-8 位数字' }, 400);
+  }
+  // 验证旧密码
+  const storedPin = await my_kv.get('pin:admin');
+  if (storedPin) {
+    if (currentPin !== storedPin) return jsonResponse({ ok: false, message: '旧密码不正确' }, 403);
+  } else {
+    if (currentPin !== '888888') return jsonResponse({ ok: false, message: '旧密码不正确' }, 403);
+  }
+  // 更新
+  await my_kv.put('pin:admin', newPin);
+  return jsonResponse({ ok: true });
 }
 
 // ===== 主路由 =====
@@ -330,6 +350,11 @@ const server = http.createServer(async (req, res) => {
         if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));
         const body = await readJson(req);
         return send(res, await handleVerifyPin(body));
+      }
+      if (urlPath === '/api/update-admin-pin') {
+        if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));
+        const body = await readJson(req);
+        return send(res, await handleUpdatePin(body));
       }
 
       // 受保护端点
