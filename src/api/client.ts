@@ -1,6 +1,10 @@
-// API 客户端基础 — fetch + Bearer Token + 错误处理
+// API 客户端基础 — fetch + Bearer Token + 错误处理 + 自动重试
 
 const API_BASE = '/api';
+
+// 重试配置
+const RETRY_MAX = 3;
+const RETRY_BASE_MS = 1000; // 初始退避 1s
 
 /**
  * API 强制登出事件
@@ -46,7 +50,8 @@ export function hasToken(): boolean {
 
 async function request<T>(
   path: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  attempt = 1
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
@@ -69,7 +74,7 @@ async function request<T>(
     });
 
     if (response.status === 401) {
-      // Token 过期或无效 → 触发强制登出
+      // Token 过期或无效 → 触发强制登出（不重试）
       triggerForceLogout();
       const msg = '登录已过期，请重新登录';
       throw new APIError(msg, 401);
@@ -88,11 +93,22 @@ async function request<T>(
 
     return response.json() as Promise<T>;
   } catch (e) {
-    if (e instanceof APIError) throw e;
-    // 网络错误或超时
-    const msg = e instanceof DOMException && e.name === 'AbortError'
-      ? '请求超时'
-      : '网络错误，请检查网络连接';
+    if (e instanceof APIError) {
+      // HTTP 业务错误（非网络错误）— 不重试，直接抛出
+      throw e;
+    }
+    // 网络错误或超时 — 自动重试（指数退避）
+    const isTimeout = e instanceof DOMException && e.name === 'AbortError';
+    const msg = isTimeout ? '请求超时' : '网络错误，请检查网络连接';
+
+    if (attempt < RETRY_MAX) {
+      const delay = RETRY_BASE_MS * Math.pow(2, attempt - 1);
+      console.warn(`[API] 请求失败 (attempt ${attempt}/${RETRY_MAX}), ${delay}ms 后重试: ${path}`, msg);
+      await new Promise(resolve => setTimeout(resolve, delay));
+      return request<T>(path, options, attempt + 1);
+    }
+
+    console.error(`[API] 请求已重试 ${RETRY_MAX} 次仍失败: ${path}`);
     throw new APIError(msg, 0);
   } finally {
     clearTimeout(timeoutId);

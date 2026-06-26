@@ -8,6 +8,7 @@ import { Loading } from '../components/Loading';
 import { getTotalDays } from '../services/utils/petVocabLoader';
 import { MASTER_WORDS } from '../services/utils/petVocabLoader';
 import { getActiveTracking } from '../services/activity/activityTracker';
+import { getActivity } from '../api/activity';
 
 function getLevel(mastered: number): { level: number; title: string; icon: string } {
   const levels = [
@@ -104,8 +105,19 @@ export function Home() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const totalDays = getTotalDays(wordsPerDay);
+  const [todayDuration, setTodayDuration] = useState(0); // 今日学习时长（毫秒）
 
   useEffect(() => { loadAll(); }, []);
+
+  // 单独获取今日学习时长
+  useEffect(() => {
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    getActivity(todayStr).then(resp => {
+      const total = (resp.events || []).reduce((s, e) => s + e.duration, 0);
+      setTodayDuration(total);
+    }).catch(() => {});
+  }, []);
 
   const mastered = useMemo(() =>
     Object.values(state.states).filter(v => v >= 4).length,
@@ -201,7 +213,7 @@ export function Home() {
 
       {/* 学习统计 */}
       <Card className="!p-3">
-        <div className="grid grid-cols-3 gap-3 text-center">
+        <div className="grid grid-cols-4 gap-2 text-center">
           <div>
             <div className="text-lg font-bold text-gray-800">{mastered}</div>
             <div className="text-[10px] text-gray-400">已掌握</div>
@@ -213,6 +225,16 @@ export function Home() {
           <div>
             <div className="text-lg font-bold text-gray-800">{streak}</div>
             <div className="text-[10px] text-gray-400">连续打卡</div>
+          </div>
+          <div>
+            <div className="text-lg font-bold text-primary-500">
+              {todayDuration >= 60000
+                ? `${Math.round(todayDuration / 60000)}分钟`
+                : todayDuration > 0
+                  ? `${Math.round(todayDuration / 1000)}秒`
+                  : '-'}
+            </div>
+            <div className="text-[10px] text-gray-400">今日学习</div>
           </div>
         </div>
       </Card>

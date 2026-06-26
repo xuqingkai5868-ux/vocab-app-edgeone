@@ -42,7 +42,6 @@ export function Study() {
   const [filter, setFilter] = useState<FilterKey>('all');
   const [currentGroup, setCurrentGroup] = useState(0);
   const [cardIndex, setCardIndex] = useState(0);
-  const [flipped, setFlipped] = useState(false);
   const [completed, setCompleted] = useState(false);
   const [feedbackWord, setFeedbackWord] = useState<string | null>(null);
   const [feedbackType, setFeedbackType] = useState<'mastered' | 'fuzzy' | null>(null);
@@ -59,11 +58,27 @@ export function Study() {
     };
   }, []);
 
-  // Load grammar data
+  // Load grammar data with localStorage cache (24h TTL)
   useEffect(() => {
+    const CACHE_KEY = 'vocab_grammar_cards';
+    const CACHE_TTL = 24 * 60 * 60 * 1000; // 24 小时
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        const cachedAt = parsed._cachedAt || 0;
+        if (Date.now() - cachedAt < CACHE_TTL && parsed?.stages?.length) {
+          setGrammarStages(parsed.stages || []);
+          return;
+        }
+      } catch { /* ignore corrupt cache */ }
+    }
     fetch('/grammar_cards.json')
       .then(r => r.json())
-      .then(d => setGrammarStages(d.stages || []))
+      .then(d => {
+        setGrammarStages(d.stages || []);
+        try { localStorage.setItem(CACHE_KEY, JSON.stringify({ ...d, _cachedAt: Date.now() })); } catch { /* quota exceeded */ }
+      })
       .catch(() => {});
   }, []);
 
@@ -104,11 +119,11 @@ export function Study() {
 
   const completedCount = stats[1] + stats[2] + stats[3] + stats[4]; // 所有学过（level > 0）
 
-  // Group into groups of 6
+  // Group into groups of 10
   const groups = useMemo(() => {
     const gs: { words: typeof words; phrases: typeof phrases }[] = [];
-    for (let i = 0; i < words.length; i += 6) {
-      gs.push({ words: words.slice(i, i + 6), phrases: [] });
+    for (let i = 0; i < words.length; i += 10) {
+      gs.push({ words: words.slice(i, i + 10), phrases: [] });
     }
     let pi = 0;
     const gsLen = gs.length;
@@ -123,7 +138,7 @@ export function Study() {
   }, [words, phrases]);
 
   const group = groups[currentGroup];
-  const allItems = group ? [...group.words.map(w => ({ type: 'word' as const, word: w.word, meaning: `${w.meaning} (${w.pos})`, source: null, assoc: null })), ...group.phrases.map(p => ({ type: 'phrase' as const, word: p.phrase, meaning: p.meaning, source: p.source, assoc: p.associated_word }))] : [];
+  const allItems = group ? [...group.words.map(w => ({ type: 'word' as const, word: w.word, meaning: `${w.pos}. ${w.meaning}`, example: w.example, translation: w.translation, source: null, assoc: null })), ...group.phrases.map(p => ({ type: 'phrase' as const, word: p.phrase, meaning: p.meaning, example: undefined, translation: undefined, source: p.source, assoc: p.associated_word }))] : [];
   const currentItem = allItems[cardIndex];
 
   const markStatus = (isKnown: boolean) => {
@@ -140,7 +155,6 @@ export function Study() {
   };
 
   const nextCard = () => {
-    setFlipped(false);
     if (cardIndex < allItems.length - 1) {
       setCardIndex(i => i + 1);
     } else if (currentGroup < groups.length - 1) {
@@ -332,7 +346,7 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
                     <div className="flex items-center gap-2 min-w-0">
                       <span className="text-sm font-mono text-gray-400 w-5 shrink-0">{i + 1}</span>
                       <span className="font-medium text-gray-800 truncate">{w.word}</span>
-                      <span className="text-sm text-gray-500 shrink-0">_{w.pos}_</span>
+                      <span className="text-xs text-gray-400 shrink-0">{w.pos}.</span>
                       <span className="text-sm text-gray-500 truncate">{w.meaning}</span>
                     </div>
                     <div className="flex items-center gap-2 shrink-0">
@@ -385,51 +399,60 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
         </>
       )}
 
-      {/* ===== 学习视图（翻转卡片） ===== */}
+      {/* ===== 学习视图（见词思义模式） ===== */}
       {tab === 'study' && (
         <>
           <ProgressBar value={doneCards} max={totalCards} label="今日进度" />
 
           {currentItem && (
-            <Card
-              className={`text-center py-12 min-h-[280px] flex flex-col items-center justify-center cursor-pointer select-none transition-all duration-300 ${
+            <>
+              {/* 学习卡片：单词 + 释义 + 例句 */}
+              <div className={`bg-white rounded-xl border border-gray-100 min-h-[240px] flex flex-col text-left p-6 transition-all duration-300 ${
                 feedbackWord === currentItem.word
                   ? feedbackType === 'mastered'
                     ? 'ring-4 ring-green-300 scale-[0.97]'
                     : 'ring-4 ring-yellow-300 scale-[1.02]'
                   : ''
-              }`}
-              onClick={() => setFlipped(!flipped)}
-            >
-              {currentItem.type === 'phrase' && (
-                <span className={`text-xs px-2 py-0.5 rounded-full mb-3 ${currentItem.source === 'book' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
-                  {currentItem.source === 'book' ? '📗 书本短语' : '📘 剑桥短语'}
-                </span>
-              )}
-              <div className={`relative w-full transition-all duration-300 ease-out ${flipped ? 'opacity-0 scale-90' : 'opacity-100 scale-100'}`}>
-                <div className="flex items-center justify-center gap-3">
+              }`}>
+                {/* 类型标签 */}
+                {currentItem.type === 'phrase' && (
+                  <span className={`self-start text-xs px-2 py-0.5 rounded-full mb-3 ${currentItem.source === 'book' ? 'bg-amber-100 text-amber-700' : 'bg-blue-100 text-blue-700'}`}>
+                    {currentItem.source === 'book' ? '📗 书本短语' : '📘 剑桥短语'}
+                  </span>
+                )}
+
+                {/* 单词 + 发音 */}
+                <div className="flex items-center justify-center gap-3 mt-4 mb-6">
                   <h2 className="text-3xl font-bold text-gray-800">{currentItem.word}</h2>
                   <button onClick={e => { e.stopPropagation(); speakWord(currentItem.word); }} className="text-2xl text-primary-400 hover:text-primary-600 active:scale-110 transition-transform">🔊</button>
                 </div>
-                <p className="text-sm text-gray-400 mt-3">点卡片翻转查看释义</p>
-              </div>
-              <div className={`relative w-full transition-all duration-300 ease-out ${!flipped ? 'opacity-0 scale-90' : 'opacity-100 scale-100'}`}>
-                <p className="text-xl text-gray-700">{currentItem.meaning}</p>
-                {currentItem.assoc && <p className="text-xs text-gray-400 mt-2">关联词：{currentItem.assoc}</p>}
-                <p className="text-xs text-gray-400 mt-4">点卡片返回</p>
-              </div>
-            </Card>
-          )}
 
-          {flipped && (
-            <div className="flex gap-3">
-              <button onClick={() => markStatus(false)} className="flex-1 py-3 bg-yellow-500 text-white rounded-xl font-medium text-lg">△ 模糊</button>
-              <button onClick={() => markStatus(true)} className="flex-1 py-3 bg-green-500 text-white rounded-xl font-medium text-lg">✓ 认识</button>
-            </div>
-          )}
+                {/* 释义 */}
+                <div className="mb-4">
+                  <p className="text-lg text-gray-700 leading-relaxed">{currentItem.meaning}</p>
+                </div>
 
-          {!flipped && (
-            <button onClick={() => setFlipped(true)} className="w-full py-3 bg-primary-500 text-white rounded-xl font-medium">翻转查看释义</button>
+                {/* 例句 + 翻译 */}
+                {currentItem.example && (
+                  <div className="border-t border-gray-100 pt-3 mt-1">
+                    <p className="text-sm text-gray-600 leading-relaxed">{currentItem.example}</p>
+                    {currentItem.translation && (
+                      <p className="text-sm text-gray-400 mt-1 leading-relaxed">{currentItem.translation}</p>
+                    )}
+                  </div>
+                )}
+
+                {currentItem.assoc && (
+                  <p className="text-xs text-gray-400 mt-2">关联词：{currentItem.assoc}</p>
+                )}
+              </div>
+
+              {/* 操作按钮（始终可见） */}
+              <div className="flex gap-3">
+                <button onClick={() => markStatus(false)} className="flex-1 py-3 bg-yellow-500 text-white rounded-xl font-medium text-lg">△ 模糊</button>
+                <button onClick={() => markStatus(true)} className="flex-1 py-3 bg-green-500 text-white rounded-xl font-medium text-lg">✓ 认识</button>
+              </div>
+            </>
           )}
 
           <div className="text-center text-xs text-gray-400">
