@@ -272,26 +272,6 @@ async function handleVerifyPin(body) {
   return jsonResponse({ ok: pin === storedPin });
 }
 
-async function handleUpdatePin(body) {
-  const { currentPin, newPin } = body || {};
-  if (!currentPin || !newPin || typeof currentPin !== 'string' || typeof newPin !== 'string') {
-    return jsonResponse({ error: 'missing_fields', message: '需要 currentPin 和 newPin' }, 400);
-  }
-  if (!/^\d{4,8}$/.test(newPin)) {
-    return jsonResponse({ error: 'invalid_pin', message: '新密码必须是 4-8 位数字' }, 400);
-  }
-  // 验证旧密码
-  const storedPin = await my_kv.get('pin:admin');
-  if (storedPin) {
-    if (currentPin !== storedPin) return jsonResponse({ ok: false, message: '旧密码不正确' }, 403);
-  } else {
-    if (currentPin !== '888888') return jsonResponse({ ok: false, message: '旧密码不正确' }, 403);
-  }
-  // 更新
-  await my_kv.put('pin:admin', newPin);
-  return jsonResponse({ ok: true });
-}
-
 // ===== 主路由 =====
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://localhost:${PORT}`);
@@ -351,12 +331,6 @@ const server = http.createServer(async (req, res) => {
         const body = await readJson(req);
         return send(res, await handleVerifyPin(body));
       }
-      if (urlPath === '/api/update-admin-pin') {
-        if (req.method !== 'POST') return send(res, jsonResponse({ error: 'method_not_allowed' }, 405));
-        const body = await readJson(req);
-        return send(res, await handleUpdatePin(body));
-      }
-
       // 受保护端点
       const user = mw; // { userId, role }
       if (urlPath === '/api/me') return send(res, await handleMe(user));

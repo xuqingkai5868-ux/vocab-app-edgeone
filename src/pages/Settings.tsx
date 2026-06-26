@@ -6,7 +6,7 @@ import { useApp } from '../contexts/AppContext';
 import { getTotalDays } from '../services/utils/petVocabLoader';
 import { getActivity, getActivityRange, ActivityEvent } from '../api/activity';
 import { getDayWords } from '../services/utils/petVocabLoader';
-import { verifyAdminPin, updateAdminPin } from '../api/verifyPin';
+import { verifyAdminPin } from '../api/verifyPin';
 
 const TYPE_LABELS: Record<string, string> = {
   study: '📚 学习新词',
@@ -62,13 +62,10 @@ export function Settings() {
   const [todayEvents, setTodayEvents] = useState<ActivityEvent[]>([]);
   const [weekStats, setWeekStats] = useState<{ type: string; totalMs: number }[]>([]);
   const [loading, setLoading] = useState(true);
-  const [passwordMode, setPasswordMode] = useState<'wordsPerDay' | 'resetToday' | 'resetAll' | 'changePin' | null>(null);
+  const [passwordMode, setPasswordMode] = useState<'wordsPerDay' | 'resetToday' | 'resetAll' | null>(null);
   const [passwordInput, setPasswordInput] = useState('');
   const [passwordError, setPasswordError] = useState(false);
   const [sliderUnlocked, setSliderUnlocked] = useState(false); // 密码验证后解锁
-  const [pinChangeMode, setPinChangeMode] = useState(false);   // 是否在修改密码流程
-  const [newPinInput, setNewPinInput] = useState('');          // 新密码
-  const [pinChangeMsg, setPinChangeMsg] = useState('');        // 修改密码提示
 
   useEffect(() => {
     loadActivity();
@@ -139,14 +136,6 @@ export function Settings() {
         confirmResetToday();
       } else if (passwordMode === 'resetAll') {
         confirmResetAll();
-      } else if (passwordMode === 'changePin') {
-        // 验证通过后进入设置新密码阶段
-        setPinChangeMode(true);
-        setNewPinInput('');
-        setPinChangeMsg('');
-        setPasswordMode(null);
-        setPasswordInput('');
-        return; // 不关闭弹窗
       }
       setPasswordMode(null);
       setPasswordInput('');
@@ -154,32 +143,6 @@ export function Settings() {
       setPasswordError(true);
       setPasswordInput('');
     }
-  };
-
-  const handleConfirmNewPin = async () => {
-    if (!/^\d{4,8}$/.test(newPinInput)) {
-      setPinChangeMsg('密码必须是 4-8 位数字');
-      return;
-    }
-    setPinChangeMsg('正在修改...');
-    const result = await updateAdminPin(passwordInput, newPinInput);
-    if (result.ok) {
-      setPinChangeMsg('✅ 密码修改成功！');
-      setPinChangeMode(false);
-      setPasswordInput('');
-      setTimeout(() => setPinChangeMsg(''), 2000);
-    } else {
-      setPinChangeMsg(result.message || '修改失败，请重试');
-    }
-  };
-
-  const openChangePin = () => {
-    setPasswordMode('changePin');
-    setPinChangeMode(false);
-    setPasswordInput('');
-    setNewPinInput('');
-    setPinChangeMsg('');
-    setPasswordError(false);
   };
 
   const todayTotalMs = todayEvents.reduce((s, e) => s + e.duration, 0);
@@ -334,87 +297,11 @@ export function Settings() {
             ⚠️ 完全重置
             <span className="text-red-200 text-xs ml-2">所有进度归零，从 Day 1 开始</span>
           </button>
-          <button onClick={openChangePin} className="w-full py-2.5 border border-indigo-200 text-indigo-600 rounded-lg text-sm">
-            🔑 修改家长密码
-          </button>
           <button onClick={() => { logout(); navigate('/'); }} className="w-full py-2.5 mt-1 border border-gray-200 text-gray-600 rounded-lg text-sm">退出登录</button>
         </div>
       </Card>
 
-      {/* 密码验证弹窗 */}
-      {passwordMode === 'changePin' && !pinChangeMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setPasswordMode(null); setPasswordInput(''); setPasswordError(false); }}>
-          <div className="bg-white rounded-2xl p-6 w-80 mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-gray-800 mb-2">🔑 修改家长密码</h3>
-            <p className="text-sm text-gray-500 mb-4">请先输入当前家长密码</p>
-            <input
-              type="password"
-              value={passwordInput}
-              autoFocus
-              onChange={e => { setPasswordInput(e.target.value); setPasswordError(false); }}
-              onKeyDown={e => e.key === 'Enter' && handlePasswordSubmit()}
-              placeholder="请输入当前密码"
-              className={`w-full px-4 py-3 border rounded-xl text-center text-lg focus:outline-none focus:ring-2 ${passwordError ? 'border-red-400 focus:ring-red-300' : 'border-gray-300 focus:ring-primary-500'}`}
-            />
-            {passwordError && (
-              <p className="text-red-500 text-xs mt-2 text-center">密码错误，请重试</p>
-            )}
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => { setPasswordMode(null); setPasswordInput(''); setPasswordError(false); }}
-                className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm"
-              >
-                取消
-              </button>
-              <button
-                onClick={handlePasswordSubmit}
-                className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium"
-              >
-                下一步
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* 设置新密码弹窗 */}
-      {pinChangeMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <div className="bg-white rounded-2xl p-6 w-80 mx-4 shadow-xl">
-            <h3 className="text-lg font-bold text-gray-800 mb-2">🔑 设置新密码</h3>
-            <p className="text-sm text-gray-500 mb-4">输入新的家长密码（4-8 位数字）</p>
-            <input
-              type="password"
-              value={newPinInput}
-              autoFocus
-              onChange={e => { setNewPinInput(e.target.value); setPinChangeMsg(''); }}
-              onKeyDown={e => e.key === 'Enter' && handleConfirmNewPin()}
-              placeholder="请输入新密码"
-              maxLength={8}
-              className="w-full px-4 py-3 border border-gray-300 rounded-xl text-center text-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
-            />
-            {pinChangeMsg && (
-              <p className={`text-xs mt-2 text-center ${pinChangeMsg.includes('✅') ? 'text-green-600' : 'text-red-500'}`}>{pinChangeMsg}</p>
-            )}
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => { setPinChangeMode(false); setPasswordMode(null); setNewPinInput(''); setPinChangeMsg(''); }}
-                className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl text-sm"
-              >
-                取消
-              </button>
-              <button
-                onClick={handleConfirmNewPin}
-                className="flex-1 py-2.5 bg-primary-500 text-white rounded-xl text-sm font-medium"
-              >
-                确认修改
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {passwordMode && passwordMode !== 'changePin' && (
+      {passwordMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => { setPasswordMode(null); setPasswordInput(''); setPasswordError(false); }}>
           <div className="bg-white rounded-2xl p-6 w-80 mx-4 shadow-xl" onClick={e => e.stopPropagation()}>
             <h3 className="text-lg font-bold text-gray-800 mb-2">🔒 家长验证</h3>

@@ -1,4 +1,4 @@
-// 家长密码验证 & 修改 API 客户端
+// 家长密码验证 API 客户端
 // 调用 /api/verify-admin-pin 验证密码，避免密码暴露在前端
 //
 // 兜底策略：API 不通时（如新 Edge Function 尚未部署），
@@ -25,30 +25,11 @@ export async function verifyAdminPin(pin: string): Promise<boolean> {
       return pin === LOCAL_DEFAULT_PIN;
     }
     const data = await response.json();
-    return data.ok === true;
+    if (data.ok === true) return true;
+    // API 返回验证失败（ok: false），降级到本地兜底
+    return pin === LOCAL_DEFAULT_PIN;
   } catch {
     // 网络错误/API 不存在，降级到本地验证
     return pin === LOCAL_DEFAULT_PIN;
-  }
-}
-
-/** 修改家长密码（需要验证旧密码） */
-export async function updateAdminPin(currentPin: string, newPin: string): Promise<{ ok: boolean; message?: string }> {
-  try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-
-    const response = await fetch('/api/update-admin-pin', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ currentPin, newPin }),
-      signal: controller.signal,
-    });
-    clearTimeout(timeoutId);
-
-    const data = await response.json();
-    return data;
-  } catch {
-    return { ok: false, message: '网络错误，无法连接服务器' };
   }
 }
