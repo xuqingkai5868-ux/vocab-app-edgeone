@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { useApp } from '../contexts/AppContext';
@@ -31,36 +31,26 @@ function loadDictationProgress(dictType: string): DictationProgress | null {
   } catch { return null; }
 }
 
-function hasSavedProgress(dictType: string): boolean {
-  const p = loadDictationProgress(dictType);
-  return !!(p && p.results && p.results.length > 0);
-}
-
 export function Dictation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const dictType = (searchParams.get('type') || 'spelling') as DictType;
-  const { state, wordsPerDay, updateUserState, updateWordStates } = useApp();
+  const { state, wordsPerDay, updateWordStates } = useApp();
 
-  const [mode, setMode] = useState<Mode>(() => {
-    const saved = loadDictationProgress(searchParams.get('type') || 'spelling');
-    return (saved?.mode as Mode) || 'today';
-  });
-  const [currentIdx, setCurrentIdx] = useState(() => {
-    const saved = loadDictationProgress(searchParams.get('type') || 'spelling');
-    return saved?.currentIdx ?? 0;
-  });
+  // 初始化时一次性加载持久化进度，避免多次读 localStorage
+  const savedRef = useRef(loadDictationProgress(searchParams.get('type') || 'spelling'));
+  const saved = savedRef.current;
+
+  const [mode, setMode] = useState<Mode>(() => (saved?.mode as Mode) || 'today');
+  const [currentIdx, setCurrentIdx] = useState(() => saved?.currentIdx ?? 0);
   const [input, setInput] = useState('');
-  const [results, setResults] = useState<{ word: string; correct: boolean }[]>(() => {
-    const saved = loadDictationProgress(searchParams.get('type') || 'spelling');
-    return saved?.results ?? [];
-  });
-  const [started, setStarted] = useState(() => hasSavedProgress(searchParams.get('type') || 'spelling'));
+  const [results, setResults] = useState<{ word: string; correct: boolean }[]>(() => saved?.results ?? []);
+  const [started, setStarted] = useState(() => !!(saved?.results?.length));
   const [finished, setFinished] = useState(false);
   const [autoPlayed, setAutoPlayed] = useState(false);
   const [feedback, setFeedback] = useState<{ fuzzyWords: number; masteredWords: number } | null>(null);
-  // 是否刚恢复进度，首次渲染时跳过自动播放
-  const [resumed, setResumed] = useState(() => hasSavedProgress(searchParams.get('type') || 'spelling'));
+  // 是否刚恢复进度，用 ref 确保首个词不自动播放语音
+  const resumedRef = useRef(!!(saved?.results?.length));
 
   const saveDictationProgress = (idx: number, res: { word: string; correct: boolean }[]) => {
     try {
@@ -114,8 +104,8 @@ export function Dictation() {
 
   // Auto-play audio when entering a new word (audio mode), skip if just resumed
   useEffect(() => {
-    if (resumed) {
-      setResumed(false);
+    if (resumedRef.current) {
+      resumedRef.current = false;
       return;
     }
     if (started && !finished && dictType === 'audio' && current) {
@@ -126,7 +116,7 @@ export function Dictation() {
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [currentIdx, started, finished, dictType, current, resumed]);
+  }, [currentIdx, started, finished, dictType, current]);
 
   // 听写完成后，将错误单词自动标为 fuzzy，正确单词标为 mastered，并记录成绩
   useEffect(() => {
@@ -167,7 +157,7 @@ export function Dictation() {
       details: `${correct}/${results.length} 正确，错误：${wrongList.join('、')}`,
       date: today,
     }).catch(() => {});
-  }, [finished, results, state, updateUserState, feedback, dictType]);
+  }, [finished, results, state, feedback, dictType]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

@@ -180,11 +180,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const refreshCheckIns = useCallback(async () => {
     if (!userRef.current) return;
     try {
-      const monthStr = `${getCurrentYear()}-${String(getCurrentMonth()).padStart(2, '0')}`;
-      const resp = await getCheckIns(monthStr);
+      const thisMonth = `${getCurrentYear()}-${String(getCurrentMonth()).padStart(2, '0')}`;
+      const prevDate = new Date();
+      prevDate.setDate(1);
+      prevDate.setMonth(prevDate.getMonth() - 1);
+      const prevMonth = `${prevDate.getFullYear()}-${String(prevDate.getMonth() + 1).padStart(2, '0')}`;
+
+      const [resp, prevResp] = await Promise.all([
+        getCheckIns(thisMonth),
+        getCheckIns(prevMonth),
+      ]);
       if (!mountedRef.current) return;
-      setCheckIns(resp.records);
-      setStreak(calculateStreak(Object.values(resp.records)));
+      const allRecords = { ...resp.records, ...prevResp.records };
+      setCheckIns(allRecords);
+      setStreak(calculateStreak(Object.values(resp.records), Object.values(prevResp.records)));
     } catch (e) {
       console.error('Failed to load checkins:', e);
     }

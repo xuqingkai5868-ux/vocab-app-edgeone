@@ -135,11 +135,19 @@ export function Home() {
     return { masteredToday, fuzzyToday, studiedToday, fuzzyCount };
   }, [todayNewWords, state.states]);
 
+  const reviewWordsCompleted = useMemo(() => {
+    const todayWordSet = new Set(todayNewWords.map(w => w.word));
+    return Object.entries(state.states).filter(
+      ([word, level]) => !todayWordSet.has(word) && (level as number) > 0
+    ).length;
+  }, [todayNewWords, state.states]);
+
   const handleCheckIn = async () => {
+    // 使用服务端累计时长 + 当前活跃会话时长，与首页展示的学习时长保持一致
     const active = getActiveTracking();
-    const sessionSec = active ? Math.round(active.elapsed / 1000) : studiedToday * 10;
-    const min = Math.max(1, Math.round(sessionSec / 60));
-    const ok = await doCheckIn({ newWordsCompleted: studiedToday, reviewWordsCompleted: 0, studyDurationMinutes: min });
+    const totalMs = todayDuration + (active ? active.elapsed : 0);
+    const min = Math.max(1, Math.round(totalMs / 60000));
+    const ok = await doCheckIn({ newWordsCompleted: studiedToday, reviewWordsCompleted, studyDurationMinutes: min });
     if (!ok) alert('任务未完成，还不能打卡');
   };
 

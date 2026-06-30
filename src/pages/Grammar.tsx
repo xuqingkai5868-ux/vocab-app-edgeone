@@ -14,6 +14,9 @@ export function Grammar() {
   const [fetchError, setFetchError] = useState(false);
 
   useEffect(() => {
+    setFetchError(false);
+    setCardIdx(0);
+    setShowAnswer(false);
     fetch('/grammar_cards.json')
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
@@ -30,17 +33,18 @@ export function Grammar() {
       });
   }, [stageId]);
 
+  // cardIdx 变化时同步 current
+  useEffect(() => {
+    const stage = stages.find(s => s.stage === Number(stageId));
+    if (stage && stage.cards[cardIdx]) {
+      setCurrent(stage.cards[cardIdx]);
+    }
+  }, [cardIdx, stages, stageId]);
+
   const handleNext = useCallback(() => {
     setShowAnswer(false);
-    setCardIdx(prevIdx => {
-      const nextIdx = prevIdx + 1;
-      const stage = stages.find(s => s.stage === Number(stageId));
-      if (stage && stage.cards[nextIdx]) {
-        setCurrent(stage.cards[nextIdx]);
-      }
-      return nextIdx;
-    });
-  }, [stages, stageId]);
+    setCardIdx(prevIdx => prevIdx + 1);
+  }, []);
 
   if (fetchError) {
     return (

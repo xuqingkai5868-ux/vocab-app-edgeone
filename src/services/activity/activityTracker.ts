@@ -47,11 +47,12 @@ export async function stopTracking(key = 'default', details = ''): Promise<void>
 }
 
 /**
- * 获取当前的追踪 session（用于判断是否正在某个活动中）
+ * 获取当前所有追踪 session 的总耗时（用于打卡等外部统计）
  */
 export function getActiveTracking(): { type: ActivityType; elapsed: number } | null {
   const keys = Object.keys(trackers);
   if (keys.length === 0) return null;
-  const t = trackers[keys[0]];
-  return { type: t.type, elapsed: Date.now() - t.startTime };
+  // 汇总所有活跃追踪器的耗时
+  const totalElapsed = keys.reduce((sum, k) => sum + (Date.now() - trackers[k].startTime), 0);
+  return { type: trackers[keys[0]].type, elapsed: totalElapsed };
 }

@@ -16,7 +16,7 @@ function activityKey(userId, date) {
 /**
  * ActivityEvent 结构
  * {
- *   type: 'study' | 'review_definition' | 'review_spelling' | 'review_audio' | 'vocabulary' | 'checkin',
+ *   type: 'study' | 'review_definition' | 'review_spelling' | 'review_audio' | 'vocabulary' | 'checkin' | 'review_spelling_result' | 'review_audio_result',
  *   startTime: number,    // 进入页面的时间戳 (ms)
  *   endTime: number,      // 离开页面的时间戳 (ms)
  *   duration: number,     // 持续时长 (ms)

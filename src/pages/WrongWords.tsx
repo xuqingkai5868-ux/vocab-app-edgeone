@@ -1,13 +1,15 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card } from '../components/Card';
 import { useApp } from '../contexts/AppContext';
 import { MASTER_WORDS } from '../services/utils/petVocabLoader';
 import { speakWord } from '../services/utils/speak';
+import { startTracking, stopTracking } from '../services/activity/activityTracker';
+import { logActivity } from '../api/activity';
 
 export function WrongWords() {
   const navigate = useNavigate();
-  const { state, updateUserState } = useApp();
+  const { state, updateWordStates } = useApp();
 
   // 收集所有 △ 模糊的词
   const wrongWords = useMemo(() => {
@@ -25,6 +27,53 @@ export function WrongWords() {
   const [currentIdx, setCurrentIdx] = useState(0);
   const [input, setInput] = useState('');
   const [results, setResults] = useState<{ word: string; correct: boolean }[]>([]);
+  const [feedback, setFeedback] = useState<{ fuzzyWords: number; masteredWords: number } | null>(null);
+  const feedbackRef = useRef(false); // 防止重复保存
+
+  // 追踪学习时长（只在听写过程中追踪）
+  useEffect(() => {
+    if (selectedTab !== 'dictation') return;
+    startTracking('review_spelling', 'wrongwords_dictation');
+    return () => { stopTracking('wrongwords_dictation', 'wrongwords_dictation'); };
+  }, [selectedTab]);
+
+  // 听写完成后保存等级变更并上报日志
+  useEffect(() => {
+    if (selectedTab !== 'finish' || results.length === 0 || feedbackRef.current) return;
+
+    const partialUpdates: Record<string, number> = {};
+    let fuzzyCount = 0;
+    let masteredCount = 0;
+    const wrongList: string[] = [];
+
+    for (const r of results) {
+      if (r.correct) {
+        const currentLevel = state.states[r.word] || 0;
+        partialUpdates[r.word] = Math.min(currentLevel + 1, 4);
+        masteredCount++;
+      } else {
+        wrongList.push(r.word);
+        partialUpdates[r.word] = 2;
+        fuzzyCount++;
+      }
+    }
+
+    feedbackRef.current = true;
+    updateWordStates(partialUpdates);
+    setFeedback({ fuzzyWords: fuzzyCount, masteredWords: masteredCount });
+
+    // 上报活动日志
+    const d = new Date();
+    const today = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    const correct = results.filter(r => r.correct).length;
+    logActivity({
+      type: 'review_spelling_result',
+      startTime: Date.now(),
+      duration: 0,
+      details: `${correct}/${results.length} 正确，错误：${wrongList.join('、')}`,
+      date: today,
+    }).catch(() => {});
+  }, [selectedTab, results, state.states, updateWordStates]);
 
   const total = wrongWords.length;
 
@@ -37,6 +86,14 @@ export function WrongWords() {
         <div className="text-5xl mb-4">📕</div>
         <h1 className="text-2xl font-bold text-gray-800">错词本听写完成！</h1>
         <p className="text-gray-500">{correct}/{results.length} 正确</p>
+
+        {feedback && (
+          <div className="bg-blue-50 rounded-xl px-4 py-3 text-sm text-blue-700 mx-4">
+            {feedback.fuzzyWords > 0 && <p>✏️ {feedback.fuzzyWords} 个错误词已加入复习列表</p>}
+            {feedback.masteredWords > 0 && <p>✅ {feedback.masteredWords} 个正确词已升级</p>}
+          </div>
+        )}
+
         {wrongList.length > 0 && (
           <Card className="!p-3 text-left">
             <p className="text-xs text-gray-400 mb-2 text-center">仍需复习：</p>
@@ -52,7 +109,7 @@ export function WrongWords() {
           </Card>
         )}
         <div className="flex gap-3 justify-center">
-          <button onClick={() => { setSelectedTab('list'); setCurrentIdx(0); setResults([]); }} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg">返回错词本</button>
+          <button onClick={() => { setSelectedTab('list'); setCurrentIdx(0); setResults([]); setFeedback(null); feedbackRef.current = false; }} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg">返回错词本</button>
           <button onClick={() => navigate('/home')} className="px-6 py-2.5 bg-gray-100 text-gray-600 rounded-lg">返回首页</button>
         </div>
       </div>
@@ -87,7 +144,7 @@ export function WrongWords() {
 
     return (
       <div className="space-y-4">
-        <button onClick={() => { setSelectedTab('list'); setCurrentIdx(0); setResults([]); }} className="text-primary-500 text-sm">&larr; 返回错词本</button>
+        <button onClick={() => { setSelectedTab('list'); setCurrentIdx(0); setResults([]); setFeedback(null); feedbackRef.current = false; }} className="text-primary-500 text-sm">&larr; 返回错词本</button>
         <div className="text-center text-xs text-gray-400 mb-1">{currentIdx + 1} / {total}</div>
         <div className="w-full bg-gray-200 rounded-full h-1.5 mb-4">
           <div className="bg-amber-500 h-1.5 rounded-full transition-all" style={{ width: `${(currentIdx / total) * 100}%` }} />
@@ -131,7 +188,7 @@ export function WrongWords() {
           <Card className="!p-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">共 <strong className="text-amber-600">{total}</strong> 个词需要复习</span>
-              <button onClick={() => { setSelectedTab('dictation'); setCurrentIdx(0); setResults([]); }}
+              <button onClick={() => { setSelectedTab('dictation'); setCurrentIdx(0); setResults([]); feedbackRef.current = false; setFeedback(null); }}
                 className="px-4 py-2 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-xl text-sm font-medium hover:bg-indigo-100 active:scale-[0.98] transition-all">
                 错词本听写 ✍️
               </button>

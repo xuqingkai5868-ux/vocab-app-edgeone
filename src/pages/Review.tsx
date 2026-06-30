@@ -27,8 +27,10 @@ export function Review() {
   const [mode, setMode] = useState<Mode>('select');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [showMeaning, setShowMeaning] = useState(false);
+  // 递增计数器，每次返回选择页面时更新，使词表重新洗牌
+  const [reviewGen, setReviewGen] = useState(0);
 
-  // All words the user has interacted with, only shuffle once on mount
+  // All words the user has interacted with, only shuffle once per review session
   // 使用 ref 防止每次 state.states 变化时重新洗牌打断复习流程
   const reviewWordsRef = useRef<{ word: string }[] | null>(null);
   const reviewWords = useMemo(() => {
@@ -43,12 +45,19 @@ export function Review() {
     }
     reviewWordsRef.current = all;
     return all;
-  }, []); // 空依赖：只跑一次，挂载时洗牌
+  }, [reviewGen]); // reviewGen 变化时重新洗牌
+
+  const goBackToSelect = () => {
+    setMode('select');
+    setCurrentIndex(0);
+    setShowMeaning(false);
+    reviewWordsRef.current = null; // 下次进入定义模式时重新洗牌
+    setReviewGen(v => v + 1);
+  };
 
   const currentWord = reviewWords[currentIndex];
   const total = reviewWords.length;
   const meaning = currentWord ? getWordMeaning(currentWord.word) : '';
-  const currentStatus = currentWord ? (state.states[currentWord.word] || '') : '';
 
   // 追踪释义复习时长
   useEffect(() => {
@@ -151,7 +160,7 @@ export function Review() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <button onClick={() => setMode('select')} className="text-primary-500 text-sm">&larr; 返回选择</button>
+        <button onClick={goBackToSelect} className="text-primary-500 text-sm">&larr; 返回选择</button>
         <h1 className="text-lg font-bold text-gray-800">
           释义复习
           <span className="text-sm font-normal text-gray-400 ml-2">({total} 个)</span>
