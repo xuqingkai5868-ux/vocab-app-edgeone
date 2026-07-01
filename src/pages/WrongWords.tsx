@@ -11,11 +11,11 @@ export function WrongWords() {
   const navigate = useNavigate();
   const { state, updateWordStates } = useApp();
 
-  // 收集所有 △ 模糊的词
+  // 只收集 △ 模糊的词（等级 2），即听写/复习中答错或标记为模糊的词
   const wrongWords = useMemo(() => {
     const result: { word: string; meaning: string; pos: string }[] = [];
     for (const [word, level] of Object.entries(state.states)) {
-      if (level >= 1 && level <= 3) {
+      if (level === 2) {
         const w = MASTER_WORDS.find(mw => mw.word.toLowerCase() === word.toLowerCase());
         result.push({ word, meaning: w?.meaning || '', pos: w?.pos || '' });
       }
@@ -179,7 +179,7 @@ export function WrongWords() {
 
       {total === 0 ? (
         <Card>
-          <p className="text-gray-500 text-center py-8">没有错误单词，继续保持！🎉</p>
+          <p className="text-gray-500 text-center py-8">错词本空空如也，继续保持！🎉</p>
           <button onClick={() => navigate('/study')} className="w-full py-2.5 bg-primary-500 text-white rounded-lg">去学习新词</button>
         </Card>
       ) : (

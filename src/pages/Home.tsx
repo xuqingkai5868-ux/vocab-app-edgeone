@@ -117,29 +117,38 @@ export function Home() {
     }).catch(() => {});
   }, []);
 
-  const mastered = useMemo(() =>
-    Object.values(state.states).filter(v => v >= 4).length,
-  [state.states]);
+  const levelStats = useMemo(() => {
+    const counts = [0, 0, 0, 0, 0];
+    for (const w of MASTER_WORDS) {
+      const lvl = state.states[w.word] || 0;
+      counts[Math.min(lvl, 4)]++;
+    }
+    return counts; // [未学, 刚学, 模糊, 已知, 掌握]
+  }, [state.states]);
+
+  const mastered = useMemo(() => levelStats[4], [levelStats]);
+  const fuzzyCount = useMemo(() => levelStats[1] + levelStats[2] + levelStats[3], [levelStats]);
 
   const level = useMemo(() => getLevel(mastered), [mastered]);
   const pct = Math.min(100, Math.round((mastered / MASTER_WORDS.length) * 100));
 
-  const { masteredToday, fuzzyToday, studiedToday, fuzzyCount } = useMemo(() => {
+  const { masteredToday, fuzzyToday, studiedToday } = useMemo(() => {
     const masteredToday = todayNewWords.filter(w => (state.states[w.word] || 0) >= 4).length;
     const fuzzyToday = todayNewWords.filter(w => {
       const lvl = state.states[w.word] || 0;
       return lvl >= 1 && lvl <= 3;
     }).length;
     const studiedToday = masteredToday + fuzzyToday;
-    const fuzzyCount = Object.values(state.states).filter(v => v >= 1 && v <= 3).length;
-    return { masteredToday, fuzzyToday, studiedToday, fuzzyCount };
+    return { masteredToday, fuzzyToday, studiedToday };
   }, [todayNewWords, state.states]);
 
   const reviewWordsCompleted = useMemo(() => {
     const todayWordSet = new Set(todayNewWords.map(w => w.word));
-    return Object.entries(state.states).filter(
-      ([word, level]) => !todayWordSet.has(word) && (level as number) > 0
-    ).length;
+    let count = 0;
+    for (const w of MASTER_WORDS) {
+      if (!todayWordSet.has(w.word) && (state.states[w.word] || 0) > 0) count++;
+    }
+    return count;
   }, [todayNewWords, state.states]);
 
   const handleCheckIn = async () => {
@@ -150,16 +159,6 @@ export function Home() {
     const ok = await doCheckIn({ newWordsCompleted: studiedToday, reviewWordsCompleted, studyDurationMinutes: min });
     if (!ok) alert('任务未完成，还不能打卡');
   };
-
-  // 5级掌握分布统计
-  const levelStats = useMemo(() => {
-    const counts = [0, 0, 0, 0, 0];
-    for (const w of MASTER_WORDS) {
-      const lvl = state.states[w.word] || 0;
-      counts[Math.min(lvl, 4)]++;
-    }
-    return counts; // [未学, 刚学, 模糊, 已知, 掌握]
-  }, [state.states]);
 
   if (!state) return <Loading text="加载中..." />;
 
