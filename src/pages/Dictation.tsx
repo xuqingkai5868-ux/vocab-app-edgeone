@@ -8,8 +8,6 @@ import { logActivity } from '../api/activity';
 import { speakWord } from '../services/utils/speak';
 
 type Mode = 'today' | 'past';
-type DictType = 'spelling' | 'audio';
-
 interface DictationProgress {
   currentIdx: number;
   results: { word: string; correct: boolean }[];
@@ -34,7 +32,8 @@ function loadDictationProgress(dictType: string): DictationProgress | null {
 export function Dictation() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const dictType = (searchParams.get('type') || 'spelling') as DictType;
+  const rawType = searchParams.get('type');
+  const dictType: 'spelling' | 'audio' = rawType === 'audio' ? 'audio' : 'spelling';
   const { state, wordsPerDay, updateWordStates } = useApp();
 
   // 初始化时一次性加载持久化进度，避免多次读 localStorage

@@ -80,7 +80,7 @@ async function networkFirstWithFallback(request) {
     const response = await fetch(request);
     if (response && response.status === 200) {
       const clone = response.clone();
-      caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
+      caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone)).catch(() => {});
     }
     return response;
   } catch (e) {
@@ -103,7 +103,7 @@ async function cacheFirstWithUpdate(request) {
     const response = await fetch(request);
     if (response && response.status === 200 && response.type === 'basic') {
       const clone = response.clone();
-      caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone));
+      caches.open(STATIC_CACHE).then((cache) => cache.put(request, clone)).catch(() => {});
     }
     return response;
   } catch (e) {

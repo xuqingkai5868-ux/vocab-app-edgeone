@@ -37,7 +37,9 @@ export function Study() {
   const navigate = useNavigate();
   const { state, wordsPerDay, updateWordStates, advanceDay, isTodayComplete } = useApp();
   const day = state.currentDay;
+  const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
 
+  const [viewDay, setViewDay] = useState(day);
   const [tab, setTab] = useState<Tab>('list');
   const [filter, setFilter] = useState<FilterKey>('all');
   const [currentGroup, setCurrentGroup] = useState(0);
@@ -82,28 +84,38 @@ export function Study() {
       .catch(() => {});
   }, []);
 
-  const grammarStage = getGrammarStage(day, wordsPerDay);
+  // viewDay 变化时重置学习进度
+  useEffect(() => {
+    setCurrentGroup(0);
+    setCardIndex(0);
+    setCompleted(false);
+  }, [viewDay]);
+
+  const grammarStage = getGrammarStage(viewDay, wordsPerDay);
   const stageData = grammarStages.find(s => s.stage === grammarStage);
   const grammarCards = stageData?.cards || [];
   const currentGrammar = grammarCards[grammarCardIdx];
 
-  // 追踪学习时长
+  // 追踪学习时长（只在查看当天时追踪）
   useEffect(() => {
-    startTracking('study', 'study');
-    return () => { stopTracking('study', `Day${day}`); };
-  }, [day]);
+    if (viewDay === day) {
+      startTracking('study', 'study');
+      return () => { stopTracking('study', `Day${day}`); };
+    }
+  }, [day, viewDay]);
 
-  const words = getDayWords(day, wordsPerDay);
-  const phrases = getDayPhrases(day, wordsPerDay);
+  const words = getDayWords(viewDay, wordsPerDay);
+  const phrases = getDayPhrases(viewDay, wordsPerDay);
 
   // 过滤后的单词列表
   const filteredWords = useMemo(() => {
     if (filter === 'all') return words;
     // 从 FILTER_OPTIONS 中获取当前筛选对应的等级
-    const targetLevel = (FILTER_OPTIONS.find(o => o.key === filter) as { key: string; level: number } | undefined)?.level;
+    const opt = FILTER_OPTIONS.find(o => o.key === filter);
+    const targetLevel = opt && 'level' in opt ? opt.level : undefined;
     return words.filter(w => {
       const level = state.states[w.word] || 0;
-      return targetLevel ? level === targetLevel : true;
+      return targetLevel !== undefined ? level === targetLevel : true;
     });
   }, [words, state.states, filter]);
 
@@ -175,9 +187,6 @@ export function Study() {
     setAnimatingWord(word);
     animatingTimerRef.current = setTimeout(() => setAnimatingWord(null), 400);
   };
-
-const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
-
   if (!words.length) return <Loading />;
 
   // 学习完成界面
@@ -185,8 +194,10 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
     return (
       <div className="space-y-4 text-center py-6">
         <div className="text-6xl mb-2">🎉</div>
-        <h1 className="text-2xl font-bold text-gray-800">今日学习完成！</h1>
-        <p className="text-gray-500 text-sm">Day {day}/{totalDays}</p>
+        <h1 className="text-2xl font-bold text-gray-800">
+          {viewDay === day ? '今日学习完成！' : `Day ${viewDay} 回顾完成！`}
+        </h1>
+        <p className="text-gray-500 text-sm">Day {viewDay}/{totalDays}</p>
 
         {/* 进度摘要 */}
         <Card className="!p-3">
@@ -241,11 +252,15 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
             <button onClick={() => setGrammarCardIdx(i => i + 1)} className="px-6 py-2.5 bg-amber-500 text-white rounded-lg">
               下一个语法点 →
             </button>
-          ) : day < totalDays ? (
+          ) : viewDay === day && day < totalDays ? (
             <>
               {isTodayComplete && (
                 <button
-                  onClick={() => { advanceDay(); navigate('/study'); }}
+                  onClick={async () => {
+                    await advanceDay();
+                    setViewDay(v => Math.min(v + 1, totalDays));
+                    navigate('/study');
+                  }}
                   className="px-6 py-2.5 bg-amber-500 text-white rounded-lg animate-pulse"
                 >
                   进入 Day {day + 1} 🚀
@@ -255,6 +270,10 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
                 返回首页 🏠
               </button>
             </>
+          ) : viewDay !== day ? (
+            <button onClick={() => setViewDay(day)} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg">
+              回到今天 {day} 🏠
+            </button>
           ) : (
             <button onClick={() => navigate('/home')} className="px-6 py-2.5 bg-primary-500 text-white rounded-lg">
               返回首页 🏠
@@ -270,10 +289,31 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
 
   return (
     <div className="space-y-4">
-      {/* 头部 */}
+      {/* 头部：返回 + 日期导航 */}
       <div className="flex items-center justify-between">
         <button onClick={() => navigate('/home')} className="text-primary-500 text-sm">&larr; 返回</button>
-        <div className="text-sm text-gray-500">Day {day}</div>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setViewDay(v => Math.max(1, v - 1))}
+            disabled={viewDay <= 1}
+            className="text-sm text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            &lt;
+          </button>
+          <span className={`text-sm font-medium ${viewDay !== day ? 'text-blue-600' : 'text-gray-500'}`}>
+            Day {viewDay}
+          </span>
+          <button
+            onClick={() => setViewDay(v => Math.min(totalDays, v + 1))}
+            disabled={viewDay >= totalDays}
+            className="text-sm text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+          >
+            &gt;
+          </button>
+          {viewDay !== day && (
+            <button onClick={() => setViewDay(day)} className="text-xs text-primary-500 ml-1">回到今天</button>
+          )}
+        </div>
       </div>
 
       {/* Tab 切换 */}
@@ -402,7 +442,7 @@ const totalDays = Math.ceil(MASTER_WORDS.length / wordsPerDay);
       {/* ===== 学习视图（见词思义模式） ===== */}
       {tab === 'study' && (
         <>
-          <ProgressBar value={doneCards} max={totalCards} label="今日进度" />
+          <ProgressBar value={doneCards} max={totalCards} label={viewDay === day ? '今日进度' : `Day ${viewDay} 进度`} />
 
           {currentItem && (
             <>

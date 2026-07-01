@@ -95,14 +95,23 @@ export async function onRequestGet({ request }) {
     const results = {};
     const days = range === 'week' ? 7 : 30;
 
-    for (let i = 0; i < days; i++) {
+    // 并行读取，避免串行 await 导致 30 次 KV 往返延迟叠加
+    const dateStrs = Array.from({ length: days }, (_, i) => {
       const d = new Date(now);
       d.setDate(d.getDate() - i);
-      const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-      const events = (await kvGetJSON(activityKey(userId, dateStr))) || [];
-      if (events.length > 0) {
-        results[dateStr] = events;
-      }
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+    });
+
+    const entries = await Promise.all(
+      dateStrs.map(async dateStr => {
+        const events = (await kvGetJSON(activityKey(userId, dateStr))) || [];
+        return { dateStr, events };
+      })
+    );
+
+    const results = {};
+    for (const { dateStr, events } of entries) {
+      if (events.length > 0) results[dateStr] = events;
     }
 
     return json({ userId, range, results });

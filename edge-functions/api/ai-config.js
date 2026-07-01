@@ -28,11 +28,15 @@ export async function onRequestGet({ request }) {
   };
 
   const result = config || defaultConfig;
-  if (result.apiKey) {
-    result.apiKeyMasked = result.apiKey.slice(0, 8) + '...' + result.apiKey.slice(-4);
+
+  // P0: 绝不将完整 apiKey 返回给前端
+  const safeConfig = { ...result };
+  if (safeConfig.apiKey) {
+    safeConfig.apiKeyMasked = safeConfig.apiKey.slice(0, 8) + '...' + safeConfig.apiKey.slice(-4);
+    delete safeConfig.apiKey;
   }
 
-  return json({ userId, config: result });
+  return json({ userId, config: safeConfig });
 }
 
 export async function onRequestPut({ request }) {
@@ -64,11 +68,13 @@ export async function onRequestPut({ request }) {
 
   await kvSetJSON(configKey(userId), updated);
 
+  // P0: 绝不将完整 apiKey 返回给前端
   return json({
     ok: true,
     config: {
-      ...updated,
       apiKeyMasked: updated.apiKey.slice(0, 8) + '...' + updated.apiKey.slice(-4),
+      model: updated.model,
+      endpoint: updated.endpoint,
     },
   });
 }

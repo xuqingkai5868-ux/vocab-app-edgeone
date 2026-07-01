@@ -17,7 +17,8 @@ export function Grammar() {
     setFetchError(false);
     setCardIdx(0);
     setShowAnswer(false);
-    fetch('/grammar_cards.json')
+    const ac = new AbortController();
+    fetch('/grammar_cards.json', { signal: ac.signal })
       .then(r => {
         if (!r.ok) throw new Error(`HTTP ${r.status}`);
         return r.json();
@@ -28,9 +29,10 @@ export function Grammar() {
         if (s && s.cards.length > 0) setCurrent(s.cards[0]);
       })
       .catch(e => {
-        console.error('Failed to load grammar cards:', e);
+        if (e.name === 'AbortError') return;
         setFetchError(true);
       });
+    return () => ac.abort();
   }, [stageId]);
 
   // cardIdx 变化时同步 current

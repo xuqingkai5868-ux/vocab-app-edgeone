@@ -6,6 +6,18 @@
 import { K, kvGet, kvSetJSON } from './_lib/kv.js';
 import { json } from './_lib/respond.js';
 
+/**
+ * 恒定时间字符串比较，防止时序攻击
+ */
+function constantTimeCompare(a, b) {
+  if (a.length !== b.length) return false;
+  let result = 0;
+  for (let i = 0; i < a.length; i++) {
+    result |= a.charCodeAt(i) ^ b.charCodeAt(i);
+  }
+  return result === 0;
+}
+
 export async function onRequestPost({ request }) {
   let body;
   try {
@@ -33,7 +45,9 @@ export async function onRequestPost({ request }) {
     return json({ error: 'user_not_found', message: '用户不存在或未初始化' }, 404);
   }
 
-  if (String(pin) !== String(storedPin)) {
+  const pinStr = String(pin);
+  const storedPinStr = String(storedPin);
+  if (!constantTimeCompare(pinStr, storedPinStr)) {
     return json({ error: 'wrong_pin', message: 'PIN 错误' }, 401);
   }
 

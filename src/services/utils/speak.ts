@@ -143,6 +143,7 @@ function speakWithWebSpeech(word: string): Promise<void> {
       if (l && l.resolve === resolve) l.resolve();
     };
     utterance.onerror = (e) => {
+      console.warn('[speak] Web Speech error:', e);
       const l = lastUtterance;
       lastUtterance = null;
       if (l && l.reject === reject) l.reject(e);

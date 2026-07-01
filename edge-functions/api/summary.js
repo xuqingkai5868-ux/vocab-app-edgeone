@@ -34,8 +34,10 @@ export async function onRequestGet({ request }) {
     const u = typeof uRaw === 'string' ? JSON.parse(uRaw) : uRaw;
 
     const state = await kvGetJSON(K.state(id)) || { currentDay: 1, states: {} };
-    const mastered = Object.values(state.states || {}).filter(s => s === 'mastered').length;
-    const fuzzy = Object.values(state.states || {}).filter(s => s === 'fuzzy').length;
+    // 兼容数字格式（state.js 归一化为 0-4）和旧版字符串格式
+    const stateValues = Object.values(state.states || {});
+    const mastered = stateValues.filter(s => s === 4 || s === 'mastered').length;
+    const fuzzy = stateValues.filter(s => s === 2 || s === 'fuzzy').length;
 
     const isSelf = id === userId;
     const isAdmin = role === 'admin';

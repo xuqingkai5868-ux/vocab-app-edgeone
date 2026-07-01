@@ -38,46 +38,53 @@ let _initPromise: Promise<void> | null = null;
 export function ensureVocabLoaded(): Promise<void> {
   if (_initPromise) return _initPromise;
   _initPromise = (async () => {
-    const resp = await fetch('/pet_schedule_v2.json');
-    const data: any = await resp.json();
+    try {
+      const resp = await fetch('/pet_schedule_v2.json');
+      const data: any = await resp.json();
 
-    // 构建主词表（去重）
-    const seen = new Set<string>();
-    for (const d of data.schedule) {
-      for (const w of d.words) {
-        const key = w.word.toLowerCase();
-        if (!seen.has(key)) {
-          seen.add(key);
-          MASTER_WORDS.push({ word: w.word, pos: w.pos || '', meaning: w.meaning, example: w.example, translation: w.translation });
+      // 构建主词表（去重）
+      const seen = new Set<string>();
+      for (const d of data.schedule) {
+        for (const w of d.words) {
+          const key = w.word.toLowerCase();
+          if (!seen.has(key)) {
+            seen.add(key);
+            MASTER_WORDS.push({ word: w.word, pos: w.pos || '', meaning: w.meaning, example: w.example, translation: w.translation });
+          }
         }
       }
-    }
 
-    // 预缓存小写（P2-13 优化）
-    for (let i = 0; i < MASTER_WORDS.length; i++) {
-      _wordLower[i] = MASTER_WORDS[i].word.toLowerCase();
-      _meaningLower[i] = MASTER_WORDS[i].meaning.toLowerCase();
-    }
+      // 预缓存小写（P2-13 优化）
+      for (let i = 0; i < MASTER_WORDS.length; i++) {
+        _wordLower[i] = MASTER_WORDS[i].word.toLowerCase();
+        _meaningLower[i] = MASTER_WORDS[i].meaning.toLowerCase();
+      }
 
-    // 构建短语表（去重）
-    const seenPhrases = new Set<string>();
-    for (const d of data.schedule) {
-      for (const p of d.phrases) {
-        const key = p.phrase.toLowerCase().trim();
-        if (!seenPhrases.has(key)) {
-          seenPhrases.add(key);
-          MASTER_PHRASES.push({
-            phrase: p.phrase,
-            meaning: p.meaning || '',
-            source: p.source || 'book',
-            associated_word: p.associated_word || '',
-            day: d.day,
-          });
+      // 构建短语表（去重）
+      const seenPhrases = new Set<string>();
+      for (const d of data.schedule) {
+        for (const p of d.phrases) {
+          const key = p.phrase.toLowerCase().trim();
+          if (!seenPhrases.has(key)) {
+            seenPhrases.add(key);
+            MASTER_PHRASES.push({
+              phrase: p.phrase,
+              meaning: p.meaning || '',
+              source: p.source || 'book',
+              associated_word: p.associated_word || '',
+              day: d.day,
+            });
+          }
         }
       }
-    }
 
-    _loaded = true;
+      _loaded = true;
+    } catch (e) {
+      // 加载失败时重置 _initPromise，让后续调用可以重试
+      _initPromise = null;
+      console.error('[petVocabLoader] 词库加载失败，可重试:', e);
+      throw e;
+    }
   })();
   return _initPromise;
 }
@@ -117,7 +124,11 @@ export function getDayPhrases(day: number, wordsPerDay: number): PETPhrase[] {
   const wordSet = new Set(dayWords.map(w => w.word.toLowerCase()));
   return MASTER_PHRASES.filter(p => {
     const assoc = (p.associated_word || '').toLowerCase();
-    return assoc && wordSet.has(assoc);
+    // 有关联词的短语：按关联词匹配当天单词
+    if (assoc) return wordSet.has(assoc);
+    // 无关联词的短语：按 day 字段匹配
+    if (!assoc && p.day === day) return true;
+    return false;
   });
 }
 

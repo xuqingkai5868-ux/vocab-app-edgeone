@@ -65,6 +65,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   // P1-7: 用 ref 持有最新 loadAll，避免因 loadAll 引用变化导致 effect 频繁重建
   const loadAllRef = useRef<() => Promise<void>>(() => Promise.resolve());
+  // P1: loadAll 防重入锁
+  const loadingRef = useRef(false);
   // P1-5: advanceDay 防重入锁
   const advancingRef = useRef(false);
 
@@ -95,6 +97,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const loadAll = useCallback(async () => {
     if (!userRef.current) return;
+    // P1: 防重入锁，避免轮询 + visibilitychange 并发请求
+    if (loadingRef.current) return;
+    loadingRef.current = true;
     setIsSyncing(true);
     try {
       const thisMonth = `${getCurrentYear()}-${String(getCurrentMonth()).padStart(2, '0')}`;
@@ -141,8 +146,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
     } catch (e) {
       console.error('Failed to load data:', e);
     } finally {
-      if (!mountedRef.current) return;
-      setIsSyncing(false);
+      loadingRef.current = false;
+      if (mountedRef.current) setIsSyncing(false);
     }
   }, [wordsPerDay, loadDayData]); // P1-7: loadAll 不再依赖 user，避免级联重建
 

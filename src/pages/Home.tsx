@@ -4,9 +4,7 @@ import { useApp } from '../contexts/AppContext';
 import { useAuth } from '../contexts/AuthContext';
 import { Card } from '../components/Card';
 import { ProgressBar } from '../components/ProgressBar';
-import { Loading } from '../components/Loading';
-import { getTotalDays } from '../services/utils/petVocabLoader';
-import { MASTER_WORDS } from '../services/utils/petVocabLoader';
+import { getTotalDays, MASTER_WORDS } from '../services/utils/petVocabLoader';
 import { getActiveTracking } from '../services/activity/activityTracker';
 import { getActivity } from '../api/activity';
 
@@ -152,15 +150,20 @@ export function Home() {
   }, [todayNewWords, state.states]);
 
   const handleCheckIn = async () => {
-    // 使用服务端累计时长 + 当前活跃会话时长，与首页展示的学习时长保持一致
+    // 打卡前重新获取服务器端时长，与客户端实时记录合并
+    const now = new Date();
+    const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    let serverMs = todayDuration;
+    try {
+      const resp = await getActivity(todayStr);
+      serverMs = (resp.events || []).reduce((s, e) => s + e.duration, 0);
+    } catch { /* fallback to cached todayDuration */ }
     const active = getActiveTracking();
-    const totalMs = todayDuration + (active ? active.elapsed : 0);
+    const totalMs = serverMs + (active ? active.elapsed : 0);
     const min = Math.max(1, Math.round(totalMs / 60000));
     const ok = await doCheckIn({ newWordsCompleted: studiedToday, reviewWordsCompleted, studyDurationMinutes: min });
     if (!ok) alert('任务未完成，还不能打卡');
   };
-
-  if (!state) return <Loading text="加载中..." />;
 
   const LEVEL_COLORS = [
     { bg: 'bg-gray-200', text: 'text-gray-500' },
